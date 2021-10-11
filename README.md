@@ -1,5 +1,5 @@
 # wheelctrl_ros
-[![Build Status](https://travis-ci.com/KeioRoboticsAssociation/wheelctrl_ros.svg?branch=main)](https://travis-ci.com/KeioRoboticsAssociation/wheelctrl) [![ROS: Melodic](https://img.shields.io/badge/ROS-Melodic-deepgreen.svg)](http://wiki.ros.org/melodic)  [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
+[![Build Status](https://app.travis-ci.com/KeioRoboticsAssociation/wheelctrl_ros.svg?branch=main)](https://app.travis-ci.com/KeioRoboticsAssociation/wheelctrl_ros) [![ROS: Melodic](https://img.shields.io/badge/ROS-Melodic-deepgreen.svg)](http://wiki.ros.org/melodic)  [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 
 A ROS meta package for wheel control
 
