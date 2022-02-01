@@ -30,6 +30,7 @@ private:
     ros::Publisher pub_RB_angle;
     ros::Subscriber cmd_vel_sub_;
     ros::Subscriber init_angle_sub_;
+    ros::Subscriber emergency_stop_sub_;
 
     //Configurations
     int loop_rate_;

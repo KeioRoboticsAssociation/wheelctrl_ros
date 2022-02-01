@@ -48,7 +48,7 @@ VelConverter::VelConverter(ros::NodeHandle &nh, const double &body_width, const 
     init_angle_sub_ = nh_.subscribe("/init_angle_flag", 1,
                                  &VelConverter::InitAngleFlagCallback, this);
 
-    init_angle_sub_ = nh_.subscribe("/emergency_stop_flag", 1,
+    emergency_stop_sub_ = nh_.subscribe("/emergency_stop_flag", 1,
                                  &VelConverter::EmergencyStopFlagCallback, this);
 
     last_sub_vel_time_ = std::chrono::system_clock::now();
