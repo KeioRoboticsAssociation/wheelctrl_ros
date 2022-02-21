@@ -1,5 +1,5 @@
-#ifndef MECANUM_ODOM_PUBLISHER_H
-#define MECANUM_ODOM_PUBLISHER_H
+#ifndef Omni_ODOM_PUBLISHER_H
+#define Omni_ODOM_PUBLISHER_H
 
 #include <ros/ros.h>
 #include <std_msgs/Float32MultiArray.h>
@@ -9,11 +9,11 @@
 #include <cmath>
 #include <string>
 
-class Mecanum_Odom_Publisher
+class Omni_Odom_Publisher
 {
 public:
-    Mecanum_Odom_Publisher(ros::NodeHandle &nh, const int &loop_rate, const float &body_height, const float &body_width, const std::string &base_farme_id);
-    ~Mecanum_Odom_Publisher(){};
+    Omni_Odom_Publisher(ros::NodeHandle &nh, const int &loop_rate, const float &body_height, const float &body_width, const std::string &base_farme_id);
+    ~Omni_Odom_Publisher(){};
 
 private:
     //Handlers
