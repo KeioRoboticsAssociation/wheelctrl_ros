@@ -58,8 +58,8 @@ void VelConverter::cmdvel2omni(){
     float a = BODY_WIDTH / 2.0;
     float b = BODY_HEIGHT / 2.0;
     target_speed[0] = vx + vy + (a + b) * omega;
-    target_speed[1] = vx - vy - (a + b) * omega;
-    target_speed[2] = vx + vy - (a + b) * omega;
+    target_speed[1] = -vx + vy + (a + b) * omega;
+    target_speed[2] = -vx - vy + (a + b) * omega;
     target_speed[3] = vx - vy + (a + b) * omega;
 
     // target_speed[1] *= -1.0;
