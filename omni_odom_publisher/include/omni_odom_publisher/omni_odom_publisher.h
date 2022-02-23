@@ -1,5 +1,5 @@
-#ifndef Omni_ODOM_PUBLISHER_H
-#define Omni_ODOM_PUBLISHER_H
+#ifndef OMNI_ODOM_PUBLISHER_H
+#define OMNI_ODOM_PUBLISHER_H
 
 #include <ros/ros.h>
 #include <std_msgs/Float32MultiArray.h>
