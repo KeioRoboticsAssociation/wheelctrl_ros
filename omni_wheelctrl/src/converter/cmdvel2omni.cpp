@@ -118,7 +118,7 @@ void VelConverter::publishMsg()
 
         command.data = target_speed[3];
         pub_RB.publish(command);
-    }it
+    }
     else{
         std_msgs::Float32MultiArray floatarray;
         floatarray.data.resize(1);
