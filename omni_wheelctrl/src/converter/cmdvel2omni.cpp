@@ -57,11 +57,18 @@ void VelConverter::init_variables(){
 void VelConverter::cmdvel2omni(){
     float a = BODY_WIDTH / 2.0;
     float b = BODY_HEIGHT / 2.0;
-    target_speed[0] = vx + vy + (a + b) * omega;
-    target_speed[1] = -vx + vy + (a + b) * omega;
-    target_speed[2] = -vx - vy + (a + b) * omega;
-    target_speed[3] = vx - vy + (a + b) * omega;
-
+    float c = sqrt(pow(a,2)+pow(b,2));
+    const float n = 1/sqrt(2);
+    target_speed[0] = n*vx + n*vy + c * omega;
+    target_speed[1] = -1*n*vx + n*vy + c * omega;
+    target_speed[2] = -1*n*vx - n*vy + c * omega;
+    target_speed[3] = n*vx - n*vy + c * omega;
+    
+    // なぜかspeed > 0 で時計回りにロボが回るので、-1倍
+    for(int i = 0; i < 4; i++)
+    {
+        target_speed[i] *= -1;
+    }
     // target_speed[1] *= -1.0;
     // target_speed[2] *= -1.0;
 }
@@ -111,7 +118,7 @@ void VelConverter::publishMsg()
 
         command.data = target_speed[3];
         pub_RB.publish(command);
-    }
+    }it
     else{
         std_msgs::Float32MultiArray floatarray;
         floatarray.data.resize(1);
