@@ -23,18 +23,18 @@ VelConverter::VelConverter(ros::NodeHandle &nh, const float &body_height, const 
             "control_RB", 1);
     }
     else{
-        pub_RF = nh_.advertise<std_msgs::Float32MultiArray>(
-            "control_RF", 1);
-        pub_LF = nh_.advertise<std_msgs::Float32MultiArray>(
-            "control_LF", 1);
-        pub_LB = nh_.advertise<std_msgs::Float32MultiArray>(
-            "control_LB", 1);
-        pub_RB = nh_.advertise<std_msgs::Float32MultiArray>(
-            "control_RB", 1);
-        // pub_Right = nh_.advertise<std_msgs::Float32MultiArray>(
-        //     "control_Right", 1);
-        // pub_Left = nh_.advertise<std_msgs::Float32MultiArray>(
-        //     "control_Left", 1);
+        // pub_RF = nh_.advertise<std_msgs::Float32MultiArray>(
+        //     "control_RF", 1);
+        // pub_LF = nh_.advertise<std_msgs::Float32MultiArray>(
+        //     "control_LF", 1);
+        // pub_LB = nh_.advertise<std_msgs::Float32MultiArray>(
+        //     "control_LB", 1);
+        // pub_RB = nh_.advertise<std_msgs::Float32MultiArray>(
+        //     "control_RB", 1);
+        pub_Right = nh_.advertise<std_msgs::Float32MultiArray>(
+            "control_Right", 1);
+        pub_Left = nh_.advertise<std_msgs::Float32MultiArray>(
+            "control_Left", 1);
     }
     cmd_vel_sub_ = nh_.subscribe("/cmd_vel", 1,
                                  &VelConverter::cmdvelCallback, this);
@@ -121,27 +121,27 @@ void VelConverter::publishMsg()
     }
     else{
         std_msgs::Float32MultiArray floatarray;
-        floatarray.data.resize(1);
-        floatarray.data[0] = target_speed[0];
-        pub_RF.publish(floatarray);
-
-        floatarray.data[0] = target_speed[1];
-        pub_LF.publish(floatarray);
-
-        floatarray.data[0] = target_speed[2];
-        pub_LB.publish(floatarray);
-
-        floatarray.data[0] = target_speed[3];
-        pub_RB.publish(floatarray);
-
-        // floatarray.data.resize(2);
+        // floatarray.data.resize(1);
         // floatarray.data[0] = target_speed[0];
-        // floatarray.data[1] = target_speed[3];
-        // pub_Right.publish(floatarray);
+        // pub_RF.publish(floatarray);
 
         // floatarray.data[0] = target_speed[1];
-        // floatarray.data[1] = target_speed[2];
-        // pub_Left.publish(floatarray);
+        // pub_LF.publish(floatarray);
+
+        // floatarray.data[0] = target_speed[2];
+        // pub_LB.publish(floatarray);
+
+        // floatarray.data[0] = target_speed[3];
+        // pub_RB.publish(floatarray);
+
+        floatarray.data.resize(2);
+        floatarray.data[0] = target_speed[0];
+        floatarray.data[1] = target_speed[3];
+        pub_Right.publish(floatarray);
+
+        floatarray.data[0] = target_speed[1];
+        floatarray.data[1] = target_speed[2];
+        pub_Left.publish(floatarray);
     }
 }
 

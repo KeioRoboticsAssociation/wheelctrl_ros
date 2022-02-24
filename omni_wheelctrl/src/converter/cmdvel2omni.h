@@ -23,8 +23,8 @@ private:
     ros::Publisher pub_LF;
     ros::Publisher pub_LB;
     ros::Publisher pub_RB;
-    // ros::Publisher pub_Right;
-    // ros::Publisher pub_Left;
+    ros::Publisher pub_Right;
+    ros::Publisher pub_Left;
     ros::Subscriber cmd_vel_sub_;
 
     //Configurations
