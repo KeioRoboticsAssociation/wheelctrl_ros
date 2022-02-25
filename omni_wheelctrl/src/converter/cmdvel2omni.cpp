@@ -65,7 +65,7 @@ void VelConverter::cmdvel2omni(){
     target_speed[3] = n*vx - n*vy + c * omega;
     
     // なぜかspeed > 0 で時計回りにロボが回るので、-1倍
-    for(int i = 1; i < 4; i++)
+    for(int i = 0; i < 4; i++)
     {
         target_speed[i] *= -1;
     }
