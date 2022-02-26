@@ -30,5 +30,5 @@ include_directories(
 add_subdirectory(src/converter)
 
 add_executable(omni_wheelctrl src/main.cpp)
-target_link_libraries(omni_wheelctrl ${catkin_LIBRARIES} converter_mecanum)
+target_link_libraries(omni_wheelctrl ${catkin_LIBRARIES} converter_omni)
 add_dependencies(omni_wheelctrl ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})

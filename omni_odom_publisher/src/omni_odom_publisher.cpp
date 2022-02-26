@@ -1,23 +1,23 @@
-#include "mecanum_odom_publisher/mecanum_odom_publisher.h"
+#include "omni_odom_publisher/omni_odom_publisher.h"
 
-std::string node_name = "mecanum_odom_publisher";
+std::string node_name = "Omni_odom_publisher";
 
-Mecanum_Odom_Publisher::Mecanum_Odom_Publisher(ros::NodeHandle &nh, const int &loop_rate, const float &body_height, const float &body_width, const std::string &base_frame_id)
+Omni_Odom_Publisher::Omni_Odom_Publisher(ros::NodeHandle &nh, const int &loop_rate, const float &body_height, const float &body_width, const std::string &base_frame_id)
     : nh_(nh), loop_rate_(loop_rate), BODY_HEIGHT(body_height), BODY_WIDTH(body_width), base_frame_id_(base_frame_id)
 { //constructer, define pubsub
-    ROS_INFO("Creating mecanum_odom_publisher");
+    ROS_INFO("Creating Omni_odom_publisher");
     ROS_INFO_STREAM("loop_rate [Hz]: " << loop_rate_);
     ROS_INFO_STREAM("body_height [m]: " << BODY_HEIGHT);
     ROS_INFO_STREAM("body_width [m]: " << BODY_WIDTH);
     ROS_INFO_STREAM("base_frame_id: " << base_frame_id_);
 
     odom_pub = nh_.advertise<nav_msgs::Odometry>("odom", 1);
-    sub_RF = nh_.subscribe("data_RF", 1, &Mecanum_Odom_Publisher::RF_Callback, this);
-    sub_LF = nh_.subscribe("data_LF", 1, &Mecanum_Odom_Publisher::LF_Callback, this);
-    sub_LB = nh_.subscribe("data_LB", 1, &Mecanum_Odom_Publisher::LB_Callback, this);
-    sub_RB = nh_.subscribe("data_RB", 1, &Mecanum_Odom_Publisher::RB_Callback, this);
-    // sub_Right = nh_.subscribe("data_Right", 1, &Mecanum_Odom_Publisher::Right_Callback, this);
-    // sub_Left = nh_.subscribe("data_Left", 1, &Mecanum_Odom_Publisher::Left_Callback, this);
+    sub_RF = nh_.subscribe("data_RF", 1, &Omni_Odom_Publisher::RF_Callback, this);
+    sub_LF = nh_.subscribe("data_LF", 1, &Omni_Odom_Publisher::LF_Callback, this);
+    sub_LB = nh_.subscribe("data_LB", 1, &Omni_Odom_Publisher::LB_Callback, this);
+    sub_RB = nh_.subscribe("data_RB", 1, &Omni_Odom_Publisher::RB_Callback, this);
+    // sub_Right = nh_.subscribe("data_Right", 1, &Omni_Odom_Publisher::Right_Callback, this);
+    // sub_Left = nh_.subscribe("data_Left", 1, &Omni_Odom_Publisher::Left_Callback, this);
     // Float32MultiArray data[1]; data[0]=v
 
     init_variables();
@@ -25,7 +25,7 @@ Mecanum_Odom_Publisher::Mecanum_Odom_Publisher(ros::NodeHandle &nh, const int &l
     update();
 }
 
-void Mecanum_Odom_Publisher::init_variables()
+void Omni_Odom_Publisher::init_variables()
 {
     vx = 0;
     vy = 0;
@@ -42,39 +42,39 @@ void Mecanum_Odom_Publisher::init_variables()
     }
 }
 
-void Mecanum_Odom_Publisher::RF_Callback(const std_msgs::Float32MultiArray::ConstPtr &msg)
+void Omni_Odom_Publisher::RF_Callback(const std_msgs::Float32MultiArray::ConstPtr &msg)
 {
     wheel_speed[0] = msg->data[0];
 }
 
-void Mecanum_Odom_Publisher::LF_Callback(const std_msgs::Float32MultiArray::ConstPtr &msg)
+void Omni_Odom_Publisher::LF_Callback(const std_msgs::Float32MultiArray::ConstPtr &msg)
 {
     wheel_speed[1] = msg->data[0];
 }
 
-void Mecanum_Odom_Publisher::LB_Callback(const std_msgs::Float32MultiArray::ConstPtr &msg)
+void Omni_Odom_Publisher::LB_Callback(const std_msgs::Float32MultiArray::ConstPtr &msg)
 {
     wheel_speed[2] = msg->data[0];
 }
 
-void Mecanum_Odom_Publisher::RB_Callback(const std_msgs::Float32MultiArray::ConstPtr &msg)
+void Omni_Odom_Publisher::RB_Callback(const std_msgs::Float32MultiArray::ConstPtr &msg)
 {
     wheel_speed[3] = msg->data[0];
 }
 
-// void Mecanum_Odom_Publisher::Right_Callback(const std_msgs::Float32MultiArray::ConstPtr &msg)
+// void Omni_Odom_Publisher::Right_Callback(const std_msgs::Float32MultiArray::ConstPtr &msg)
 // {
 //     wheel_speed[0] = msg->data[0];
 //     wheel_speed[3] = msg->data[1];
 // }
 
-// void Mecanum_Odom_Publisher::Left_Callback(const std_msgs::Float32MultiArray::ConstPtr &msg)
+// void Omni_Odom_Publisher::Left_Callback(const std_msgs::Float32MultiArray::ConstPtr &msg)
 // {
 //     wheel_speed[1] = msg->data[0];
 //     wheel_speed[2] = msg->data[1];
 // }
 
-void Mecanum_Odom_Publisher::update()
+void Omni_Odom_Publisher::update()
 {
     ros::Rate r(loop_rate_);
 
@@ -154,6 +154,6 @@ int main(int argc, char **argv)
     arg_n.getParam("body_height", body_height);
     arg_n.getParam("base_frame_id", base_frame_id);
 
-    Mecanum_Odom_Publisher publisher(nh, looprate, body_height, body_width, base_frame_id);
+    Omni_Odom_Publisher publisher(nh, looprate, body_height, body_width, base_frame_id);
     return 0;
 }
