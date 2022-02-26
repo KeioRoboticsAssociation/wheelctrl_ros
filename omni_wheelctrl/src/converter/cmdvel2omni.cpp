@@ -84,7 +84,7 @@ void VelConverter::cmdvel2omni(){
 }
 
 void VelConverter::reset(){
-    ROS_ERROR("omni_wheelctrl: unable to subscribe topics. Reset velocity...");
+    ROS_ERROR_ONCE("omni_wheelctrl: unable to subscribe topics. Reset velocity...");
     for (int i = 0; i < 4; i++) {
         target_speed[i] = 0;
         // reset velovity, sustain theta
@@ -93,12 +93,12 @@ void VelConverter::reset(){
 
 void VelConverter::cmdvelCallback(const geometry_msgs::Twist::ConstPtr &cmd_vel)
 {
-    ROS_DEBUG("Received cmd_vel");
-    vx = cmd_vel->linear.x;
-    vy = cmd_vel->linear.y;
-    omega = cmd_vel->angular.z;
+        ROS_DEBUG("Received cmd_vel");
+        vx = cmd_vel->linear.x;
+        vy = cmd_vel->linear.y;
+        omega = cmd_vel->angular.z;
 
-    last_sub_vel_time_ = std::chrono::system_clock::now();
+        last_sub_vel_time_ = std::chrono::system_clock::now();
 }
 
 bool VelConverter::isSubscribed() {
@@ -161,14 +161,18 @@ void VelConverter::update()
 
     while (ros::ok())
     {
-        if(isSubscribed()){
-            cmdvel2omni();
+        if(!emergency_stop_flag){
+            if(isSubscribed()){
+                cmdvel2omni();
+            }   
+            else{
+                reset();
+            }
+            publishMsg();
+            ros::spinOnce();
+            r.sleep();
         }
-        else{
-            reset();
-        }
-        publishMsg();
-        ros::spinOnce();
-        r.sleep();
+
+        else ROS_ERROR_ONCE("omni_wheelctrl: emergency stopping...");
     }
 }
