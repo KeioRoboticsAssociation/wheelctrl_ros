@@ -38,6 +38,8 @@ VelConverter::VelConverter(ros::NodeHandle &nh, const float &body_height, const 
     }
     cmd_vel_sub_ = nh_.subscribe("/cmd_vel", 1,
                                  &VelConverter::cmdvelCallback, this);
+    emergency_stop_sub_ = nh_.subscribe("/emergency_stop_flag", 1,
+                                 &VelConverter::EmergencyStopFlagCallback, this);
 
     last_sub_vel_time_ = std::chrono::system_clock::now();
 
@@ -52,6 +54,14 @@ void VelConverter::init_variables(){
     {
         target_speed[i] = 0;
     }
+}
+
+void VelConverter::EmergencyStopFlagCallback(const std_msgs::Empty::ConstPtr &msg){
+    for (int i = 0; i < 4; i++)
+    {
+        target_speed[i] = 0;
+    }
+    emergency_stop_flag = true;  
 }
 
 void VelConverter::cmdvel2omni(){
