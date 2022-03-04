@@ -16,8 +16,8 @@ Measure_Wheel_Odom_Publisher::Measure_Wheel_Odom_Publisher(ros::NodeHandle &nh, 
     // sub_LF = nh_.subscribe("data_LF", 1, &Omni_Odom_Publisher::LF_Callback, this);
     // sub_LB = nh_.subscribe("data_LB", 1, &Omni_Odom_Publisher::LB_Callback, this);
     // sub_RB = nh_.subscribe("data_RB", 1, &Omni_Odom_Publisher::RB_Callback, this);
-    sub_X_axis = nh_.subscribe("data_Right", 1, &Measure_Wheel_Odom_Publisher::X_Axis_Callback, this);
-    sub_Y_axis = nh_.subscribe("data_Left", 1, &Measure_Wheel_Odom_Publisher::Y_Axis_Callback, this);
+    sub_X_axis = nh_.subscribe("data_X_axis", 1, &Measure_Wheel_Odom_Publisher::X_Axis_Callback, this);
+    sub_Y_axis = nh_.subscribe("data_Y_axis", 1, &Measure_Wheel_Odom_Publisher::Y_Axis_Callback, this);
     // Float32MultiArray data[1]; data[0]=v
 
     init_variables();
