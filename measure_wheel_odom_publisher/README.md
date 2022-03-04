@@ -21,8 +21,8 @@
 
 ## Subscribed Topics
 
-- **/data_X** (type : `std_msgs::Float32MultiArray`)
-- **/data_Y** (type : `std_msgs::Float32MultiArray`)
+- **/data_X_axis** (type : `std_msgs::Float32MultiArray`)
+- **/data_Y_axis** (type : `std_msgs::Float32MultiArray`)
 
 <img src="https://i.imgur.com/3giWneE.png" style="zoom:50%;" />
 
