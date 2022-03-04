@@ -1,11 +1,11 @@
-#include "omni_odom_publisher/omni_odom_publisher.h"
+#include "measure_wheel_odom_publisher/measure_wheel_odom_publisher.h"
 
-std::string node_name = "Omni_odom_publisher";
+std::string node_name = "Measure_Wheel_Odom_Publisher";
 
-Omni_Odom_Publisher::Omni_Odom_Publisher(ros::NodeHandle &nh, const int &loop_rate, const float &body_height, const float &body_width, const std::string &base_frame_id)
+Measure_Wheel_Odom_Publisher::Measure_Wheel_Odom_Publisher(ros::NodeHandle &nh, const int &loop_rate, const float &body_height, const float &body_width, const std::string &base_frame_id)
     : nh_(nh), loop_rate_(loop_rate), BODY_HEIGHT(body_height), BODY_WIDTH(body_width), base_frame_id_(base_frame_id)
 { //constructer, define pubsub
-    ROS_INFO("Creating Omni_odom_publisher");
+    ROS_INFO("Creating Measure_Wheel_Odom_Publisher");
     ROS_INFO_STREAM("loop_rate [Hz]: " << loop_rate_);
     ROS_INFO_STREAM("body_height [m]: " << BODY_HEIGHT);
     ROS_INFO_STREAM("body_width [m]: " << BODY_WIDTH);
@@ -16,8 +16,8 @@ Omni_Odom_Publisher::Omni_Odom_Publisher(ros::NodeHandle &nh, const int &loop_ra
     // sub_LF = nh_.subscribe("data_LF", 1, &Omni_Odom_Publisher::LF_Callback, this);
     // sub_LB = nh_.subscribe("data_LB", 1, &Omni_Odom_Publisher::LB_Callback, this);
     // sub_RB = nh_.subscribe("data_RB", 1, &Omni_Odom_Publisher::RB_Callback, this);
-    sub_Right = nh_.subscribe("data_Right", 1, &Omni_Odom_Publisher::Right_Callback, this);
-    sub_Left = nh_.subscribe("data_Left", 1, &Omni_Odom_Publisher::Left_Callback, this);
+    sub_X_axis = nh_.subscribe("data_Right", 1, &Measure_Wheel_Odom_Publisher::X_Axis_Callback, this);
+    sub_Y_axis = nh_.subscribe("data_Left", 1, &Measure_Wheel_Odom_Publisher::Y_Axis_Callback, this);
     // Float32MultiArray data[1]; data[0]=v
 
     init_variables();
@@ -25,7 +25,7 @@ Omni_Odom_Publisher::Omni_Odom_Publisher(ros::NodeHandle &nh, const int &loop_ra
     update();
 }
 
-void Omni_Odom_Publisher::init_variables()
+void Measure_Wheel_Odom_Publisher::init_variables()
 {
     vx = 0;
     vy = 0;
@@ -62,19 +62,19 @@ void Omni_Odom_Publisher::init_variables()
 //     wheel_speed[3] = msg->data[0];
 // }
 
-void Omni_Odom_Publisher::Right_Callback(const std_msgs::Float32MultiArray::ConstPtr &msg)
+void Measure_Wheel_Odom_Publisher::X_Axis_Callback(const std_msgs::Float32MultiArray::ConstPtr &msg)
 {
     wheel_speed[0] = msg->data[0];
     wheel_speed[3] = msg->data[1];
 }
 
-void Omni_Odom_Publisher::Left_Callback(const std_msgs::Float32MultiArray::ConstPtr &msg)
+void Measure_Wheel_Odom_Publisher::Y_Axis_Callback(const std_msgs::Float32MultiArray::ConstPtr &msg)
 {
     wheel_speed[1] = msg->data[0];
     wheel_speed[2] = msg->data[1];
 }
 
-void Omni_Odom_Publisher::update()
+void Measure_Wheel_Odom_Publisher::update()
 {
     ros::Rate r(loop_rate_);
 
@@ -154,6 +154,6 @@ int main(int argc, char **argv)
     arg_n.getParam("body_height", body_height);
     arg_n.getParam("base_frame_id", base_frame_id);
 
-    Omni_Odom_Publisher publisher(nh, looprate, body_height, body_width, base_frame_id);
+    Measure_Wheel_Odom_Publisher publisher(nh, looprate, body_height, body_width, base_frame_id);
     return 0;
 }

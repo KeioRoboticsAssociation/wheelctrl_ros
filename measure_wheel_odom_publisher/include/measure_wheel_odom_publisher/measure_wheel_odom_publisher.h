@@ -1,5 +1,5 @@
-#ifndef OMNI_ODOM_PUBLISHER_H
-#define OMNI_ODOM_PUBLISHER_H
+#ifndef MEASURE_WHEEL_ODOM_PUBLISHER_H
+#define MEASURE_WHEEL_ODOM_PUBLISHER_H
 
 #include <ros/ros.h>
 #include <std_msgs/Float32MultiArray.h>
@@ -9,11 +9,11 @@
 #include <cmath>
 #include <string>
 
-class Omni_Odom_Publisher
+class Measure_Wheel_Odom_Publisher
 {
 public:
-    Omni_Odom_Publisher(ros::NodeHandle &nh, const int &loop_rate, const float &body_height, const float &body_width, const std::string &base_farme_id);
-    ~Omni_Odom_Publisher(){};
+    Measure_Wheel_Odom_Publisher(ros::NodeHandle &nh, const int &loop_rate, const float &body_height, const float &body_width, const std::string &base_farme_id);
+    ~Measure_Wheel_Odom_Publisher(){};
 
 private:
     //Handlers
@@ -24,8 +24,8 @@ private:
     // ros::Subscriber sub_LF;
     // ros::Subscriber sub_LB;
     // ros::Subscriber sub_RB;
-    ros::Subscriber sub_Right;
-    ros::Subscriber sub_Left;
+    ros::Subscriber sub_X_axis;
+    ros::Subscriber sub_Y_axis;
 
     tf::TransformBroadcaster odom_broadcaster;
 
@@ -47,8 +47,8 @@ private:
     // void LF_Callback(const std_msgs::Float32MultiArray::ConstPtr &msg);
     // void RB_Callback(const std_msgs::Float32MultiArray::ConstPtr &msg);
     // void LB_Callback(const std_msgs::Float32MultiArray::ConstPtr &msg);
-    void Right_Callback(const std_msgs::Float32MultiArray::ConstPtr &msg);
-    void Left_Callback(const std_msgs::Float32MultiArray::ConstPtr &msg);
+    void X_Axis_Callback(const std_msgs::Float32MultiArray::ConstPtr &msg);
+    void Y_Axis_Callback(const std_msgs::Float32MultiArray::ConstPtr &msg);
     void update();
 };
 
