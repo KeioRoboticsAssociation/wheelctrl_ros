@@ -7,8 +7,8 @@
 ## Launch parameters
 
 - **control_frequency** : publish frequency (default : 30[Hz])
-- **wheel_width** : ロボットの中心からのx車輪の距離 (default : 0.440[m])
-- **wheel_height** : ロボットの中心からのy車輪の距離 (default : 0.440[m])
+- **wheel_width** : ロボットの中心からのx車輪の距離 (default : 0.150[m])
+- **wheel_height** : ロボットの中心からのy車輪の距離 (default : 0.150[m])
 - **base_frame_id** : ロボット座標系 (default : "base_link")
 
 

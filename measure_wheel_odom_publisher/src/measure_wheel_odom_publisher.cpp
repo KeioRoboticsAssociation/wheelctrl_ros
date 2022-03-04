@@ -2,13 +2,13 @@
 
 std::string node_name = "Measure_Wheel_Odom_Publisher";
 
-Measure_Wheel_Odom_Publisher::Measure_Wheel_Odom_Publisher(ros::NodeHandle &nh, const int &loop_rate, const float &body_height, const float &body_width, const std::string &base_frame_id)
-    : nh_(nh), loop_rate_(loop_rate), BODY_HEIGHT(body_height), BODY_WIDTH(body_width), base_frame_id_(base_frame_id)
+Measure_Wheel_Odom_Publisher::Measure_Wheel_Odom_Publisher(ros::NodeHandle &nh, const int &loop_rate, const float &wheel_height, const float &wheel_width, const std::string &base_frame_id)
+    : nh_(nh), loop_rate_(loop_rate), WHEEL_HEIGHT(wheel_height), WHEEL_WIDTH(wheel_width), base_frame_id_(base_frame_id)
 { //constructer, define pubsub
     ROS_INFO("Creating Measure_Wheel_Odom_Publisher");
     ROS_INFO_STREAM("loop_rate [Hz]: " << loop_rate_);
-    ROS_INFO_STREAM("body_height [m]: " << BODY_HEIGHT);
-    ROS_INFO_STREAM("body_width [m]: " << BODY_WIDTH);
+    ROS_INFO_STREAM("body_height [m]: " << WHEEL_HEIGHT);
+    ROS_INFO_STREAM("body_width [m]: " << WHEEL_WIDTH);
     ROS_INFO_STREAM("base_frame_id: " << base_frame_id_);
 
     odom_pub = nh_.advertise<nav_msgs::Odometry>("odom", 1);
@@ -18,6 +18,7 @@ Measure_Wheel_Odom_Publisher::Measure_Wheel_Odom_Publisher(ros::NodeHandle &nh, 
     // sub_RB = nh_.subscribe("data_RB", 1, &Omni_Odom_Publisher::RB_Callback, this);
     sub_X_axis = nh_.subscribe("data_X_axis", 1, &Measure_Wheel_Odom_Publisher::X_Axis_Callback, this);
     sub_Y_axis = nh_.subscribe("data_Y_axis", 1, &Measure_Wheel_Odom_Publisher::Y_Axis_Callback, this);
+    sub_IMU = nh_.subscribe("/imu",1, &Measure_Wheel_Odom_Publisher::Imu_Callback, this);
     // Float32MultiArray data[1]; data[0]=v
 
     init_variables();
@@ -40,6 +41,7 @@ void Measure_Wheel_Odom_Publisher::init_variables()
     {
         wheel_speed[i] = 0;
     }
+    rotate_speed=0;
 }
 
 // void Omni_Odom_Publisher::RF_Callback(const std_msgs::Float32MultiArray::ConstPtr &msg)
@@ -65,13 +67,16 @@ void Measure_Wheel_Odom_Publisher::init_variables()
 void Measure_Wheel_Odom_Publisher::X_Axis_Callback(const std_msgs::Float32MultiArray::ConstPtr &msg)
 {
     wheel_speed[0] = msg->data[0];
-    wheel_speed[3] = msg->data[1];
 }
 
 void Measure_Wheel_Odom_Publisher::Y_Axis_Callback(const std_msgs::Float32MultiArray::ConstPtr &msg)
 {
     wheel_speed[1] = msg->data[0];
-    wheel_speed[2] = msg->data[1];
+}
+
+void Measure_Wheel_Odom_Publisher::Imu_Callback(const std_msgs::Float32MultiArray::ConstPtr &msg)
+{
+    rotate_speed = msg->data[0];
 }
 
 void Measure_Wheel_Odom_Publisher::update()
@@ -80,8 +85,8 @@ void Measure_Wheel_Odom_Publisher::update()
 
     while (ros::ok())
     {
-        float a = BODY_WIDTH / 2.0;
-        float b = BODY_HEIGHT / 2.0;
+        float a = WHEEL_WIDTH;
+        float b = WHEEL_HEIGHT;
         vx = (wheel_speed[0] + wheel_speed[1] + wheel_speed[2] + wheel_speed[3]) / 4.0;
         vy = (wheel_speed[0] - wheel_speed[1] + wheel_speed[2] - wheel_speed[3]) / 4.0;
         omega = (wheel_speed[0] - wheel_speed[1] - wheel_speed[2] + wheel_speed[3]) / 4.0 / (a+b);
@@ -145,8 +150,8 @@ int main(int argc, char **argv)
     ros::NodeHandle arg_n("~");
 
     int looprate = 30; // Hz
-    float body_width = 0.440;
-    float body_height = 0.440;
+    float body_width = 0.150;
+    float body_height = 0.150;
     std::string base_frame_id = "base_link";
 
     arg_n.getParam("control_frequency", looprate);
