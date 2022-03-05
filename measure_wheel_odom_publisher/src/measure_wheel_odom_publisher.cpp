@@ -96,63 +96,59 @@ void Measure_Wheel_Odom_Publisher::update()
 {
     ros::Rate r(loop_rate_);
 
-    while (ros::ok())
-    {
-        omega = rotate_speed;
-        vx = (wheel_speed[0] - omega * CENTER_WHEEL_DISTANCE)*cos(theta)
-             - (wheel_speed[1] - omega * CENTER_WHEEL_DISTANCE) * sin(theta);       
-        vy = (wheel_speed[0] - omega * CENTER_WHEEL_DISTANCE)*sin(theta)
-             + (wheel_speed[1] - omega * CENTER_WHEEL_DISTANCE) * cos(theta);
+    omega = rotate_speed;
+    vx = (wheel_speed[0] - omega * CENTER_WHEEL_DISTANCE)*cos(theta)
+            - (wheel_speed[1] - omega * CENTER_WHEEL_DISTANCE) * sin(theta);       
+    vy = (wheel_speed[0] - omega * CENTER_WHEEL_DISTANCE)*sin(theta)
+            + (wheel_speed[1] - omega * CENTER_WHEEL_DISTANCE) * cos(theta);
 
-        static ros::Time last_time = ros::Time::now();
-        ros::Time current_time = ros::Time::now();
-        float delta_t = (current_time - last_time).toSec();
-        x = x + vx * delta_t;
-        y = y + vy * delta_t;
-        theta = theta + omega * delta_t;
-        theta = atan2(sin(theta), cos(theta)); // inf to pi
-        last_time = current_time;
+    static ros::Time last_time = ros::Time::now();
+    ros::Time current_time = ros::Time::now();
+    float delta_t = (current_time - last_time).toSec();
+    x = x + vx * delta_t;
+    y = y + vy * delta_t;
+    theta = theta + omega * delta_t;
+    theta = atan2(sin(theta), cos(theta)); // inf to pi
+    last_time = current_time;
 
-        //since all odometry is 6DOF we'll need a quaternion created from yaw
-        geometry_msgs::Quaternion odom_quat = tf::createQuaternionMsgFromYaw(theta);
+    //since all odometry is 6DOF we'll need a quaternion created from yaw
+    geometry_msgs::Quaternion odom_quat = tf::createQuaternionMsgFromYaw(theta);
 
-        //first, we'll publish the transform over tf
-        geometry_msgs::TransformStamped odom_trans;
-        odom_trans.header.stamp = current_time;
-        odom_trans.header.frame_id = "odom";
-        odom_trans.child_frame_id = base_frame_id_;
+    //first, we'll publish the transform over tf
+    geometry_msgs::TransformStamped odom_trans;
+    odom_trans.header.stamp = current_time;
+    odom_trans.header.frame_id = "odom";
+    odom_trans.child_frame_id = base_frame_id_;
 
-        odom_trans.transform.translation.x = x;
-        odom_trans.transform.translation.y = y;
-        odom_trans.transform.translation.z = 0.0;
-        odom_trans.transform.rotation = odom_quat;
+    odom_trans.transform.translation.x = x;
+    odom_trans.transform.translation.y = y;
+    odom_trans.transform.translation.z = 0.0;
+    odom_trans.transform.rotation = odom_quat;
 
-        //send the transform
-        odom_broadcaster.sendTransform(odom_trans);
+    //send the transform
+    odom_broadcaster.sendTransform(odom_trans);
 
-        //next, we'll publish the odometry message over ROS
-        nav_msgs::Odometry odom;
-        odom.header.stamp = current_time;
-        odom.header.frame_id = "odom";
+    //next, we'll publish the odometry message over ROS
+    nav_msgs::Odometry odom;
+    odom.header.stamp = current_time;
+    odom.header.frame_id = "odom";
 
-        //set the position
-        odom.pose.pose.position.x = x;
-        odom.pose.pose.position.y = y;
-        odom.pose.pose.position.z = 0.0;
-        odom.pose.pose.orientation = odom_quat;
+    //set the position
+    odom.pose.pose.position.x = x;
+    odom.pose.pose.position.y = y;
+    odom.pose.pose.position.z = 0.0;
+    odom.pose.pose.orientation = odom_quat;
 
-        //set the velocity
-        odom.child_frame_id = base_frame_id_;
-        odom.twist.twist.linear.x = vx;
-        odom.twist.twist.linear.y = vy;
-        odom.twist.twist.angular.z = omega;
+    //set the velocity
+    odom.child_frame_id = base_frame_id_;
+    odom.twist.twist.linear.x = vx;
+    odom.twist.twist.linear.y = vy;
+    odom.twist.twist.angular.z = omega;
 
-        //publish the message
-        odom_pub.publish(odom);
+    //publish the message
+    odom_pub.publish(odom);
 
-        ros::spinOnce();
-        r.sleep();
-    }
+    ros::spin();
 }
 
 int main(int argc, char **argv)
