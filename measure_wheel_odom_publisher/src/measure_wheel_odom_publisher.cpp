@@ -2,13 +2,16 @@
 
 std::string node_name = "Measure_Wheel_Odom_Publisher";
 
-Measure_Wheel_Odom_Publisher::Measure_Wheel_Odom_Publisher(ros::NodeHandle &nh, const int &loop_rate, const float &wheel_height, const float &wheel_width, const std::string &base_frame_id)
-    : nh_(nh), loop_rate_(loop_rate), WHEEL_HEIGHT(wheel_height), WHEEL_WIDTH(wheel_width), base_frame_id_(base_frame_id)
+Measure_Wheel_Odom_Publisher::Measure_Wheel_Odom_Publisher(ros::NodeHandle &nh, const int &loop_rate, 
+                                                            const std::string &vertical_axis,
+                                                            const std::string &base_frame_id)
+    : nh_(nh), loop_rate_(loop_rate), WHEEL_HEIGHT(wheel_height), WHEEL_WIDTH(wheel_width), VERTICAL_AXIS(vertical_axis),base_frame_id_(base_frame_id)
 { //constructer, define pubsub
     ROS_INFO("Creating Measure_Wheel_Odom_Publisher");
     ROS_INFO_STREAM("loop_rate [Hz]: " << loop_rate_);
-    ROS_INFO_STREAM("body_height [m]: " << WHEEL_HEIGHT);
-    ROS_INFO_STREAM("body_width [m]: " << WHEEL_WIDTH);
+    // ROS_INFO_STREAM("body_height [m]: " << WHEEL_HEIGHT);
+    // ROS_INFO_STREAM("body_width [m]: " << WHEEL_WIDTH);
+    ROS_INFO_STREAM("vertical_axis: " << VERTICAL_AXIS);
     ROS_INFO_STREAM("base_frame_id: " << base_frame_id_);
 
     odom_pub = nh_.advertise<nav_msgs::Odometry>("odom", 1);
@@ -19,7 +22,7 @@ Measure_Wheel_Odom_Publisher::Measure_Wheel_Odom_Publisher(ros::NodeHandle &nh, 
     sub_X_axis = nh_.subscribe("data_X_axis", 1, &Measure_Wheel_Odom_Publisher::X_Axis_Callback, this);
     sub_Y_axis = nh_.subscribe("data_Y_axis", 1, &Measure_Wheel_Odom_Publisher::Y_Axis_Callback, this);
     sub_IMU = nh_.subscribe("/imu",1, &Measure_Wheel_Odom_Publisher::Imu_Callback, this);
-    // Float32MultiArray data[1]; data[0]=v
+    // Float32MultiArray data[1]; data[0]=v;
 
     init_variables();
 
@@ -37,7 +40,7 @@ void Measure_Wheel_Odom_Publisher::init_variables()
     x = 0;
     y = 0;
     theta = 0;
-    for (int i = 0; i < 4; i++)
+    for (int i = 0; i < 2; i++)
     {
         wheel_speed[i] = 0;
     }
@@ -74,9 +77,18 @@ void Measure_Wheel_Odom_Publisher::Y_Axis_Callback(const std_msgs::Float32MultiA
     wheel_speed[1] = msg->data[0];
 }
 
-void Measure_Wheel_Odom_Publisher::Imu_Callback(const std_msgs::Float32MultiArray::ConstPtr &msg)
+void Measure_Wheel_Odom_Publisher::Imu_Callback(const sensor_msgs::Imu::ConstPtr &msg)
 {
-    rotate_speed = msg->data[0];
+    if(VERTICAL_AXIS == "x")
+    {
+        rotate_speed = msg->angular_velocity.x;
+    }else if(VERTICAL_AXIS == "y")
+    {
+        rotate_speed = msg->angular_velocity.y;
+    }else if(VERTICAL_AXIS == "z")
+    {
+        rotate_speed = msg->angular_velocity.z;
+    }
 }
 
 void Measure_Wheel_Odom_Publisher::update()
@@ -85,8 +97,6 @@ void Measure_Wheel_Odom_Publisher::update()
 
     while (ros::ok())
     {
-        float a = WHEEL_WIDTH;
-        float b = WHEEL_HEIGHT;
         vx = (wheel_speed[0] + wheel_speed[1] + wheel_speed[2] + wheel_speed[3]) / 4.0;
         vy = (wheel_speed[0] - wheel_speed[1] + wheel_speed[2] - wheel_speed[3]) / 4.0;
         omega = (wheel_speed[0] - wheel_speed[1] - wheel_speed[2] + wheel_speed[3]) / 4.0 / (a+b);
@@ -150,15 +160,17 @@ int main(int argc, char **argv)
     ros::NodeHandle arg_n("~");
 
     int looprate = 30; // Hz
-    float body_width = 0.150;
-    float body_height = 0.150;
+    // float body_width = 0.150;
+    // float body_height = 0.150;
+    std::string vertical_axis = "x";
     std::string base_frame_id = "base_link";
 
     arg_n.getParam("control_frequency", looprate);
-    arg_n.getParam("body_width", body_width);
-    arg_n.getParam("body_height", body_height);
+    // arg_n.getParam("body_height", body_height);
+    // arg_n.getParam("body_width", body_width);
+    arg_n.getParam("vertical_axis",vertical_axis);
     arg_n.getParam("base_frame_id", base_frame_id);
 
-    Measure_Wheel_Odom_Publisher publisher(nh, looprate, body_height, body_width, base_frame_id);
+    Measure_Wheel_Odom_Publisher publisher(nh, looprate, vertical_axis,base_frame_id);
     return 0;
 }
