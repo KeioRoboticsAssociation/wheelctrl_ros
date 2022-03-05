@@ -3,9 +3,10 @@
 std::string node_name = "Measure_Wheel_Odom_Publisher";
 
 Measure_Wheel_Odom_Publisher::Measure_Wheel_Odom_Publisher(ros::NodeHandle &nh, const int &loop_rate, 
+                                                            const float &c_w_distance,
                                                             const std::string &vertical_axis,
                                                             const std::string &base_frame_id)
-    : nh_(nh), loop_rate_(loop_rate), WHEEL_HEIGHT(wheel_height), WHEEL_WIDTH(wheel_width), VERTICAL_AXIS(vertical_axis),base_frame_id_(base_frame_id)
+    : nh_(nh), loop_rate_(loop_rate), CENTER_WHEEL_DISTANCE(c_w_distance),VERTICAL_AXIS(vertical_axis),base_frame_id_(base_frame_id)
 { //constructer, define pubsub
     ROS_INFO("Creating Measure_Wheel_Odom_Publisher");
     ROS_INFO_STREAM("loop_rate [Hz]: " << loop_rate_);
@@ -97,9 +98,11 @@ void Measure_Wheel_Odom_Publisher::update()
 
     while (ros::ok())
     {
-        vx = (wheel_speed[0] + wheel_speed[1] + wheel_speed[2] + wheel_speed[3]) / 4.0;
-        vy = (wheel_speed[0] - wheel_speed[1] + wheel_speed[2] - wheel_speed[3]) / 4.0;
-        omega = (wheel_speed[0] - wheel_speed[1] - wheel_speed[2] + wheel_speed[3]) / 4.0 / (a+b);
+        omega = rotate_speed;
+        vx = (wheel_speed[0] - omega * CENTER_WHEEL_DISTANCE)*cos(theta)
+             - (wheel_speed[1] - omega * CENTER_WHEEL_DISTANCE) * sin(theta);       
+        vy = (wheel_speed[0] - omega * CENTER_WHEEL_DISTANCE)*sin(theta)
+             + (wheel_speed[1] - omega * CENTER_WHEEL_DISTANCE) * cos(theta);
 
         static ros::Time last_time = ros::Time::now();
         ros::Time current_time = ros::Time::now();
@@ -162,15 +165,17 @@ int main(int argc, char **argv)
     int looprate = 30; // Hz
     // float body_width = 0.150;
     // float body_height = 0.150;
+    float center_wheel_distance = 0.1;
     std::string vertical_axis = "x";
     std::string base_frame_id = "base_link";
 
     arg_n.getParam("control_frequency", looprate);
     // arg_n.getParam("body_height", body_height);
     // arg_n.getParam("body_width", body_width);
+    arg_n.getParam("center_wheel_distance",center_wheel_distance);
     arg_n.getParam("vertical_axis",vertical_axis);
     arg_n.getParam("base_frame_id", base_frame_id);
 
-    Measure_Wheel_Odom_Publisher publisher(nh, looprate, vertical_axis,base_frame_id);
+    Measure_Wheel_Odom_Publisher publisher(nh, looprate, center_wheel_distance,vertical_axis,base_frame_id);
     return 0;
 }

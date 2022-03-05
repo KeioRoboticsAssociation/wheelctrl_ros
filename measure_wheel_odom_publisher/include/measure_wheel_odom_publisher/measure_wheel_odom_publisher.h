@@ -13,7 +13,7 @@
 class Measure_Wheel_Odom_Publisher
 {
 public:
-    Measure_Wheel_Odom_Publisher(ros::NodeHandle &nh, const int &loop_rate, 
+    Measure_Wheel_Odom_Publisher(ros::NodeHandle &nh, const int &loop_rate, const float &c_w_distance,
                                 const std::string &vertical_axis,const std::string &base_farme_id);
     ~Measure_Wheel_Odom_Publisher(){};
 
@@ -36,6 +36,7 @@ private:
     int loop_rate_;
 //    float WHEEL_WIDTH;
 //    float WHEEL_HEIGHT;
+    float CENTER_WHEEL_DISTANCE;
     std::string VERTICAL_AXIS;
     std::string base_frame_id_;
 
