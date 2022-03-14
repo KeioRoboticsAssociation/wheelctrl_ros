@@ -82,9 +82,18 @@ void Omni_Odom_Publisher::update()
     {
         float a = BODY_WIDTH / 2.0;
         float b = BODY_HEIGHT / 2.0;
-        vx = (wheel_speed[0] + wheel_speed[1] + wheel_speed[2] + wheel_speed[3]) / 4.0;
-        vy = (wheel_speed[0] - wheel_speed[1] + wheel_speed[2] - wheel_speed[3]) / 4.0;
-        omega = (wheel_speed[0] - wheel_speed[1] - wheel_speed[2] + wheel_speed[3]) / 4.0 / (a+b);
+        float c = sqrt(pow(a,2)+pow(b,2));
+        const float n = 1/sqrt(2);
+
+        // エンコーダーの取付方向が通常と逆のため速度反転
+        // 処理速度が落ちるので代入時に本来ならやるべきだが可読性のため
+        for(int i=0;i<4;i++){
+            wheel_speed[i]=-wheel_speed[i];
+        }
+
+        vx = n*(wheel_speed[0] - wheel_speed[1] - wheel_speed[2] + wheel_speed[3]) /4.0;
+        vy = n*(wheel_speed[0] + wheel_speed[1] - wheel_speed[2] - wheel_speed[3]) / 4.0;
+        omega = (wheel_speed[0] + wheel_speed[1] + wheel_speed[2] + wheel_speed[3]) / 4.0 / (a+b);
 
         static ros::Time last_time = ros::Time::now();
         ros::Time current_time = ros::Time::now();

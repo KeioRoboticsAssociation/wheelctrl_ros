@@ -74,7 +74,7 @@ void VelConverter::cmdvel2omni(){
     target_speed[2] = -1*n*vx - n*vy + c * omega;
     target_speed[3] = n*vx - n*vy + c * omega;
     
-    // なぜかspeed > 0 で時計回りにロボが回るので、-1倍
+    // エンコーダーの取り付けが通常と逆向きのため、-1倍
     for(int i = 0; i < 4; i++)
     {
         target_speed[i] *= -1;
