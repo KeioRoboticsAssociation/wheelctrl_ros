@@ -61,7 +61,7 @@ void VelConverter::EmergencyStopFlagCallback(const std_msgs::Empty::ConstPtr &ms
     {
         target_speed[i] = 0;
     }
-    emergency_stop_flag = true;  
+    emergency_stop_flag = !emergency_stop_flag;  
 }
 
 void VelConverter::cmdvel2omni(){
@@ -93,12 +93,28 @@ void VelConverter::reset(){
 
 void VelConverter::cmdvelCallback(const geometry_msgs::Twist::ConstPtr &cmd_vel)
 {
-    ROS_DEBUG("Received cmd_vel");
-    vx = cmd_vel->linear.x;
-    vy = cmd_vel->linear.y;
-    omega = cmd_vel->angular.z;
+    if(!emergency_stop_flag){
+        ROS_DEBUG("Received cmd_vel");
+        vx = cmd_vel->linear.x;
+        vy = cmd_vel->linear.y;
+        omega = cmd_vel->angular.z;
 
-    last_sub_vel_time_ = std::chrono::system_clock::now();
+        last_sub_vel_time_ = std::chrono::system_clock::now();
+    }
+
+    else{
+        vx = 0;
+        vy = 0;
+        omega = 0;
+        last_sub_vel_time_ = std::chrono::system_clock::now();
+        ROS_ERROR("omni_wheelctrl: emergency stopping...");
+        while(true){
+            if(emergency_stop_flag){
+                ROS_ERROR("omni_wheelctrl: emergency recover");
+                break;
+            }
+        }
+    }
 }
 
 bool VelConverter::isSubscribed() {
