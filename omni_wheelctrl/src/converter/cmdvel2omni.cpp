@@ -31,19 +31,43 @@ VelConverter::VelConverter(ros::NodeHandle &nh, const float &body_height, const 
         //     "control_LB", 1);
         // pub_RB = nh_.advertise<std_msgs::Float32MultiArray>(
         //     "control_RB", 1);
-        pub_Right = nh_.advertise<std_msgs::Float32MultiArray>(
-            "control_Right", 1);
-        pub_Left = nh_.advertise<std_msgs::Float32MultiArray>(
-            "control_Left", 1);
+        // pub_Right = nh_.advertise<rogi_link_msgs::RogiLink>(
+        //     "send_serial", 1);
+        // pub_Left = nh_.advertise<rogi_link_msgs::RogiLink>(
+        //     "send_serial", 1);
+        control_pub = nh.advertise<rogi_link_msgs::RogiLink>(
+            "send_serial", 1);
     }
     cmd_vel_sub_ = nh_.subscribe("/cmd_vel", 1,
-                                 &VelConverter::cmdvelCallback, this);
+                                &VelConverter::cmdvelCallback, this);
     emergency_stop_sub_ = nh_.subscribe("/emergency_stop_flag", 1,
-                                 &VelConverter::EmergencyStopFlagCallback, this);
+                                &VelConverter::EmergencyStopFlagCallback, this);
+    
+    init_drivers();
 
     last_sub_vel_time_ = std::chrono::system_clock::now();
 
     update();
+}
+
+void VelConverter::init_drivers(){
+    rogi_link_msgs::RogiLink init_msg;
+    //RF
+    init_msg.id= RFMD << 6 || 0x02;
+    init_msg.data[0]=1;
+    control_pub.publish(init_msg);
+    //LF
+    init_msg.id= LFMD << 6 || 0x02;
+    init_msg.data[0]=1;
+    control_pub.publish(init_msg);
+    //LB
+    init_msg.id= LBMD << 6 || 0x02;
+    init_msg.data[0]=1;
+    control_pub.publish(init_msg);
+    //RB
+    init_msg.id= RBMD << 6 || 0x02;
+    init_msg.data[0]=1;
+    control_pub.publish(init_msg);
 }
 
 void VelConverter::init_variables(){
@@ -108,12 +132,6 @@ void VelConverter::cmdvelCallback(const geometry_msgs::Twist::ConstPtr &cmd_vel)
         omega = 0;
         last_sub_vel_time_ = std::chrono::system_clock::now();
         ROS_ERROR("omni_wheelctrl: emergency stopping...");
-        while(true){
-            if(emergency_stop_flag){
-                ROS_ERROR("omni_wheelctrl: emergency recover");
-                break;
-            }
-        }
     }
 }
 
@@ -146,7 +164,7 @@ void VelConverter::publishMsg()
         pub_RB.publish(command);
     }
     else{
-        std_msgs::Float32MultiArray floatarray;
+        // std_msgs::Float32MultiArray floatarray;
         // floatarray.data.resize(1);
         // floatarray.data[0] = target_speed[0];
         // pub_RF.publish(floatarray);
@@ -160,14 +178,36 @@ void VelConverter::publishMsg()
         // floatarray.data[0] = target_speed[3];
         // pub_RB.publish(floatarray);
 
-        floatarray.data.resize(2);
-        floatarray.data[0] = target_speed[0];
-        floatarray.data[1] = target_speed[3];
-        pub_Right.publish(floatarray);
+        // floatarray.data.resize(2);
+        // floatarray.data[0] = target_speed[0];
+        // floatarray.data[1] = target_speed[3];
+        // pub_Right.publish(floatarray);
 
-        floatarray.data[0] = target_speed[1];
-        floatarray.data[1] = target_speed[2];
-        pub_Left.publish(floatarray);
+        // floatarray.data[0] = target_speed[1];
+        // floatarray.data[1] = target_speed[2];
+        // pub_Left.publish(floatarray);
+        
+        //RF publish
+        rogi_link_msgs::RogiLink control_msg;
+        control_msg.id= RFMD << 6 || 0x04; 
+        control_msg.data[0]=*(float*)(&target_speed[0]);
+        control_pub.publish(control_msg);
+
+        //LF publish
+        control_msg.id= LFMD << 6 || 0x04; 
+        control_msg.data[0]=*(float*)(&target_speed[1]);
+        control_pub.publish(control_msg);
+
+        //LB publish
+        control_msg.id= LBMD << 6 || 0x04; 
+        control_msg.data[0]=*(float*)(&target_speed[2]);
+        control_pub.publish(control_msg);
+
+        //RB publish
+        control_msg.id= RBMD << 6 || 0x04; 
+        control_msg.data[0]=*(float*)(&target_speed[3]);
+        control_pub.publish(control_msg);
+
     }
 }
 

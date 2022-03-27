@@ -9,6 +9,13 @@
 #include <std_msgs/Float64.h>
 #include <std_msgs/Empty.h>
 #include <geometry_msgs/Twist.h>
+#include "rogi_link_msgs/RogiLink.h"
+
+// params
+const char RFMD=0x02;
+const char LFMD=0x03;
+const char LBMD=0x04;
+const char RBMD=0x05;
 
 class VelConverter
 {
@@ -24,8 +31,9 @@ private:
     ros::Publisher pub_LF;
     ros::Publisher pub_LB;
     ros::Publisher pub_RB;
-    ros::Publisher pub_Right;
-    ros::Publisher pub_Left;
+    // ros::Publisher pub_Right;
+    // ros::Publisher pub_Left;
+    ros::Publisher control_pub;
     ros::Subscriber cmd_vel_sub_;
     ros::Subscriber emergency_stop_sub_;
 
@@ -50,6 +58,7 @@ private:
 
     //Methods
     void init_variables();
+    void init_drivers();
     void cmdvelCallback(const geometry_msgs::Twist::ConstPtr &cmd_vel);
     void EmergencyStopFlagCallback(const std_msgs::Empty::ConstPtr &msg);
     bool isSubscribed();
