@@ -6,7 +6,11 @@ Measure_Wheel_Odom_Publisher::Measure_Wheel_Odom_Publisher(ros::NodeHandle &nh, 
                                                             const float &c_w_distance,
                                                             const std::string &vertical_axis,
                                                             const std::string &base_frame_id)
-    : nh_(nh), loop_rate_(loop_rate), CENTER_WHEEL_DISTANCE(c_w_distance),VERTICAL_AXIS(vertical_axis),base_frame_id_(base_frame_id)
+    :nh_(nh), 
+    loop_rate_(loop_rate), 
+    CENTER_WHEEL_DISTANCE(c_w_distance),
+    VERTICAL_AXIS(vertical_axis),
+    base_frame_id_(base_frame_id)
 { //constructer, define pubsub
     ROS_INFO("Creating Measure_Wheel_Odom_Publisher");
     ROS_INFO_STREAM("loop_rate [Hz]: " << loop_rate_);
@@ -15,14 +19,11 @@ Measure_Wheel_Odom_Publisher::Measure_Wheel_Odom_Publisher(ros::NodeHandle &nh, 
     ROS_INFO_STREAM("vertical_axis: " << VERTICAL_AXIS);
     ROS_INFO_STREAM("base_frame_id: " << base_frame_id_);
 
+    //publisher
     odom_pub = nh_.advertise<nav_msgs::Odometry>("odom", 1);
-    // sub_RF = nh_.subscribe("data_RF", 1, &Omni_Odom_Publisher::RF_Callback, this);
-    // sub_LF = nh_.subscribe("data_LF", 1, &Omni_Odom_Publisher::LF_Callback, this);
-    // sub_LB = nh_.subscribe("data_LB", 1, &Omni_Odom_Publisher::LB_Callback, this);
-    // sub_RB = nh_.subscribe("data_RB", 1, &Omni_Odom_Publisher::RB_Callback, this);
+    //subscriber
     sub_wheel = nh_.subscribe("rcv_serial", 1, &Measure_Wheel_Odom_Publisher::Wheel_Callback, this);
-    // sub_Y_axis = nh_.subscribe("data_Y_axis", 1, &Measure_Wheel_Odom_Publisher::Y_Axis_Callback, this);
-    sub_IMU = nh_.subscribe("/imu",1, &Measure_Wheel_Odom_Publisher::Imu_Callback, this);
+    sub_IMU = nh_.subscribe("imu",1, &Measure_Wheel_Odom_Publisher::Imu_Callback, this);
     // Float32MultiArray data[1]; data[0]=v;
 
     init_variables();
@@ -48,36 +49,11 @@ void Measure_Wheel_Odom_Publisher::init_variables()
     rotate_speed=0;
 }
 
-// void Omni_Odom_Publisher::RF_Callback(const std_msgs::Float32MultiArray::ConstPtr &msg)
-// {
-//     wheel_speed[0] = msg->data[0];
-// }
-
-// void Omni_Odom_Publisher::LF_Callback(const std_msgs::Float32MultiArray::ConstPtr &msg)
-// {
-//     wheel_speed[1] = msg->data[0];
-// }
-
-// void Omni_Odom_Publisher::LB_Callback(const std_msgs::Float32MultiArray::ConstPtr &msg)
-// {
-//     wheel_speed[2] = msg->data[0];
-// }
-
-// void Omni_Odom_Publisher::RB_Callback(const std_msgs::Float32MultiArray::ConstPtr &msg)
-// {
-//     wheel_speed[3] = msg->data[0];
-// }
-
 void Measure_Wheel_Odom_Publisher::Wheel_Callback(const std_msgs::Float32MultiArray::ConstPtr &msg)
 {
     wheel_speed[0] = msg->data[0];
     wheel_speed[1] = msg->data[1];
 }
-
-// void Measure_Wheel_Odom_Publisher::Y_Axis_Callback(const std_msgs::Float32MultiArray::ConstPtr &msg)
-// {
-//     wheel_speed[1] = msg->data[0];
-// }
 
 void Measure_Wheel_Odom_Publisher::Imu_Callback(const sensor_msgs::Imu::ConstPtr &msg)
 {

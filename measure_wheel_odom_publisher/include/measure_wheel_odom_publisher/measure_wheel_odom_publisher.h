@@ -22,12 +22,7 @@ private:
     ros::NodeHandle &nh_;
 
     ros::Publisher odom_pub;
-    // ros::Subscriber sub_RF;
-    // ros::Subscriber sub_LF;
-    // ros::Subscriber sub_LB;
-    // ros::Subscriber sub_RB;
     ros::Subscriber sub_wheel;
-    // ros::Subscriber sub_Y_axis;
     ros::Subscriber sub_IMU;
 
     tf::TransformBroadcaster odom_broadcaster;
@@ -49,12 +44,7 @@ private:
 
     //Methods
     void init_variables();
-    // void RF_Callback(const std_msgs::Float32MultiArray::ConstPtr &msg);
-    // void LF_Callback(const std_msgs::Float32MultiArray::ConstPtr &msg);
-    // void RB_Callback(const std_msgs::Float32MultiArray::ConstPtr &msg);
-    // void LB_Callback(const std_msgs::Float32MultiArray::ConstPtr &msg);
     void Wheel_Callback(const std_msgs::Float32MultiArray::ConstPtr &msg);
-    // void Y_Axis_Callback(const std_msgs::Float32MultiArray::ConstPtr &msg);
     void Imu_Callback(const sensor_msgs::Imu::ConstPtr &msg);
     void update();
 };
