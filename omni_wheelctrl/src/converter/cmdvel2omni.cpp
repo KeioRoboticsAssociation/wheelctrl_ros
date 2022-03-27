@@ -53,19 +53,19 @@ VelConverter::VelConverter(ros::NodeHandle &nh, const float &body_height, const 
 void VelConverter::init_drivers(){
     rogi_link_msgs::RogiLink init_msg;
     //RF
-    init_msg.id= RFMD << 6 || 0x02;
+    init_msg.id= RFMD << 6 | 0x02;
     init_msg.data[0]=1;
     control_pub.publish(init_msg);
     //LF
-    init_msg.id= LFMD << 6 || 0x02;
+    init_msg.id= LFMD << 6 | 0x02;
     init_msg.data[0]=1;
     control_pub.publish(init_msg);
     //LB
-    init_msg.id= LBMD << 6 || 0x02;
+    init_msg.id= LBMD << 6 | 0x02;
     init_msg.data[0]=1;
     control_pub.publish(init_msg);
     //RB
-    init_msg.id= RBMD << 6 || 0x02;
+    init_msg.id= RBMD << 6 | 0x02;
     init_msg.data[0]=1;
     control_pub.publish(init_msg);
 }
@@ -189,22 +189,22 @@ void VelConverter::publishMsg()
         
         //RF publish
         rogi_link_msgs::RogiLink control_msg;
-        control_msg.id= RFMD << 6 || 0x04; 
+        control_msg.id= RFMD << 6 | 0x04; 
         control_msg.data[0]=*(float*)(&target_speed[0]);
         control_pub.publish(control_msg);
 
         //LF publish
-        control_msg.id= LFMD << 6 || 0x04; 
+        control_msg.id= LFMD << 6 | 0x04; 
         control_msg.data[0]=*(float*)(&target_speed[1]);
         control_pub.publish(control_msg);
 
         //LB publish
-        control_msg.id= LBMD << 6 || 0x04; 
+        control_msg.id= LBMD << 6 | 0x04; 
         control_msg.data[0]=*(float*)(&target_speed[2]);
         control_pub.publish(control_msg);
 
         //RB publish
-        control_msg.id= RBMD << 6 || 0x04; 
+        control_msg.id= RBMD << 6 | 0x04; 
         control_msg.data[0]=*(float*)(&target_speed[3]);
         control_pub.publish(control_msg);
 
