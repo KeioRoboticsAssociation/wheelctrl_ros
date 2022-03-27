@@ -20,8 +20,8 @@ Measure_Wheel_Odom_Publisher::Measure_Wheel_Odom_Publisher(ros::NodeHandle &nh, 
     // sub_LF = nh_.subscribe("data_LF", 1, &Omni_Odom_Publisher::LF_Callback, this);
     // sub_LB = nh_.subscribe("data_LB", 1, &Omni_Odom_Publisher::LB_Callback, this);
     // sub_RB = nh_.subscribe("data_RB", 1, &Omni_Odom_Publisher::RB_Callback, this);
-    sub_X_axis = nh_.subscribe("data_X_axis", 1, &Measure_Wheel_Odom_Publisher::X_Axis_Callback, this);
-    sub_Y_axis = nh_.subscribe("data_Y_axis", 1, &Measure_Wheel_Odom_Publisher::Y_Axis_Callback, this);
+    sub_wheel = nh_.subscribe("rcv_serial", 1, &Measure_Wheel_Odom_Publisher::Wheel_Callback, this);
+    // sub_Y_axis = nh_.subscribe("data_Y_axis", 1, &Measure_Wheel_Odom_Publisher::Y_Axis_Callback, this);
     sub_IMU = nh_.subscribe("/imu",1, &Measure_Wheel_Odom_Publisher::Imu_Callback, this);
     // Float32MultiArray data[1]; data[0]=v;
 
@@ -68,15 +68,16 @@ void Measure_Wheel_Odom_Publisher::init_variables()
 //     wheel_speed[3] = msg->data[0];
 // }
 
-void Measure_Wheel_Odom_Publisher::X_Axis_Callback(const std_msgs::Float32MultiArray::ConstPtr &msg)
+void Measure_Wheel_Odom_Publisher::Wheel_Callback(const std_msgs::Float32MultiArray::ConstPtr &msg)
 {
     wheel_speed[0] = msg->data[0];
+    wheel_speed[1] = msg->data[1];
 }
 
-void Measure_Wheel_Odom_Publisher::Y_Axis_Callback(const std_msgs::Float32MultiArray::ConstPtr &msg)
-{
-    wheel_speed[1] = msg->data[0];
-}
+// void Measure_Wheel_Odom_Publisher::Y_Axis_Callback(const std_msgs::Float32MultiArray::ConstPtr &msg)
+// {
+//     wheel_speed[1] = msg->data[0];
+// }
 
 void Measure_Wheel_Odom_Publisher::Imu_Callback(const sensor_msgs::Imu::ConstPtr &msg)
 {
