@@ -190,22 +190,22 @@ void VelConverter::publishMsg()
         //RF publish
         rogi_link_msgs::RogiLink control_msg;
         control_msg.id= RFMD << 6 | 0x04; 
-        control_msg.data[0]=*(float*)(&target_speed[0]);
+        *(float *)(&control_msg.data[0])=target_speed[0];
         control_pub.publish(control_msg);
 
         //LF publish
         control_msg.id= LFMD << 6 | 0x04; 
-        control_msg.data[0]=*(float*)(&target_speed[1]);
+        *(float *)(&control_msg.data[0])=target_speed[0];
         control_pub.publish(control_msg);
 
         //LB publish
         control_msg.id= LBMD << 6 | 0x04; 
-        control_msg.data[0]=*(float*)(&target_speed[2]);
+        *(float *)(&control_msg.data[0])=target_speed[0];
         control_pub.publish(control_msg);
 
         //RB publish
         control_msg.id= RBMD << 6 | 0x04; 
-        control_msg.data[0]=*(float*)(&target_speed[3]);
+        *(float *)(&control_msg.data[0])=target_speed[0];
         control_pub.publish(control_msg);
 
     }
