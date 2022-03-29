@@ -51,7 +51,7 @@ private:
     float target_speed[4];// 0:RF, 1:LF, 2:LB, 3:RB
 
     //flags
-    bool emergency_stop_flag;
+    bool emergency_stop_flag = false;
 
     // Timers
     std::chrono::system_clock::time_point last_sub_vel_time_;

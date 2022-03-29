@@ -131,7 +131,7 @@ void VelConverter::cmdvelCallback(const geometry_msgs::Twist::ConstPtr &cmd_vel)
         vy = 0;
         omega = 0;
         last_sub_vel_time_ = std::chrono::system_clock::now();
-        ROS_ERROR("omni_wheelctrl: emergency stopping...");
+        ROS_ERROR_ONCE("omni_wheelctrl: emergency stopping...");
     }
 }
 
