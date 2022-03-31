@@ -14,6 +14,7 @@ Measure_Wheel_Odom_Publisher::Measure_Wheel_Odom_Publisher(ros::NodeHandle &nh, 
 { //constructer, define pubsub
     ROS_INFO("Creating Measure_Wheel_Odom_Publisher");
     ROS_INFO_STREAM("loop_rate [Hz]: " << loop_rate_);
+    ROS_INFO_STREAM("c_w_istance[m]"<<CENTER_WHEEL_DISTANCE);
     // ROS_INFO_STREAM("body_height [m]: " << WHEEL_HEIGHT);
     // ROS_INFO_STREAM("body_width [m]: " << WHEEL_WIDTH);
     ROS_INFO_STREAM("vertical_axis: " << VERTICAL_AXIS);
@@ -22,7 +23,7 @@ Measure_Wheel_Odom_Publisher::Measure_Wheel_Odom_Publisher(ros::NodeHandle &nh, 
     //publisher
     odom_pub = nh_.advertise<nav_msgs::Odometry>("odom", 1);
     //subscriber
-    sub_wheel = nh_.subscribe("rcv_serial", 1, &Measure_Wheel_Odom_Publisher::Wheel_Callback, this);
+    sub_wheel = nh_.subscribe("rcv_serial_01", 1, &Measure_Wheel_Odom_Publisher::Wheel_Callback, this);
     sub_IMU = nh_.subscribe("imu",1, &Measure_Wheel_Odom_Publisher::Imu_Callback, this);
     // Float32MultiArray data[1]; data[0]=v;
 
