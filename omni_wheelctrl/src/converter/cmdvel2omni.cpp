@@ -195,17 +195,17 @@ void VelConverter::publishMsg()
 
         //LF publish
         control_msg.id= LFMD << 6 | 0x04; 
-        *(float *)(&control_msg.data[0])=target_speed[0];
+        *(float *)(&control_msg.data[0])=target_speed[1];
         control_pub.publish(control_msg);
 
         //LB publish
         control_msg.id= LBMD << 6 | 0x04; 
-        *(float *)(&control_msg.data[0])=target_speed[0];
+        *(float *)(&control_msg.data[0])=target_speed[2];
         control_pub.publish(control_msg);
 
         //RB publish
         control_msg.id= RBMD << 6 | 0x04; 
-        *(float *)(&control_msg.data[0])=target_speed[0];
+        *(float *)(&control_msg.data[0])=target_speed[3];
         control_pub.publish(control_msg);
 
     }
@@ -214,6 +214,7 @@ void VelConverter::publishMsg()
 void VelConverter::update()
 {
     ros::Rate r(loop_rate_);
+    init_drivers();
 
     while (ros::ok())
     {
