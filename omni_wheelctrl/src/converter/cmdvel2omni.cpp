@@ -104,6 +104,7 @@ void VelConverter::cmdvel2omni(){
     target_speed[2] = -1*n*vx - n*vy + c * omega;
     target_speed[3] = n*vx - n*vy + c * omega;
     
+
     // エンコーダーの取り付けが通常と逆向きのため、-1倍
     for(int i = 0; i < 4; i++)
     {
@@ -114,7 +115,7 @@ void VelConverter::cmdvel2omni(){
 }
 
 void VelConverter::reset(){
-    ROS_ERROR("omni_wheelctrl: unable to subscribe topics. Reset velocity...");
+    ROS_ERROR_ONCE("omni_wheelctrl: unable to subscribe topics. Reset velocity...");
     for (int i = 0; i < 4; i++) {
         target_speed[i] = 0;
         // reset velovity, sustain theta
@@ -137,6 +138,7 @@ void VelConverter::cmdvelCallback(const geometry_msgs::Twist::ConstPtr &cmd_vel)
         vy = 0;
         omega = 0;
         last_sub_vel_time_ = std::chrono::system_clock::now();
+
         ROS_ERROR_ONCE("omni_wheelctrl: emergency stopping...");
     }
 }
@@ -240,7 +242,7 @@ void VelConverter::update()
     {
         if(isSubscribed()){
             cmdvel2omni();
-        }
+        }   
         else{
             reset();
         }
