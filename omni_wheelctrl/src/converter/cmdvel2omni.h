@@ -8,6 +8,7 @@
 #include <std_msgs/Float32MultiArray.h>
 #include <std_msgs/Float64.h>
 #include <std_msgs/Empty.h>
+#include <std_msgs/Bool.h>
 #include <geometry_msgs/Twist.h>
 #include "rogi_link_msgs/RogiLink.h"
 
@@ -36,6 +37,7 @@ private:
     ros::Publisher control_pub;
     ros::Subscriber cmd_vel_sub_;
     ros::Subscriber emergency_stop_sub_;
+    ros::Subscriber connection_status_sub_;
 
     //Configurations
     int loop_rate_;
@@ -52,6 +54,7 @@ private:
 
     //flags
     bool emergency_stop_flag = false;
+    bool connection_flag = false;
 
     // Timers
     std::chrono::system_clock::time_point last_sub_vel_time_;
@@ -61,6 +64,7 @@ private:
     void init_drivers();
     void cmdvelCallback(const geometry_msgs::Twist::ConstPtr &cmd_vel);
     void EmergencyStopFlagCallback(const std_msgs::Empty::ConstPtr &msg);
+    void ConnectionFlagCallback(const std_msgs::Bool::ConstPtr &msg);
     bool isSubscribed();
     void publishMsg();
     void cmdvel2omni();
