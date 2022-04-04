@@ -11,12 +11,15 @@
 #include <std_msgs/Bool.h>
 #include <geometry_msgs/Twist.h>
 #include "rogi_link_msgs/RogiLink.h"
+#include <math.h>
 
 // params
 const char RFMD=0x02;
 const char LFMD=0x03;
 const char LBMD=0x04;
 const char RBMD=0x05;
+
+const float WHEEL_DIAMETER = 0.127;
 
 class VelConverter
 {
