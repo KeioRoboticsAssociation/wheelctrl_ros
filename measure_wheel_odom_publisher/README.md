@@ -7,7 +7,7 @@
 ## Launch parameters
 
 - **control_frequency** : publish frequency (default : 30[Hz])
-- **center_wheel_distance** : ロボットの中心からの車輪の距離 (default : 0.100[m])
+- **c_w_distance** : ロボットの中心からの車輪の距離 (default : 0.100[m])
 - **base_frame_id** : ロボット座標系 (default : "base_link")
 
 
@@ -19,7 +19,7 @@
 
 ## Subscribed Topics
 
-- **/rcv_serial** (type : `rogi_link_msgs::RogiLink`)
+- **/rcv_serial_01** (type : `std_msgs::Float32MultiArray`)
 - **/imu** (type : `sensor_msgs::Imu`)
 
 <img src="https://i.imgur.com/3giWneE.png" style="zoom:50%;" />
