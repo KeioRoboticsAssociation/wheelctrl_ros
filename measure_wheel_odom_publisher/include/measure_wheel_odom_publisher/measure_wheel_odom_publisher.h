@@ -15,7 +15,7 @@ const float PI = 3.1415926535;
 class Measure_Wheel_Odom_Publisher
 {
 public:
-    Measure_Wheel_Odom_Publisher(ros::NodeHandle &nh, const int &loop_rate, const float &c_w_distance,
+    Measure_Wheel_Odom_Publisher(ros::NodeHandle &nh, const int &loop_rate, const float &c_w_distance_a, const float &c_w_distance_b,
                                 const std::string &vertical_axis,const std::string &base_farme_id, const float &wheel_diameter);
     ~Measure_Wheel_Odom_Publisher(){};
 
@@ -33,7 +33,8 @@ private:
     int loop_rate_;
 //    float WHEEL_WIDTH;
 //    float WHEEL_HEIGHT;
-    float CENTER_WHEEL_DISTANCE;
+    float CENTER_WHEEL_DISTANCE_A;
+    float CENTER_WHEEL_DISTANCE_B;
     std::string VERTICAL_AXIS;
     std::string base_frame_id_;
     float wheel_diameter_;
