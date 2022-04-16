@@ -2,15 +2,16 @@
 
 std::string node_name = "Measure_Wheel_Odom_Publisher";
 
-Measure_Wheel_Odom_Publisher::Measure_Wheel_Odom_Publisher(ros::NodeHandle &nh, const int &loop_rate, 
+Measure_Wheel_Odom_Publisher::Measure_Wheel_Odom_Publisher(ros::NodeHandle &nh, const int &loop_rate,
                                                             const float &c_w_distance,
                                                             const std::string &vertical_axis,
-                                                            const std::string &base_frame_id)
-    :nh_(nh), 
-    loop_rate_(loop_rate), 
+                                                            const std::string &base_frame_id, const float &wheel_diameter)
+    :nh_(nh),
+    loop_rate_(loop_rate),
     CENTER_WHEEL_DISTANCE(c_w_distance),
     VERTICAL_AXIS(vertical_axis),
-    base_frame_id_(base_frame_id)
+    base_frame_id_(base_frame_id),
+    wheel_diameter_(wheel_diameter)
 { //constructer, define pubsub
     ROS_INFO("Creating Measure_Wheel_Odom_Publisher");
     ROS_INFO_STREAM("loop_rate [Hz]: " << loop_rate_);
@@ -52,8 +53,8 @@ void Measure_Wheel_Odom_Publisher::init_variables()
 
 void Measure_Wheel_Odom_Publisher::Wheel_Callback(const std_msgs::Float32MultiArray::ConstPtr &msg)
 {
-    wheel_speed[0] = msg->data[0];
-    wheel_speed[1] = msg->data[1];
+    wheel_speed[0] = msg->data[0] * wheel_diameter_ * 2 * PI;
+    wheel_speed[1] = msg->data[1] * wheel_diameter_ * 2 * PI;
 }
 
 void Measure_Wheel_Odom_Publisher::Imu_Callback(const sensor_msgs::Imu::ConstPtr &msg)
@@ -76,7 +77,7 @@ void Measure_Wheel_Odom_Publisher::update()
 
     omega = rotate_speed;
     vx = (wheel_speed[0] - omega * CENTER_WHEEL_DISTANCE)*cos(theta)
-            - (wheel_speed[1] - omega * CENTER_WHEEL_DISTANCE) * sin(theta);       
+            - (wheel_speed[1] - omega * CENTER_WHEEL_DISTANCE) * sin(theta);
     vy = (wheel_speed[0] - omega * CENTER_WHEEL_DISTANCE)*sin(theta)
             + (wheel_speed[1] - omega * CENTER_WHEEL_DISTANCE) * cos(theta);
 
@@ -142,6 +143,7 @@ int main(int argc, char **argv)
     float center_wheel_distance = 0.1;
     std::string vertical_axis = "x";
     std::string base_frame_id = "base_link";
+    float wheel_diameter = 0.048;
 
     arg_n.getParam("control_frequency", looprate);
     // arg_n.getParam("body_height", body_height);
@@ -149,7 +151,8 @@ int main(int argc, char **argv)
     arg_n.getParam("center_wheel_distance",center_wheel_distance);
     arg_n.getParam("vertical_axis",vertical_axis);
     arg_n.getParam("base_frame_id", base_frame_id);
+    arg_n.getParam("wheel_diameter", wheel_diameter);
 
-    Measure_Wheel_Odom_Publisher publisher(nh, looprate, center_wheel_distance,vertical_axis,base_frame_id);
+    Measure_Wheel_Odom_Publisher publisher(nh, looprate, center_wheel_distance,vertical_axis,base_frame_id,wheel_diameter);
     return 0;
 }

@@ -10,11 +10,13 @@
 #include <cmath>
 #include <string>
 
+const float PI = 3.1415926535;
+
 class Measure_Wheel_Odom_Publisher
 {
 public:
     Measure_Wheel_Odom_Publisher(ros::NodeHandle &nh, const int &loop_rate, const float &c_w_distance,
-                                const std::string &vertical_axis,const std::string &base_farme_id);
+                                const std::string &vertical_axis,const std::string &base_farme_id, const float &wheel_diameter);
     ~Measure_Wheel_Odom_Publisher(){};
 
 private:
@@ -34,6 +36,7 @@ private:
     float CENTER_WHEEL_DISTANCE;
     std::string VERTICAL_AXIS;
     std::string base_frame_id_;
+    float wheel_diameter_;
 
     //variables
     float x, y, theta;
