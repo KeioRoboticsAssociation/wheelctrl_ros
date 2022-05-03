@@ -64,7 +64,6 @@ private:
 
     //Methods
     void init_variables();
-    void init_drivers();
     void cmdvelCallback(const geometry_msgs::Twist::ConstPtr &cmd_vel);
     void EmergencyStopFlagCallback(const std_msgs::Empty::ConstPtr &msg);
     void ConnectionFlagCallback(const std_msgs::Bool::ConstPtr &msg);
