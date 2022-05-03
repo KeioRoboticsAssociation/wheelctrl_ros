@@ -86,11 +86,11 @@ void VelConverter::cmdvel2omni(){
     target_speed[3] = n*vx - n*vy + c * omega;
 
 
-    // エンコーダーの取り付けが通常と逆向きのため、-1倍
-    for(int i = 0; i < 4; i++)
-    {
-        target_speed[i] *= -1;
-    }
+    // エンコーダーの取り付けが通常と逆向きのため、-1倍更に座標系反転故に反転
+    // for(int i = 0; i < 4; i++)
+    // {
+    //     target_speed[i] *= -1;
+    // }
     // target_speed[1] *= -1.0;
     // target_speed[2] *= -1.0;
 }
