@@ -7,14 +7,18 @@ Measure_Wheel_Odom_Publisher::Measure_Wheel_Odom_Publisher(ros::NodeHandle &nh, 
                                                             const float &c_w_distance_b,
                                                             const std::string &vertical_axis,
                                                             const std::string &base_frame_id,
-                                                            const float &wheel_diameter)
+                                                            const float &wheel_diameter,
+                                                            const float &initial_position_x,
+                                                            const float &initial_position_y)
     :nh_(nh),
     loop_rate_(loop_rate),
     CENTER_WHEEL_DISTANCE_A(c_w_distance_a),
     CENTER_WHEEL_DISTANCE_B(c_w_distance_b),
     VERTICAL_AXIS(vertical_axis),
     base_frame_id_(base_frame_id),
-    wheel_diameter_(wheel_diameter)
+    wheel_diameter_(wheel_diameter),
+    initial_position_x_(initial_position_x),
+    initial_position_y_(initial_position_y)
 { //constructer, define pubsub
     ROS_INFO("Creating Measure_Wheel_Odom_Publisher");
     ROS_INFO_STREAM("loop_rate [Hz]: " << loop_rate_);
@@ -24,6 +28,8 @@ Measure_Wheel_Odom_Publisher::Measure_Wheel_Odom_Publisher(ros::NodeHandle &nh, 
     // ROS_INFO_STREAM("body_width [m]: " << WHEEL_WIDTH);
     ROS_INFO_STREAM("vertical_axis: " << VERTICAL_AXIS);
     ROS_INFO_STREAM("base_frame_id: " << base_frame_id_);
+    ROS_INFO_STREAM("initial_position_x[m]: "<< initial_position_x_);
+    ROS_INFO_STREAM("initial_position_y[m]: "<< initial_position_y_);
 
     //publisher
     odom_pub = nh_.advertise<nav_msgs::Odometry>("odom", 1);
@@ -45,8 +51,8 @@ void Measure_Wheel_Odom_Publisher::init_variables()
     old_vx = 0;
     old_vy = 0;
     old_omega = 0;
-    x = 0;
-    y = 0;
+    x = initial_position_x_;
+    y = initial_position_y_;
     theta = 0;
     for (int i = 0; i < 2; i++)
     {
@@ -82,10 +88,10 @@ void Measure_Wheel_Odom_Publisher::update()
     while (ros::ok())
     {
         omega = rotate_speed;
-        vx = (wheel_speed[0] - omega * CENTER_WHEEL_DISTANCE_A)*cos(theta)
-                - (wheel_speed[1] - omega * CENTER_WHEEL_DISTANCE_B) * sin(theta);
-        vy = (wheel_speed[0] - omega * CENTER_WHEEL_DISTANCE_A)*sin(theta)
-                + (wheel_speed[1] - omega * CENTER_WHEEL_DISTANCE_B) * cos(theta);
+        vx = (wheel_speed[0] - omega * CENTER_WHEEL_DISTANCE_A)*cos(theta+PI/4)
+                - (wheel_speed[1] - omega * CENTER_WHEEL_DISTANCE_B) * sin(theta+PI/4);
+        vy = (wheel_speed[0] - omega * CENTER_WHEEL_DISTANCE_A)*sin(theta+PI/4)
+                + (wheel_speed[1] - omega * CENTER_WHEEL_DISTANCE_B) * cos(theta+PI/4);
 
         static ros::Time last_time = ros::Time::now();
         ros::Time current_time = ros::Time::now();
@@ -154,6 +160,8 @@ int main(int argc, char **argv)
     std::string vertical_axis = "x";
     std::string base_frame_id = "base_link";
     float wheel_diameter = 0.048;
+    float initial_position_x = 0;
+    float initial_position_y = 0;
 
     arg_n.getParam("control_frequency", looprate);
     // arg_n.getParam("body_height", body_height);
@@ -163,7 +171,9 @@ int main(int argc, char **argv)
     arg_n.getParam("vertical_axis",vertical_axis);
     arg_n.getParam("base_frame_id", base_frame_id);
     arg_n.getParam("wheel_diameter", wheel_diameter);
+    arg_n.getParam("initial_position_x", initial_position_x);
+    arg_n.getParam("initial_position_y", initial_position_y);
 
-    Measure_Wheel_Odom_Publisher publisher(nh, looprate, center_wheel_distance_a, center_wheel_distance_b,vertical_axis,base_frame_id,wheel_diameter);
+    Measure_Wheel_Odom_Publisher publisher(nh, looprate, center_wheel_distance_a, center_wheel_distance_b,vertical_axis,base_frame_id,wheel_diameter, initial_position_x, initial_position_y);
     return 0;
 }
