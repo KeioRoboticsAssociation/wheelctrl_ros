@@ -9,7 +9,8 @@ Measure_Wheel_Odom_Publisher::Measure_Wheel_Odom_Publisher(ros::NodeHandle &nh, 
                                                             const std::string &base_frame_id,
                                                             const float &wheel_diameter,
                                                             const float &initial_position_x,
-                                                            const float &initial_position_y)
+                                                            const float &initial_position_y,
+                                                            const float &initial_position_theta)
     :nh_(nh),
     loop_rate_(loop_rate),
     CENTER_WHEEL_DISTANCE_A(c_w_distance_a),
@@ -18,7 +19,8 @@ Measure_Wheel_Odom_Publisher::Measure_Wheel_Odom_Publisher(ros::NodeHandle &nh, 
     base_frame_id_(base_frame_id),
     wheel_diameter_(wheel_diameter),
     initial_position_x_(initial_position_x),
-    initial_position_y_(initial_position_y)
+    initial_position_y_(initial_position_y),
+    initial_position_theta_(initial_position_theta)
 { //constructer, define pubsub
     ROS_INFO("Creating Measure_Wheel_Odom_Publisher");
     ROS_INFO_STREAM("loop_rate [Hz]: " << loop_rate_);
@@ -30,6 +32,8 @@ Measure_Wheel_Odom_Publisher::Measure_Wheel_Odom_Publisher(ros::NodeHandle &nh, 
     ROS_INFO_STREAM("base_frame_id: " << base_frame_id_);
     ROS_INFO_STREAM("initial_position_x[m]: "<< initial_position_x_);
     ROS_INFO_STREAM("initial_position_y[m]: "<< initial_position_y_);
+    ROS_INFO_STREAM("initial_position_theta[rad]: "<< initial_position_theta_);
+
 
     //publisher
     odom_pub = nh_.advertise<nav_msgs::Odometry>("odom", 1);
@@ -53,7 +57,7 @@ void Measure_Wheel_Odom_Publisher::init_variables()
     old_omega = 0;
     x = initial_position_x_;
     y = initial_position_y_;
-    theta = 0;
+    theta = initial_position_theta_;
     for (int i = 0; i < 2; i++)
     {
         wheel_speed[i] = 0;
@@ -162,6 +166,7 @@ int main(int argc, char **argv)
     float wheel_diameter = 0.048;
     float initial_position_x = 0;
     float initial_position_y = 0;
+    float initial_position_theta = 0;
 
     arg_n.getParam("control_frequency", looprate);
     // arg_n.getParam("body_height", body_height);
@@ -173,7 +178,8 @@ int main(int argc, char **argv)
     arg_n.getParam("wheel_diameter", wheel_diameter);
     arg_n.getParam("initial_position_x", initial_position_x);
     arg_n.getParam("initial_position_y", initial_position_y);
+    arg_n.getParam("initial_position_theta", initial_position_theta);
 
-    Measure_Wheel_Odom_Publisher publisher(nh, looprate, center_wheel_distance_a, center_wheel_distance_b,vertical_axis,base_frame_id,wheel_diameter, initial_position_x, initial_position_y);
+    Measure_Wheel_Odom_Publisher publisher(nh, looprate, center_wheel_distance_a, center_wheel_distance_b,vertical_axis,base_frame_id,wheel_diameter, initial_position_x, initial_position_y, initial_position_theta);
     return 0;
 }
