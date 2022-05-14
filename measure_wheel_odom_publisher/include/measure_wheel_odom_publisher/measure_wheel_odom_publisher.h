@@ -44,7 +44,7 @@ private:
 
     //variables
     float x, y, theta;
-    float vx, vy, omega;
+    float vx, vy, r_vx, r_vy, omega;
     float old_vx, old_vy, old_omega;
     float wheel_speed[2]; // 0:右前左後, 1:左前右後（機械からみて）
     float rotate_speed;

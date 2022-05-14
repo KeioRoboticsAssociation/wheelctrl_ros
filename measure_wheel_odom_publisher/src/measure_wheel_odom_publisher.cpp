@@ -52,6 +52,8 @@ void Measure_Wheel_Odom_Publisher::init_variables()
     vx = 0;
     vy = 0;
     omega = 0;
+    r_vx = 0;
+    r_vy = 0;
     old_vx = 0;
     old_vy = 0;
     old_omega = 0;
@@ -92,10 +94,13 @@ void Measure_Wheel_Odom_Publisher::update()
     while (ros::ok())
     {
         omega = rotate_speed;
-        vx = (wheel_speed[0] - omega * CENTER_WHEEL_DISTANCE_A)*cos(theta+PI/4)
-                + (wheel_speed[1] - omega * CENTER_WHEEL_DISTANCE_B) * sin(theta+PI/4);
-        vy = -(wheel_speed[0] - omega * CENTER_WHEEL_DISTANCE_A)*sin(theta+PI/4)
-                + (wheel_speed[1] - omega * CENTER_WHEEL_DISTANCE_B) * cos(theta+PI/4);
+        r_vx = (wheel_speed[0] - omega * CENTER_WHEEL_DISTANCE_A)*cos(PI/4)
+                + (wheel_speed[1] - omega * CENTER_WHEEL_DISTANCE_B)*cos(PI/4);
+        r_vy = -(wheel_speed[0] - omega * CENTER_WHEEL_DISTANCE_A)*cos(PI/4)
+                + (wheel_speed[1] - omega * CENTER_WHEEL_DISTANCE_B) * cos(PI/4);
+
+        vx = r_vx*cos(theta)-r_vy*sin(theta);
+        vy = r_vx*sin(theta)+r_vy*cos(theta);
 
         static ros::Time last_time = ros::Time::now();
         ros::Time current_time = ros::Time::now();
