@@ -69,8 +69,8 @@ void Measure_Wheel_Odom_Publisher::init_variables()
 
 void Measure_Wheel_Odom_Publisher::Wheel_Callback(const std_msgs::Float32MultiArray::ConstPtr &msg)
 {
-    wheel_speed[0] = msg->data[0] * wheel_diameter_ * 2 * PI;
-    wheel_speed[1] = msg->data[1] * wheel_diameter_ * 2 * PI;
+    wheel_speed[0] = msg->data[0] * wheel_diameter_  * PI;
+    wheel_speed[1] = msg->data[1] * wheel_diameter_  * PI;
 }
 
 void Measure_Wheel_Odom_Publisher::Imu_Callback(const sensor_msgs::Imu::ConstPtr &msg)
