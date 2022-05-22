@@ -10,7 +10,8 @@ Measure_Wheel_Odom_Publisher::Measure_Wheel_Odom_Publisher(ros::NodeHandle &nh, 
                                                             const float &wheel_diameter,
                                                             const float &initial_position_x,
                                                             const float &initial_position_y,
-                                                            const float &initial_position_theta)
+                                                            const float &initial_position_theta,
+                                                            const bool & tf_pub)
     :nh_(nh),
     loop_rate_(loop_rate),
     CENTER_WHEEL_DISTANCE_A(c_w_distance_a),
@@ -20,7 +21,8 @@ Measure_Wheel_Odom_Publisher::Measure_Wheel_Odom_Publisher(ros::NodeHandle &nh, 
     wheel_diameter_(wheel_diameter),
     initial_position_x_(initial_position_x),
     initial_position_y_(initial_position_y),
-    initial_position_theta_(initial_position_theta)
+    initial_position_theta_(initial_position_theta),
+    tf_pub_(tf_pub)
 { //constructer, define pubsub
     ROS_INFO("Creating Measure_Wheel_Odom_Publisher");
     ROS_INFO_STREAM("loop_rate [Hz]: " << loop_rate_);
@@ -114,19 +116,22 @@ void Measure_Wheel_Odom_Publisher::update()
         //since all odometry is 6DOF we'll need a quaternion created from yaw
         geometry_msgs::Quaternion odom_quat = tf::createQuaternionMsgFromYaw(theta);
 
-        //first, we'll publish the transform over tf
-        geometry_msgs::TransformStamped odom_trans;
-        odom_trans.header.stamp = current_time;
-        odom_trans.header.frame_id = "odom";
-        odom_trans.child_frame_id = base_frame_id_;
+        if(tf_pub_){
+            //first, we'll publish the transform over tf
+            geometry_msgs::TransformStamped odom_trans;
+            odom_trans.header.stamp = current_time;
+            odom_trans.header.frame_id = "odom";
+            odom_trans.child_frame_id = base_frame_id_;
 
-        odom_trans.transform.translation.x = x;
-        odom_trans.transform.translation.y = y;
-        odom_trans.transform.translation.z = 0.0;
-        odom_trans.transform.rotation = odom_quat;
+            odom_trans.transform.translation.x = x;
+            odom_trans.transform.translation.y = y;
+            odom_trans.transform.translation.z = 0.0;
+            odom_trans.transform.rotation = odom_quat;
 
-        //send the transform
-        odom_broadcaster.sendTransform(odom_trans);
+            //send the transform
+            odom_broadcaster.sendTransform(odom_trans);
+        }
+
 
         //next, we'll publish the odometry message over ROS
         nav_msgs::Odometry odom;
@@ -172,6 +177,7 @@ int main(int argc, char **argv)
     float initial_position_x = 0;
     float initial_position_y = 0;
     float initial_position_theta = 0;
+    bool tf_pub = true;
 
     arg_n.getParam("control_frequency", looprate);
     // arg_n.getParam("body_height", body_height);
@@ -184,7 +190,8 @@ int main(int argc, char **argv)
     arg_n.getParam("initial_position_x", initial_position_x);
     arg_n.getParam("initial_position_y", initial_position_y);
     arg_n.getParam("initial_position_theta", initial_position_theta);
+    arg_n.getParam("tf_pub",tf_pub);
 
-    Measure_Wheel_Odom_Publisher publisher(nh, looprate, center_wheel_distance_a, center_wheel_distance_b,vertical_axis,base_frame_id,wheel_diameter, initial_position_x, initial_position_y, initial_position_theta);
+    Measure_Wheel_Odom_Publisher publisher(nh, looprate, center_wheel_distance_a, center_wheel_distance_b,vertical_axis,base_frame_id,wheel_diameter, initial_position_x, initial_position_y, initial_position_theta, tf_pub);
     return 0;
 }
