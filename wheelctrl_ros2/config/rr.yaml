@@ -1,0 +1,24 @@
+wheelctrl_ros2:  
+  ros__parameters:
+    robot_param:
+      name: "Rabbit Robot"
+    
+    moving_wheel:
+      type_name: "steering"
+      radius: 0.051
+      quantity: 4
+      gear_ratio: [1,1]
+      gear_ratio_horizonal: [1,1]
+      coordinates: "cartesian"
+      length_x: 0.5
+      length_y: 0.5
+    
+    measuring_wheel:
+      type_name: "steering"
+      radius: 0.051
+      quantity: 4
+      gear_ratio: [1,1]
+      gear_ratio_horizonal: [1,1]
+      coordinates: "cartesian"
+      length_x: 0.5
+      length_y: 0.5

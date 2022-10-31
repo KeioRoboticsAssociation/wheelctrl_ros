@@ -18,8 +18,19 @@ ament_target_dependencies(wheelctrl_ros2 rclcpp std_msgs geometry_msgs tf2 rogil
 
 install(TARGETS
   wheelctrl_ros2
-  DESTINATION lib/${PROJECT_NAME}
+   DESTINATION lib/${PROJECT_NAME}
 )
+
+install(
+  DIRECTORY launch
+  DESTINATION share/${PROJECT_NAME}
+)
+
+install(DIRECTORY 
+  config
+  DESTINATION share/${PROJECT_NAME}
+)
+
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)
   # the following line skips the linter which checks for copyrights
