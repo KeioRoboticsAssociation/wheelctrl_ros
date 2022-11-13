@@ -1,4 +1,4 @@
-#include "general_wheelctrl.hpp"
+#include "wheel.hpp"
 #include "geometry_msgs/msg/twist.hpp"
 #include "nav_msgs/msg/odometry.hpp"
 #include "rogilink2_interfaces/msg/frame.hpp"
@@ -27,10 +27,8 @@ class WheelCtrlRos2 : public rclcpp::Node {
     this->declare_parameter("moving_wheel.type_name", "undefined");
     this->declare_parameter("moving_wheel.radius", 0);
     this->declare_parameter("moving_wheel.quantity", 0);
-    this->declare_parameter("moving_wheel.gear_ratio",
-                            std::vector<float>(2, 0));
-    this->declare_parameter("moving_wheel.gear_ratio_horizonal",
-                            std::vector<float>(2, 0));
+    this->declare_parameter("moving_wheel.gear_ratio", 1);
+    this->declare_parameter("moving_wheel.gear_ratio_horizonal", 1);
     this->declare_parameter("moving_wheel.coordinates", "undefined");
     this->declare_parameter("moving_wheel.distance", 0);
     this->declare_parameter("moving_wheel.arguments", std::vector<float>(4, 0));
@@ -41,10 +39,8 @@ class WheelCtrlRos2 : public rclcpp::Node {
     this->declare_parameter("measuring_wheel.type_name", "undefined");
     this->declare_parameter("measuring_wheel.radius", 0);
     this->declare_parameter("measuring_wheel.quantity", 0);
-    this->declare_parameter("measuring_wheel.gear_ratio",
-                            std::vector<float>(2, 0));
-    this->declare_parameter("measuring_wheel.gear_ratio_horizonal",
-                            std::vector<float>(2, 0));
+    this->declare_parameter("measuring_wheel.gear_ratio", 1);
+    this->declare_parameter("measuring_wheel.gear_ratio_horizonal", 1);
     this->declare_parameter("measuring_wheel.coordinates", "undefined");
     this->declare_parameter("measuring_wheel.distance", 0);
     this->declare_parameter("measuring_wheel.arguments",
@@ -128,9 +124,8 @@ class WheelCtrlRos2 : public rclcpp::Node {
           wheel_sub[i] =
               this->create_subscription<rogilink2_interfaces::msg::Frame>(
                   "rogilink2/receive" + std::to_string(i), 100,
-                  [this,i](
-                      const rogilink2_interfaces::msg::Frame &msg) {
-                    sub_data[i] = msg->data;
+                  [this, i](const rogilink2_interfaces::msg::Frame &msg) {
+                    memcpy(&sub_data[i],msg.data.begin(),msg.data.size());
                   });
         }
       } else {

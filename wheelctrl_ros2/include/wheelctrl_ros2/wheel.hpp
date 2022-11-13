@@ -1,6 +1,7 @@
 #ifndef _WHEEL_
 #define _WHEEL_
-
+#include "rclcpp/rclcpp.hpp"
+#include <math.hpp>
 #include <string>
 #include <vector>
 
@@ -17,34 +18,25 @@ typedef struct WHEEL_PARAMETER {
 
   float length_x;
   float length_y;
-
-  std::vector<std::string> topic_name;
 } W_PARAM, *P_W_PARAM;
 
-typedef struct ODOMETRY
-{
+typedef struct ODOMETRY{
   float x;
   float y;
   float theta;
 } ODOM, *P_ODOM;
 
-typedef struct COMMAND
-{
-  float x;
-  float y;
-  float theta;
-} CMD, *P_CMD;
 
-class Wheel {
- public:
-  ~Wheel();
-  ODOM cal_odom_pos(float encoder[], size_t size);
-  ODOM cal_odom_vel(float encoder[], size_t size);
+class Measuring {
+  public:
+   virtual ~Measuring();
+   virtual void cal_disp() = 0;
+};
 
-
- private:
-  W_PARAM wheel_param;
-  
+class Moving {
+  public:
+   virtual ~Moving();
+   virtual void cal_cmd() = 0;
 };
 
 #endif

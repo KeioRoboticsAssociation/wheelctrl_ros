@@ -7,7 +7,7 @@ wheelctrl_ros2:
       type_name: "omni"
       radius: 0.051
       quantity: 4
-      gear_ratio: [1,1]
+      gear_ratio: 1
       coordinates: "polar"
       distance: 0.7
       arguments: [45,135,225,315]
@@ -16,7 +16,7 @@ wheelctrl_ros2:
       type_name: "omni"
       radius: 0.03
       quantity: 3
-      gear_ratio: [1,1]
+      gear_ratio: 1
       coordinates: "polar"
       distance: 0.1
       arguments: [0,135,270]

@@ -10,9 +10,5 @@
 #include "rclcpp/rclcpp.hpp"
 #include "wheel.hpp"
 
-class GeneralWheelCtrl {
- public:
- private:
-};
 
 #endif
