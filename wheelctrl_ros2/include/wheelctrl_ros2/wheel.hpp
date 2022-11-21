@@ -26,7 +26,7 @@ typedef struct ODOMETRY{
   float theta;
 } ODOM, *P_ODOM;
 
-
+// encoder は回転数でくるよ
 class Measuring {
   public:
    virtual ~Measuring();
