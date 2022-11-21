@@ -30,13 +30,13 @@ typedef struct ODOMETRY{
 class Measuring {
   public:
    virtual ~Measuring();
-   virtual void cal_disp() = 0;
+   virtual void cal_disp();
 };
 
 class Moving {
   public:
    virtual ~Moving();
-   virtual void cal_cmd() = 0;
+   virtual void cal_cmd();
 };
 
 #endif

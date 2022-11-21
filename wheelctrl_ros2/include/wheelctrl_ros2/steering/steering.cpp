@@ -45,18 +45,33 @@ void MeasureSteering::cal_disp(const float encoder[], size_t mysize,
   }
 }
 
-void MoveSteering::cal_cmd(const ODOM &cmd_r, float wheel_cmd[], size_t mysize) {
-  if (mysize != 3) {
+void MoveSteering::cal_cmd(float table_angle,const ODOM &cmd_r, float wheel_cmd[], size_t mysize) {
+  if (mysize != 8) {
     std::printf("invalid argument size");
   } else {
-    wheel_cmd[0] = -cmd_r.x * sin(w_param.arguments[0]) +
-                   cmd_r.y * cos(w_param.arguments[0]) +
-                   cmd_r.theta * w_param.distance;
-    wheel_cmd[1] = -cmd_r.x * sin(w_param.arguments[1]) +
-                   cmd_r.y * cos(w_param.arguments[1]) +
-                   cmd_r.theta * w_param.distance;
-    wheel_cmd[2] = -cmd_r.x * sin(w_param.arguments[2]) +
-                   cmd_r.y * cos(w_param.arguments[2]) +
-                   cmd_r.theta * w_param.distance;
+    wheel_cmd[0] = sqrt(
+        pow(cmd_r.x - w_param.distance * cmd_r.theta * sin(table_angle), 2) +
+        pow(cmd_r.y + w_param.distance * cmd_r.theta * sin(table_angle), 2));
+    wheel_cmd[1] = sqrt(
+        pow(cmd_r.x - w_param.distance * cmd_r.theta * cos(table_angle), 2) +
+        pow(cmd_r.y - w_param.distance * cmd_r.theta * sin(table_angle), 2));
+    wheel_cmd[2] = sqrt(
+        pow(cmd_r.x + w_param.distance * cmd_r.theta * sin(table_angle), 2) +
+        pow(cmd_r.y - w_param.distance * cmd_r.theta * cos(table_angle), 2));
+    wheel_cmd[3] = sqrt(
+        pow(cmd_r.x + w_param.distance * cmd_r.theta * cos(table_angle), 2) +
+        pow(cmd_r.y + w_param.distance * cmd_r.theta * sin(table_angle), 2));
+    wheel_cmd[4] =
+        atan2(cmd_r.y + w_param.distance * cmd_r.theta * sin(table_angle),
+              cmd_r.x - w_param.distance * cmd_r.theta * sin(table_angle));
+    wheel_cmd[5] =
+        atan2(cmd_r.y - w_param.distance * cmd_r.theta * sin(table_angle),
+              cmd_r.x - w_param.distance * cmd_r.theta * cos(table_angle));
+    wheel_cmd[6] =
+        atan2(cmd_r.y - w_param.distance * cmd_r.theta * cos(table_angle),
+              cmd_r.x + w_param.distance * cmd_r.theta * sin(table_angle));
+    wheel_cmd[7] =
+        atan2(cmd_r.y + w_param.distance * cmd_r.theta * sin(table_angle),
+              cmd_r.x + w_param.distance * cmd_r.theta * cos(table_angle));
   }
 }
