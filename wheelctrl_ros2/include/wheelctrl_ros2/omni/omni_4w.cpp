@@ -1,55 +1,61 @@
 #include "omni_4w.hpp"
 
-MeasureOmni4W::MeasureOmni4W(const W_PARAM &_w_param)
-:w_param(_w_param){
-}
-
-MoveOmni4W::MoveOmni4W(const W_PARAM &_w_param)
-:w_param(_w_param){
-
-}
-
-void MeasureOmni4W::cal_disp(const float encoder[],size_t mysize,ODOM &dist_r) {
-    if(mysize!=4){
-      std::printf("invalid argument size");
-      dist_r.x = 0;
-      dist_r.y = 0;
-      dist_r.theta = 0;
-    } else {
-      dist_r.theta = (encoder[0] + encoder[1] + encoder[2] + encoder[3]) /
-                   (4 * w_param.distance);
-      dist_r.x =
-          (-encoder[0] - encoder[1] + encoder[2] + encoder[3]) / (4 * sqrt(2));
-      dist_r.y =
-          (encoder[0] - encoder[1] - encoder[2] + encoder[3]) / (4 * sqrt(2));
-    }
-}
-void MeasureOmni4W::cal_disp(const float encoder[], size_t mysize,const float &imu, ODOM &dist_r) {
-  if (mysize != 4) {
-    std::printf("invalid argument size");
-    dist_r.x = 0;
-    dist_r.y = 0;
-    dist_r.theta = 0;
-  } else {
-    dist_r.theta = imu;
-    dist_r.x =
-        (-encoder[0] - encoder[1] + encoder[2] + encoder[3]) / (4 * sqrt(2));
-    dist_r.y =
-        (encoder[0] - encoder[1] - encoder[2] + encoder[3]) / (4 * sqrt(2));
+illias::MeasureOmni4W::MeasureOmni4W(const W_PARAM &_w_param,const POS &_past_pos)
+:Measuring(_w_param,_past_pos){
+  if(w_param.type_name == "omni"&&w_param.quantity==4){
+    printf("this is the subclass of the four-wheel measuring module\n");
+  }else{
+    printf("please use another subclass\n");
   }
 }
 
-void MoveOmni4W::cal_cmd(const ODOM &cmd_r, float wheel_cmd[], size_t mysize) {
-  if(mysize !=4){
-    std::printf("invalid argument size");
-  }else{
-    wheel_cmd[0] =
-        sqrt(2) * (-cmd_r.x + cmd_r.y) + w_param.distance * cmd_r.theta;
-    wheel_cmd[1] =
-        sqrt(2) * (-cmd_r.x - cmd_r.y) + w_param.distance * cmd_r.theta;
-    wheel_cmd[2] =
-        sqrt(2) * (cmd_r.x - cmd_r.y) + w_param.distance * cmd_r.theta;
-    wheel_cmd[3] =
-        sqrt(2) * (cmd_r.x + cmd_r.y) + w_param.distance * cmd_r.theta;
+illias::MoveOmni4W::MoveOmni4W(const W_PARAM &_w_param)
+:Moving(_w_param){
+  if (w_param.type_name == "omni" && w_param.quantity == 4) {
+    printf("this is the subclass of the four-wheel measuring module\n");
+  } else {
+    printf("please use another subclass\n");
+  }
+}
+
+void illias::MeasureOmni4W::cal_disp(const float encoder[],const int &length) {
+  POS delta;
+  // エンコーダーの値を代入
+  if (length != 4) {
+    std::printf("invalid argument size\n");
+    delta.x = 0;
+    delta.y = 0;
+    delta.theta = 0;
+  } else {
+    float v0 = rotate_to_meter(encoder[0]);
+    float v1 = rotate_to_meter(encoder[1]);
+    float v2 = rotate_to_meter(encoder[2]);
+    float v3 = rotate_to_meter(encoder[3]);
+
+    delta.x = (-v0 - v1 + v2 + v3) / (4*sqrt(2));
+    delta.y = (v0 - v1 - v2 + v3) / (4 * sqrt(2));
+    delta.theta = (v0 + v1 + v2 + v3) / 4;
+  }
+
+  //ロボット座標系から現在の固定座標に変換
+  this->current_pos.x = this->past_pos.x + cos(past_pos.theta) * delta.x -
+                        sin(past_pos.theta) * delta.y;
+  this->current_pos.y = this->past_pos.y + sin(past_pos.theta) * delta.x +
+                        cos(past_pos.theta) * delta.y;
+  this->current_pos.theta = change_range(this->past_pos.theta + delta.theta);
+
+  // past_posを更新
+  past_pos = current_pos;
+}
+
+void illias::MoveOmni4W::cal_cmd(const CMD &cmd) {
+  float arg = 1 / sqrt(2);
+  wheel_cmd_meter[0] = arg * (-cmd.x + cmd.y) + w_param.distance * cmd.theta;
+  wheel_cmd_meter[1] = arg * (-cmd.x - cmd.y) + w_param.distance * cmd.theta;
+  wheel_cmd_meter[2] = arg * (cmd.x - cmd.y) + w_param.distance * cmd.theta;
+  wheel_cmd_meter[3] = arg * (cmd.x + cmd.y) + w_param.distance * cmd.theta;
+
+  for (int i = 0; i < 4;i++){
+    wheel_cmd_rotate[i] = meter_to_rotate(wheel_cmd_meter[i]);
   }
 }

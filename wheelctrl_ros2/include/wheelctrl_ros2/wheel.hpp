@@ -5,38 +5,127 @@
 #include <string>
 #include <vector>
 
+using namespace std;
+
+namespace illias{
+
 typedef struct WHEEL_PARAMETER {
-  std::string type_name;
-  float radius;
-  float quantity;
-  float gear_ratio;
-  float gear_ratio_horizonal;
+  std::string type_name;      //足回りの種類
+  float radius;               //半径
+  float quantity;             //タイヤの数
+  float gear_ratio;           //タイヤ1回転あたりのモーター回転数
+  float gear_ratio_horizonal; //タイヤ1回転あたりのモーター回転数
 
-  std::string coordinate;
-  float distance;
-  std::vector<double> arguments;
+  std::string coordinate;     
+  float distance;             //中心からタイヤまでの距離
+  std::vector<float> arguments;//どの角度についているのか
 
-  float length_x;
-  float length_y;
+  float length_x;//x軸方向の長さ
+  float length_y;//y軸方向の長さ
 } W_PARAM, *P_W_PARAM;
 
-typedef struct ODOMETRY{
+typedef struct POSTURE {
   float x;
   float y;
   float theta;
-} ODOM, *P_ODOM;
+} POS, *P_POS;
 
-// encoder は回転数でくるよ
+typedef struct COMMAND {
+  float x;
+  float y;
+  float theta;
+} CMD, *P_CMD;
+
+float change_range(float arg){
+  if(arg>M_PI){
+    return arg - 2*M_PI;
+  }else if(arg < -M_PI){
+    return arg + 2*M_PI;
+  }else{
+    return arg;
+  }
+}
+
+float csc(float arg) {
+  if (sin(arg) != 0){
+    return 1 / sin(arg);
+  }else{
+    return 0;
+  }
+}
+
+// base class of measuring wheels
 class Measuring {
-  public:
-   virtual ~Measuring();
-   virtual void cal_disp();
+ public:
+  Measuring(const W_PARAM &_w_param,const POS &_past_pos)
+  :w_param(_w_param),past_pos(_past_pos){
+    current_pos = past_pos;
+  }
+  virtual ~Measuring();
+
+  //convert encoder data into robot posture(world coordinate)
+  virtual void cal_disp(const float encoder[],const int &length){
+    printf("please use subclass");
+  }
+
+  // convert encoder data into robot posture(world coordinate)
+  virtual void cal_disp(const float encoder[],const int &length,const float &imu){//エンコーダーの値から現在の座標を計算
+    printf("please use subclass");
+  }
+
+  // get current posture of robot (world coordinate)
+  POS get_pos() { return this->current_pos; }
+
+  float rotate_to_meter(const float &rotate){
+    return (rotate/this->w_param.gear_ratio) * 2 * M_PI * this->w_param.radius;
+  }
+  float rotate_to_rad(const float &rotate){
+    return (rotate / this->w_param.gear_ratio_horizonal) * 2 * M_PI;
+  }
+ protected:
+  W_PARAM w_param;
+  POS past_pos; //前の位置（固定座標系）
+  POS current_pos;//現在の位置（固定座標系）
 };
 
 class Moving {
-  public:
-   virtual ~Moving();
-   virtual void cal_cmd();
-};
+ public:
+  Moving(const W_PARAM &_w_param) : w_param(_w_param){
+    if (w_param.type_name == "steering"){
+      wheel_cmd_meter = new float[2*w_param.quantity];
+      wheel_cmd_rotate = new float[2 * w_param.quantity];
 
+      for (int i = 0; i < 2*w_param.quantity; i++) {
+        wheel_cmd_meter[i] = 0;
+        wheel_cmd_rotate[i] = 0;
+      }
+    }else{
+      wheel_cmd_meter = new float[w_param.quantity];
+      for (int i = 0; i < w_param.quantity; i++) {
+        wheel_cmd_meter[i] = 0;
+        wheel_cmd_rotate[i] = 0;
+      }
+    }
+  }
+  virtual ~Moving();
+  virtual void cal_cmd(const CMD &cmd_vel) { printf("please use subclass"); }
+  virtual void cal_cmd(const CMD &cmd, const float curvature){
+    printf("please use subclass");
+  }
+  virtual void cal_cmd(const CMD &cmd, const float &table_angle);
+
+  float meter_to_rotate(const float &meter) {
+    return meter * this->w_param.gear_ratio / (2 * M_PI * this->w_param.radius);
+  }
+  float rad_to_meter(const float &rad) {
+    return rad * this->w_param.gear_ratio / (2 * M_PI);
+  }
+
+  float *wheel_cmd_rotate;
+  float *wheel_cmd_meter;
+
+ protected:
+  W_PARAM w_param;
+};
+}
 #endif

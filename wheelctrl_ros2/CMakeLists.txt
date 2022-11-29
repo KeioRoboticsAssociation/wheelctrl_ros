@@ -10,11 +10,12 @@ find_package(ament_cmake REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(std_msgs REQUIRED)
 find_package(geometry_msgs REQUIRED)
+find_package(nav_msgs REQUIRED)
 find_package(tf2 REQUIRED)
 find_package(rogilink2_interfaces REQUIRED)
 
 add_executable(wheelctrl_ros2 src/wheelctrl_ros2.cpp)
-ament_target_dependencies(wheelctrl_ros2 rclcpp std_msgs geometry_msgs tf2 rogilink2_interfaces)
+ament_target_dependencies(wheelctrl_ros2 rclcpp std_msgs nav_msgs geometry_msgs tf2 rogilink2_interfaces)
 
 install(TARGETS
   wheelctrl_ros2
@@ -28,6 +29,11 @@ install(
 
 install(DIRECTORY 
   config
+  DESTINATION share/${PROJECT_NAME}
+)
+
+install(DIRECTORY
+  src/wheelctrl_ros2
   DESTINATION share/${PROJECT_NAME}
 )
 

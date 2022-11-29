@@ -8,7 +8,10 @@
 #include <vector>
 
 #include "rclcpp/rclcpp.hpp"
-#include "wheel.hpp"
+#include "omni_2W.hpp"
+#include "omni_3w.hpp"
+#include "omni_4w.hpp"
+#include "steering.hpp"
 
 
 #endif
