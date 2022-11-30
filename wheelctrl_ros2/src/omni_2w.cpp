@@ -1,4 +1,4 @@
-#include "omni_2W.hpp"
+#include "omni_2w.hpp"
 
 illias::MeasureOmni2W::MeasureOmni2W(const W_PARAM &_w_param,
                                      const POS &_past_pos)

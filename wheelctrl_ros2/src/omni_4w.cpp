@@ -11,6 +11,7 @@ illias::MeasureOmni4W::MeasureOmni4W(const W_PARAM &_w_param,const POS &_past_po
 
 illias::MoveOmni4W::MoveOmni4W(const W_PARAM &_w_param)
 :Moving(_w_param){
+  printf("gya\n");
   if (w_param.type_name == "omni" && w_param.quantity == 4) {
     printf("this is the subclass of the four-wheel measuring module\n");
   } else {
@@ -21,11 +22,11 @@ illias::MoveOmni4W::MoveOmni4W(const W_PARAM &_w_param)
 void illias::MeasureOmni4W::cal_disp(const float encoder[],const int &length) {
   POS delta;
   // エンコーダーの値を代入
+  delta.x = 0;
+  delta.y = 0;
+  delta.theta = 0;
   if (length != 4) {
     std::printf("invalid argument size\n");
-    delta.x = 0;
-    delta.y = 0;
-    delta.theta = 0;
   } else {
     float v0 = rotate_to_meter(encoder[0]);
     float v1 = rotate_to_meter(encoder[1]);

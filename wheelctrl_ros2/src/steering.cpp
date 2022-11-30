@@ -26,9 +26,9 @@ void illias::MeasureSteering::cal_disp(const float encoder[],const int &length) 
     delta.y = 0;
     delta.theta = 0;
   } else {
-    float a = w_param.arguments[0];
-    float b = w_param.arguments[1];
-    float c = w_param.arguments[2];
+    float a = (float)w_param.arguments[0];
+    float b = (float)w_param.arguments[1];
+    float c = (float)w_param.arguments[2];
     float n = 1 / (cos(c) * (sin(b) - sin(a)) + cos(b) * (sin(a) - sin(c)) +
                    cos(a) * (sin(c) - sin(b)));
     delta.x =
@@ -42,6 +42,15 @@ void illias::MeasureSteering::cal_disp(const float encoder[],const int &length) 
                     encoder[1] * (cos(c) * sin(a) - sin(c) * cos(a)) +
                     encoder[2] * (cos(a) * sin(b) - sin(a) * cos(b)));
   }
+  //ロボット座標系から現在の固定座標に変換
+  this->current_pos.x = this->past_pos.x + cos(past_pos.theta) * delta.x -
+                        sin(past_pos.theta) * delta.y;
+  this->current_pos.y = this->past_pos.y + sin(past_pos.theta) * delta.x +
+                        cos(past_pos.theta) * delta.y;
+  this->current_pos.theta = change_range(this->past_pos.theta + delta.theta);
+
+  // past_posを更新
+  past_pos = current_pos;
 }
 
 void illias::MoveSteering::cal_cmd(const CMD &cmd,const float &table_angle) {

@@ -14,7 +14,14 @@ find_package(nav_msgs REQUIRED)
 find_package(tf2 REQUIRED)
 find_package(rogilink2_interfaces REQUIRED)
 
-add_executable(wheelctrl_ros2 src/wheelctrl_ros2.cpp)
+add_executable(wheelctrl_ros2 
+src/wheelctrl_ros2.cpp 
+src/omni_2w.cpp
+src/omni_3w.cpp
+src/omni_4w.cpp
+src/steering.cpp
+)
+
 ament_target_dependencies(wheelctrl_ros2 rclcpp std_msgs nav_msgs geometry_msgs tf2 rogilink2_interfaces)
 
 install(TARGETS
@@ -29,11 +36,6 @@ install(
 
 install(DIRECTORY 
   config
-  DESTINATION share/${PROJECT_NAME}
-)
-
-install(DIRECTORY
-  src/wheelctrl_ros2
   DESTINATION share/${PROJECT_NAME}
 )
 

@@ -1,7 +1,6 @@
-#ifndef _WHEEL_
-#define _WHEEL_
+#pragma once
 #include "rclcpp/rclcpp.hpp"
-#include <math.hpp>
+#include <math.h>
 #include <string>
 #include <vector>
 
@@ -12,13 +11,13 @@ namespace illias{
 typedef struct WHEEL_PARAMETER {
   std::string type_name;      //足回りの種類
   float radius;               //半径
-  float quantity;             //タイヤの数
+  int quantity;             //タイヤの数
   float gear_ratio;           //タイヤ1回転あたりのモーター回転数
   float gear_ratio_horizonal; //タイヤ1回転あたりのモーター回転数
 
   std::string coordinate;     
   float distance;             //中心からタイヤまでの距離
-  std::vector<float> arguments;//どの角度についているのか
+  std::vector<double> arguments;//どの角度についているのか
 
   float length_x;//x軸方向の長さ
   float length_y;//y軸方向の長さ
@@ -36,7 +35,7 @@ typedef struct COMMAND {
   float theta;
 } CMD, *P_CMD;
 
-float change_range(float arg){
+inline float change_range(float arg){
   if(arg>M_PI){
     return arg - 2*M_PI;
   }else if(arg < -M_PI){
@@ -46,7 +45,7 @@ float change_range(float arg){
   }
 }
 
-float csc(float arg) {
+inline float csc(float arg) {
   if (sin(arg) != 0){
     return 1 / sin(arg);
   }else{
@@ -61,16 +60,25 @@ class Measuring {
   :w_param(_w_param),past_pos(_past_pos){
     current_pos = past_pos;
   }
-  virtual ~Measuring();
+  virtual ~Measuring(){}
 
   //convert encoder data into robot posture(world coordinate)
   virtual void cal_disp(const float encoder[],const int &length){
     printf("please use subclass");
+    for (int i = 0; i < length;i++)
+    {
+      printf("%f ", encoder[i]);
+    }
+    printf("\n");
   }
 
   // convert encoder data into robot posture(world coordinate)
   virtual void cal_disp(const float encoder[],const int &length,const float &imu){//エンコーダーの値から現在の座標を計算
     printf("please use subclass");
+    for (int i = 0; i < length;i++){
+      printf("%f ", encoder[i]);
+    }
+    printf("%f\n", imu);
   }
 
   // get current posture of robot (world coordinate)
@@ -91,28 +99,36 @@ class Measuring {
 class Moving {
  public:
   Moving(const W_PARAM &_w_param) : w_param(_w_param){
+    printf("kyan\n");
     if (w_param.type_name == "steering"){
-      wheel_cmd_meter = new float[2*w_param.quantity];
-      wheel_cmd_rotate = new float[2 * w_param.quantity];
+      wheel_cmd_meter = std::make_unique<float[]>(2 * w_param.quantity);
+      wheel_cmd_rotate = std::make_unique<float[]>(2 * w_param.quantity);
 
       for (int i = 0; i < 2*w_param.quantity; i++) {
         wheel_cmd_meter[i] = 0;
         wheel_cmd_rotate[i] = 0;
       }
     }else{
-      wheel_cmd_meter = new float[w_param.quantity];
+      wheel_cmd_meter = std::make_unique<float[]>(w_param.quantity);
+      wheel_cmd_rotate = std::make_unique<float[]>(w_param.quantity);
       for (int i = 0; i < w_param.quantity; i++) {
         wheel_cmd_meter[i] = 0;
         wheel_cmd_rotate[i] = 0;
       }
     }
   }
-  virtual ~Moving();
-  virtual void cal_cmd(const CMD &cmd_vel) { printf("please use subclass"); }
+  virtual ~Moving(){}
+  virtual void cal_cmd(const CMD &cmd) { 
+    printf("please use subclass");
+    printf("%f,%f,%f\n", cmd.x, cmd.y, cmd.theta);
+  }
   virtual void cal_cmd(const CMD &cmd, const float curvature){
     printf("please use subclass");
+    printf("%f,%f,%f,%f\n", cmd.x, cmd.y, cmd.theta, curvature);
   }
-  virtual void cal_cmd(const CMD &cmd, const float &table_angle);
+  virtual void cal_cmd(const CMD &cmd, const float &table_angle){
+    printf("%f,%f,%f,%f\n", cmd.x, cmd.y, cmd.theta, table_angle);
+    };
 
   float meter_to_rotate(const float &meter) {
     return meter * this->w_param.gear_ratio / (2 * M_PI * this->w_param.radius);
@@ -121,11 +137,10 @@ class Moving {
     return rad * this->w_param.gear_ratio / (2 * M_PI);
   }
 
-  float *wheel_cmd_rotate;
-  float *wheel_cmd_meter;
+  std::unique_ptr<float[]> wheel_cmd_meter;
+  std::unique_ptr<float[]> wheel_cmd_rotate;
 
  protected:
   W_PARAM w_param;
 };
 }
-#endif
