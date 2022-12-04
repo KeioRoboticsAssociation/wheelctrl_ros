@@ -1,0 +1,120 @@
+[0.000000] (-) TimerEvent: {}
+[0.001143] (-) JobUnselected: {'identifier': 'measure_wheel_odom_publisher'}
+[0.002298] (-) JobUnselected: {'identifier': 'mecanum_odom_publisher'}
+[0.002534] (-) JobUnselected: {'identifier': 'mecanum_wheelctrl'}
+[0.002682] (-) JobUnselected: {'identifier': 'omni_odom_publisher'}
+[0.002746] (-) JobUnselected: {'identifier': 'omni_wheelctrl'}
+[0.002792] (-) JobUnselected: {'identifier': 'swerve_odom_publisher'}
+[0.002859] (-) JobUnselected: {'identifier': 'swerve_wheelctrl'}
+[0.002907] (general_wheelctrl) JobQueued: {'identifier': 'general_wheelctrl', 'dependencies': OrderedDict()}
+[0.003054] (general_wheelctrl) JobStarted: {'identifier': 'general_wheelctrl'}
+[0.010693] (general_wheelctrl) JobProgress: {'identifier': 'general_wheelctrl', 'progress': 'cmake'}
+[0.011424] (general_wheelctrl) Command: {'cmd': ['/usr/bin/cmake', '/home/yugo/ros2_ws/src/wheelctrl_ros/general_wheelctrl', '-DCMAKE_INSTALL_PREFIX=/home/yugo/ros2_ws/src/wheelctrl_ros/install/general_wheelctrl'], 'cwd': '/home/yugo/ros2_ws/src/wheelctrl_ros/build/general_wheelctrl', 'env': OrderedDict([('LESSOPEN', '| /usr/bin/lesspipe %s'), ('USER', 'yugo'), ('SHLVL', '1'), ('LD_LIBRARY_PATH', '/opt/ros/humble/opt/rviz_ogre_vendor/lib:/opt/ros/humble/lib/x86_64-linux-gnu:/opt/ros/humble/lib'), ('HOME', '/home/yugo'), ('OLDPWD', '/home/yugo/ros2_ws/src'), ('ROS_PYTHON_VERSION', '3'), ('WSL_DISTRO_NAME', 'Ubuntu-22.04'), ('WAYLAND_DISPLAY', 'wayland-0'), ('COLCON_PREFIX_PATH', '/home/yugo/ros2_ws/src/install'), ('ROS_DISTRO', 'humble'), ('LOGNAME', 'yugo'), ('NAME', 'LAPTOP-E2JT2G1B'), ('WSL_INTEROP', '/run/WSL/3103_interop'), ('PULSE_SERVER', '/mnt/wslg/PulseServer'), ('_', '/usr/bin/colcon'), ('ROS_VERSION', '2'), ('TERM', 'xterm-256color'), ('ROS_LOCALHOST_ONLY', '1'), ('PATH', '/opt/ros/humble/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/usr/lib/wsl/lib:/mnt/c/Program Files/PerkinElmerInformatics/ChemOffice2021/ChemScript/Lib:/mnt/c/WINDOWS/system32:/mnt/c/WINDOWS:/mnt/c/WINDOWS/System32/Wbem:/mnt/c/WINDOWS/System32/WindowsPowerShell/v1.0/:/mnt/c/WINDOWS/System32/OpenSSH/:/mnt/c/Program Files/Microsoft SQL Server/Client SDK/ODBC/110/Tools/Binn/:/mnt/c/Program Files (x86)/Microsoft SQL Server/120/Tools/Binn/:/mnt/c/Program Files/Microsoft SQL Server/120/Tools/Binn/:/mnt/c/Program Files/Microsoft SQL Server/120/DTS/Binn/:/mnt/c/Program Files (x86)/Windows Kits/8.1/Windows Performance Toolkit/:/mnt/c/Program Files/PowerShell/7/:/mnt/c/texlive/2021/bin/win32:/mnt/c/Program Files/MATLAB/R2022a/runtime/win64:/mnt/c/Program Files/MATLAB/R2022a/bin:/mnt/c/Program Files/Git/cmd:/mnt/c/ProgramData/chocolatey/bin:/mnt/c/ProgramData/chocolatey/lib/gsudo/bin/:/mnt/c/Program Files/nodejs/:/mnt/c/Users/yugo/AppData/Local/Microsoft/WindowsApps:/mnt/c/Users/yugo/AppData/Local/Programs/Microsoft VS Code/bin:/mnt/c/Users/yugo/AppData/Local/GitHubDesktop/bin:/mnt/c/ProgramData/chocolatey/lib/mingw/tools/install/mingw64/bin:/mnt/c/Users/yugo/AppData/Roaming/npm:/snap/bin'), ('XDG_RUNTIME_DIR', '/mnt/wslg/runtime-dir'), ('DISPLAY', ':0'), ('LANG', 'en_US.UTF-8'), ('LS_COLORS', 'rs=0:di=01;34:ln=01;36:mh=00:pi=40;33:so=01;35:do=01;35:bd=40;33;01:cd=40;33;01:or=40;31;01:mi=00:su=37;41:sg=30;43:ca=30;41:tw=30;42:ow=34;42:st=37;44:ex=01;32:*.tar=01;31:*.tgz=01;31:*.arc=01;31:*.arj=01;31:*.taz=01;31:*.lha=01;31:*.lz4=01;31:*.lzh=01;31:*.lzma=01;31:*.tlz=01;31:*.txz=01;31:*.tzo=01;31:*.t7z=01;31:*.zip=01;31:*.z=01;31:*.dz=01;31:*.gz=01;31:*.lrz=01;31:*.lz=01;31:*.lzo=01;31:*.xz=01;31:*.zst=01;31:*.tzst=01;31:*.bz2=01;31:*.bz=01;31:*.tbz=01;31:*.tbz2=01;31:*.tz=01;31:*.deb=01;31:*.rpm=01;31:*.jar=01;31:*.war=01;31:*.ear=01;31:*.sar=01;31:*.rar=01;31:*.alz=01;31:*.ace=01;31:*.zoo=01;31:*.cpio=01;31:*.7z=01;31:*.rz=01;31:*.cab=01;31:*.wim=01;31:*.swm=01;31:*.dwm=01;31:*.esd=01;31:*.jpg=01;35:*.jpeg=01;35:*.mjpg=01;35:*.mjpeg=01;35:*.gif=01;35:*.bmp=01;35:*.pbm=01;35:*.pgm=01;35:*.ppm=01;35:*.tga=01;35:*.xbm=01;35:*.xpm=01;35:*.tif=01;35:*.tiff=01;35:*.png=01;35:*.svg=01;35:*.svgz=01;35:*.mng=01;35:*.pcx=01;35:*.mov=01;35:*.mpg=01;35:*.mpeg=01;35:*.m2v=01;35:*.mkv=01;35:*.webm=01;35:*.webp=01;35:*.ogm=01;35:*.mp4=01;35:*.m4v=01;35:*.mp4v=01;35:*.vob=01;35:*.qt=01;35:*.nuv=01;35:*.wmv=01;35:*.asf=01;35:*.rm=01;35:*.rmvb=01;35:*.flc=01;35:*.avi=01;35:*.fli=01;35:*.flv=01;35:*.gl=01;35:*.dl=01;35:*.xcf=01;35:*.xwd=01;35:*.yuv=01;35:*.cgm=01;35:*.emf=01;35:*.ogv=01;35:*.ogx=01;35:*.aac=00;36:*.au=00;36:*.flac=00;36:*.m4a=00;36:*.mid=00;36:*.midi=00;36:*.mka=00;36:*.mp3=00;36:*.mpc=00;36:*.ogg=00;36:*.ra=00;36:*.wav=00;36:*.oga=00;36:*.opus=00;36:*.spx=00;36:*.xspf=00;36:'), ('ROS_DOMAIN_ID', '0'), ('AMENT_PREFIX_PATH', '/home/yugo/ros2_ws/src/install/my_sample:/opt/ros/humble'), ('SHELL', '/bin/bash'), ('LESSCLOSE', '/usr/bin/lesspipe %s %s'), ('PWD', '/home/yugo/ros2_ws/src/wheelctrl_ros/build/general_wheelctrl'), ('XDG_DATA_DIRS', '/usr/local/share:/usr/share:/var/lib/snapd/desktop'), ('PYTHONPATH', '/opt/ros/humble/lib/python3.10/site-packages:/opt/ros/humble/local/lib/python3.10/dist-packages'), ('COLCON', '1'), ('HOSTTYPE', 'x86_64'), ('CMAKE_PREFIX_PATH', '/home/yugo/ros2_ws/src/install/my_sample:/opt/ros/humble'), ('WSLENV', '')]), 'shell': False}
+[0.022983] (general_wheelctrl) StdoutLine: {'line': b'-- Found ament_cmake: 1.3.2 (/opt/ros/humble/share/ament_cmake/cmake)\n'}
+[0.098698] (-) TimerEvent: {}
+[0.139649] (general_wheelctrl) StdoutLine: {'line': b'-- Found std_msgs: 4.2.2 (/opt/ros/humble/share/std_msgs/cmake)\n'}
+[0.198878] (-) TimerEvent: {}
+[0.294874] (general_wheelctrl) StdoutLine: {'line': b'-- Found rosidl_generator_c: 3.1.3 (/opt/ros/humble/share/rosidl_generator_c/cmake)\n'}
+[0.296713] (general_wheelctrl) StdoutLine: {'line': b'-- Found rosidl_adapter: 3.1.3 (/opt/ros/humble/share/rosidl_adapter/cmake)\n'}
+[0.299041] (-) TimerEvent: {}
+[0.301467] (general_wheelctrl) StdoutLine: {'line': b'-- Found rosidl_generator_cpp: 3.1.3 (/opt/ros/humble/share/rosidl_generator_cpp/cmake)\n'}
+[0.311662] (general_wheelctrl) StdoutLine: {'line': b'-- Using all available rosidl_typesupport_c: rosidl_typesupport_fastrtps_c;rosidl_typesupport_introspection_c\n'}
+[0.324575] (general_wheelctrl) StdoutLine: {'line': b'-- Using all available rosidl_typesupport_cpp: rosidl_typesupport_fastrtps_cpp;rosidl_typesupport_introspection_cpp\n'}
+[0.372568] (general_wheelctrl) StdoutLine: {'line': b'-- Found rclcpp: 16.0.1 (/opt/ros/humble/share/rclcpp/cmake)\n'}
+[0.399280] (-) TimerEvent: {}
+[0.413334] (general_wheelctrl) StdoutLine: {'line': b'-- Found rmw_implementation_cmake: 6.1.0 (/opt/ros/humble/share/rmw_implementation_cmake/cmake)\n'}
+[0.414175] (general_wheelctrl) StdoutLine: {'line': b'-- Found rmw_fastrtps_cpp: 6.2.1 (/opt/ros/humble/share/rmw_fastrtps_cpp/cmake)\n'}
+[0.499474] (-) TimerEvent: {}
+[0.599989] (-) TimerEvent: {}
+[0.700467] (-) TimerEvent: {}
+[0.801009] (-) TimerEvent: {}
+[0.901581] (-) TimerEvent: {}
+[1.002152] (-) TimerEvent: {}
+[1.102713] (-) TimerEvent: {}
+[1.203278] (-) TimerEvent: {}
+[1.303847] (-) TimerEvent: {}
+[1.404476] (-) TimerEvent: {}
+[1.505008] (-) TimerEvent: {}
+[1.605580] (-) TimerEvent: {}
+[1.706196] (-) TimerEvent: {}
+[1.806795] (-) TimerEvent: {}
+[1.907344] (-) TimerEvent: {}
+[2.007859] (-) TimerEvent: {}
+[2.108484] (-) TimerEvent: {}
+[2.209040] (-) TimerEvent: {}
+[2.309560] (-) TimerEvent: {}
+[2.410136] (-) TimerEvent: {}
+[2.510721] (-) TimerEvent: {}
+[2.611244] (-) TimerEvent: {}
+[2.711722] (-) TimerEvent: {}
+[2.812297] (-) TimerEvent: {}
+[2.912986] (-) TimerEvent: {}
+[3.013494] (-) TimerEvent: {}
+[3.113932] (-) TimerEvent: {}
+[3.214561] (-) TimerEvent: {}
+[3.315018] (-) TimerEvent: {}
+[3.415550] (-) TimerEvent: {}
+[3.516077] (-) TimerEvent: {}
+[3.616610] (-) TimerEvent: {}
+[3.717206] (-) TimerEvent: {}
+[3.817777] (-) TimerEvent: {}
+[3.918334] (-) TimerEvent: {}
+[4.018977] (-) TimerEvent: {}
+[4.119539] (-) TimerEvent: {}
+[4.220109] (-) TimerEvent: {}
+[4.320723] (-) TimerEvent: {}
+[4.421317] (-) TimerEvent: {}
+[4.521844] (-) TimerEvent: {}
+[4.622393] (-) TimerEvent: {}
+[4.722872] (-) TimerEvent: {}
+[4.823399] (-) TimerEvent: {}
+[4.923843] (-) TimerEvent: {}
+[5.024465] (-) TimerEvent: {}
+[5.124991] (-) TimerEvent: {}
+[5.225484] (-) TimerEvent: {}
+[5.326059] (-) TimerEvent: {}
+[5.426645] (-) TimerEvent: {}
+[5.527386] (-) TimerEvent: {}
+[5.627966] (-) TimerEvent: {}
+[5.728463] (-) TimerEvent: {}
+[5.828997] (-) TimerEvent: {}
+[5.929496] (-) TimerEvent: {}
+[6.030068] (-) TimerEvent: {}
+[6.089610] (general_wheelctrl) StdoutLine: {'line': b"-- Using RMW implementation 'rmw_fastrtps_cpp' as default\n"}
+[6.130301] (-) TimerEvent: {}
+[6.230921] (-) TimerEvent: {}
+[6.331421] (-) TimerEvent: {}
+[6.431857] (-) TimerEvent: {}
+[6.532413] (-) TimerEvent: {}
+[6.632985] (-) TimerEvent: {}
+[6.733572] (-) TimerEvent: {}
+[6.834207] (-) TimerEvent: {}
+[6.934796] (-) TimerEvent: {}
+[7.035352] (-) TimerEvent: {}
+[7.135854] (-) TimerEvent: {}
+[7.236413] (-) TimerEvent: {}
+[7.337072] (-) TimerEvent: {}
+[7.437570] (-) TimerEvent: {}
+[7.524291] (general_wheelctrl) StderrLine: {'line': b'\x1b[31mCMake Error at CMakeLists.txt:12 (find_package):\n'}
+[7.524517] (general_wheelctrl) StderrLine: {'line': b'  By not providing "Findrogilink2_interfaces.cmake" in CMAKE_MODULE_PATH this\n'}
+[7.524930] (general_wheelctrl) StderrLine: {'line': b'  project has asked CMake to find a package configuration file provided by\n'}
+[7.525135] (general_wheelctrl) StderrLine: {'line': b'  "rogilink2_interfaces", but CMake did not find one.\n'}
+[7.525318] (general_wheelctrl) StderrLine: {'line': b'\n'}
+[7.525448] (general_wheelctrl) StderrLine: {'line': b'  Could not find a package configuration file provided by\n'}
+[7.525532] (general_wheelctrl) StderrLine: {'line': b'  "rogilink2_interfaces" with any of the following names:\n'}
+[7.525726] (general_wheelctrl) StderrLine: {'line': b'\n'}
+[7.525827] (general_wheelctrl) StderrLine: {'line': b'    rogilink2_interfacesConfig.cmake\n'}
+[7.525922] (general_wheelctrl) StderrLine: {'line': b'    rogilink2_interfaces-config.cmake\n'}
+[7.526026] (general_wheelctrl) StderrLine: {'line': b'\n'}
+[7.526115] (general_wheelctrl) StderrLine: {'line': b'  Add the installation prefix of "rogilink2_interfaces" to CMAKE_PREFIX_PATH\n'}
+[7.526225] (general_wheelctrl) StderrLine: {'line': b'  or set "rogilink2_interfaces_DIR" to a directory containing one of the\n'}
+[7.526331] (general_wheelctrl) StderrLine: {'line': b'  above files.  If "rogilink2_interfaces" provides a separate development\n'}
+[7.526426] (general_wheelctrl) StderrLine: {'line': b'  package or SDK, be sure it has been installed.\n'}
+[7.526514] (general_wheelctrl) StderrLine: {'line': b'\n'}
+[7.526601] (general_wheelctrl) StderrLine: {'line': b'\x1b[0m\n'}
+[7.526775] (general_wheelctrl) StdoutLine: {'line': b'-- Configuring incomplete, errors occurred!\n'}
+[7.526936] (general_wheelctrl) StdoutLine: {'line': b'See also "/home/yugo/ros2_ws/src/wheelctrl_ros/build/general_wheelctrl/CMakeFiles/CMakeOutput.log".\n'}
+[7.531585] (general_wheelctrl) CommandEnded: {'returncode': 1}
+[7.537737] (-) TimerEvent: {}
+[7.551402] (general_wheelctrl) JobEnded: {'identifier': 'general_wheelctrl', 'rc': 1}
+[7.562676] (-) EventReactorShutdown: {}
