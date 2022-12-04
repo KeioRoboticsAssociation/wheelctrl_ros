@@ -22,8 +22,8 @@ class MoveSteering : public Moving {
   MoveSteering(const W_PARAM &_w_param);
   ~MoveSteering(){}
   void cal_cmd(const CMD &cmd) { printf("%f,%f,%f", cmd.x, cmd.y, cmd.theta); }
-  void cal_cmd(const CMD &cmd, const float curvature) {
-    printf("%f,%f,%f,%f", cmd.x, cmd.y, cmd.theta,curvature);
+  void cal_cmd(const CMD &cmd, const float &table_angle,const float curvature) {
+    printf("%f,%f,%f,%f,%f\n", cmd.x, cmd.y, cmd.theta, table_angle, curvature);
   }
   virtual void cal_cmd(const CMD &cmd, const float &table_angle);
 };

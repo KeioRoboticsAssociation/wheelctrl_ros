@@ -85,7 +85,7 @@ class Measuring {
 
   // get current posture of robot (world coordinate)
   POS get_current_pos() { return this->current_pos; }
-
+  POS get_current_vel() { return this->current_vel; }
   float rotate_to_meter(const float &rotate){
     return (rotate/this->w_param.gear_ratio) * 2 * M_PI * this->w_param.radius;
   }
@@ -124,7 +124,7 @@ class Moving {
     printf("please use subclass");
     printf("%f,%f,%f\n", cmd.x, cmd.y, cmd.theta);
   }
-  virtual void cal_cmd(const CMD &cmd, const float curvature){
+  virtual void cal_cmd(const CMD &cmd, const float &table_angle,const float curvature){
     printf("please use subclass");
     printf("%f,%f,%f,%f\n", cmd.x, cmd.y, cmd.theta, curvature);
   }

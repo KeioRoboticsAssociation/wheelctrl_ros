@@ -22,8 +22,8 @@ class MoveOmni3W : public Moving {
   MoveOmni3W(const W_PARAM &_w_param);
   ~MoveOmni3W(){}
   void cal_cmd(const CMD &cmd);
-  void cal_cmd(const CMD &cmd, const float curvature) {
-    printf("%f,%f,%f,%f\n", cmd.x, cmd.y, cmd.theta, curvature);
+  void cal_cmd(const CMD &cmd, const float &table_angle,const float curvature) {
+    printf("%f,%f,%f,%f,%f\n", cmd.x, cmd.y, cmd.theta, table_angle, curvature);
   }
   void cal_cmd(const CMD &cmd, const float &table_angle) {
     printf("%f,%f,%f,%f\n", cmd.x, cmd.y, cmd.theta, table_angle);
