@@ -126,7 +126,7 @@ class Moving {
   }
   virtual void cal_cmd(const CMD &cmd, const float &table_angle,const float curvature){
     printf("please use subclass");
-    printf("%f,%f,%f,%f\n", cmd.x, cmd.y, cmd.theta, curvature);
+    printf("%f,%f,%f,%f,%f\n", cmd.x, cmd.y, cmd.theta, table_angle, curvature);
   }
   virtual void cal_cmd(const CMD &cmd, const float &table_angle){
     printf("%f,%f,%f,%f\n", cmd.x, cmd.y, cmd.theta, table_angle);
