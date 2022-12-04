@@ -4,6 +4,10 @@
 #include "rclcpp/rclcpp.hpp"
 #include "rogilink2_interfaces/msg/frame.hpp"
 #include "rogilink2_interfaces/srv/request_add_topic.hpp"
+#include "tf2/LinearMath/Quaternion.h"
+#include "tf2_ros/transform_broadcaster.h"
+
+using namespace chrono_literals;
 
 class WheelCtrlRos2:public rclcpp::Node{
     public:
@@ -12,18 +16,39 @@ class WheelCtrlRos2:public rclcpp::Node{
       set_wheel_parameter();
       set_initial_pos();
       set_subclass();
+      frame_pub = this->create_publisher<rogilink2_interfaces::msg::Frame>("/rogilink2/send", 10);
+      mytimer =
+          this->create_wall_timer(5ms, std::bind(&WheelCtrlRos2::update, this));
     }
 
     private:
      void set_wheel_parameter();
      void set_initial_pos();
      void set_subclass();
+     void update();
+     void pub_rogilink2_frame();
+     void pub_odometry();
+
      std::unique_ptr<illias::Measuring> measure;
-     std::unique_ptr<illias::Moving> move;
+     std::unique_ptr<illias::Moving> moving;
+     rclcpp::TimerBase::SharedPtr mytimer;
+     
+     // handles of measuring wheel
+     rclcpp::Publisher<nav_msgs::msg::Odometry>::SharedPtr odom_pub;
+     rclcpp::Subscription<rogilink2_interfaces::msg::Frame>::SharedPtr
+         encoder_sub;
+
+     // handles of moving wheel
+     rclcpp::Publisher<rogilink2_interfaces::msg::Frame>::SharedPtr frame_pub;
+     rclcpp::Subscription<geometry_msgs::msg::Twist>::SharedPtr cmd_sub;
+
      illias::W_PARAM moving_wheel;
      illias::W_PARAM measuring_wheel;
      illias::POS current_pos;
+     std::unique_ptr<float[]> cmd_rotate;
      std::string robot_name;
+     std::vector<int64_t> moving_id;
+     std::vector<int64_t> measuring_id;
 };
 
 void WheelCtrlRos2::set_wheel_parameter(){
@@ -32,6 +57,7 @@ void WheelCtrlRos2::set_wheel_parameter(){
   this->declare_parameter("moving_wheel.type_name", "undefined");
   this->declare_parameter("moving_wheel.radius", 0.0);
   this->declare_parameter("moving_wheel.quantity", 0);
+  this->declare_parameter("moving_wheel.loop_rate", 200.0);
   this->declare_parameter("moving_wheel.gear_ratio", 1.0);
   this->declare_parameter("moving_wheel.gear_ratio_horizonal", 1.0);
   this->declare_parameter("moving_wheel.coordinate", "undefined");
@@ -39,10 +65,12 @@ void WheelCtrlRos2::set_wheel_parameter(){
   this->declare_parameter("moving_wheel.arguments", vector<double>(4, 0.0));
   this->declare_parameter("moving_wheel.length_x", 1.0);
   this->declare_parameter("moving_wheel.length_y", 1.0);
+  this->declare_parameter("moving_wheel.motor_id", vector<int>(4, 0));
 
   this->declare_parameter("measuring_wheel.type_name", "undefined");
   this->declare_parameter("measuring_wheel.radius", 0.0);
   this->declare_parameter("measuring_wheel.quantity", 0);
+  this->declare_parameter("measuring_wheel.loop_rate", 200.0); 
   this->declare_parameter("measuring_wheel.gear_ratio", 1.0);
   this->declare_parameter("measuring_wheel.gear_ratio_horizonal", 1.0);
   this->declare_parameter("measuring_wheel.coordinate", "undefined");
@@ -50,6 +78,7 @@ void WheelCtrlRos2::set_wheel_parameter(){
   this->declare_parameter("measuring_wheel.arguments", vector<double>(4, 0));
   this->declare_parameter("measuring_wheel.length_x", 1.0);
   this->declare_parameter("measuring_wheel.length_y", 1.0);
+  this->declare_parameter("measuring_wheel.motor_id", vector<int>(4, 0));
 
   robot_name = this->get_parameter("robot_param.name").as_string();
 
@@ -60,6 +89,8 @@ void WheelCtrlRos2::set_wheel_parameter(){
       (float)this->get_parameter("moving_wheel.radius").as_double();
   moving_wheel.quantity =
       (float)this->get_parameter("moving_wheel.quantity").as_int();
+  moving_wheel.loop_rate =
+      (float)this->get_parameter("moving_wheel.loop_rate").as_double();
   moving_wheel.gear_ratio =
       (float)this->get_parameter("moving_wheel.gear_ratio").as_double();
   moving_wheel.gear_ratio_horizonal =
@@ -75,6 +106,7 @@ void WheelCtrlRos2::set_wheel_parameter(){
       (float)this->get_parameter("moving_wheel.length_x").as_double();
   moving_wheel.length_y =
       (float)this->get_parameter("moving_wheel.length_y").as_double();
+  moving_id = this->get_parameter("moving_wheel.motor_id").as_integer_array(); 
 
   // measuring wheel
   measuring_wheel.type_name =
@@ -83,6 +115,8 @@ void WheelCtrlRos2::set_wheel_parameter(){
       (float)this->get_parameter("measuring_wheel.radius").as_double();
   measuring_wheel.quantity =
       (float)this->get_parameter("measuring_wheel.quantity").as_int();
+  measuring_wheel.loop_rate =
+      (float)this->get_parameter("measuring_wheel.loop_rate").as_double();
   measuring_wheel.gear_ratio =
       (float)this->get_parameter("measuring_wheel.gear_ratio").as_double();
   measuring_wheel.gear_ratio_horizonal =
@@ -98,6 +132,7 @@ void WheelCtrlRos2::set_wheel_parameter(){
       (float)this->get_parameter("measuring_wheel.length_x").as_double();
   measuring_wheel.length_y =
       (float)this->get_parameter("measuring_wheel.length_y").as_double();
+  measuring_id = this->get_parameter("measuring_wheel.motor_id").as_integer_array();  
 
   for (int i = 0; i < (int)moving_wheel.arguments.size();i++){
     moving_wheel.arguments[i] = moving_wheel.arguments[i] * M_PI / 180;
@@ -141,22 +176,65 @@ void WheelCtrlRos2::set_subclass(){
     RCLCPP_ERROR(this->get_logger(), "invalid wheel type");
   }
 
-  RCLCPP_INFO(this->get_logger(),"nyannyan");
   if (moving_wheel.type_name == "omni") {
+    cmd_rotate = std::make_unique<float[]>(moving_wheel.quantity);
     switch (moving_wheel.quantity) {
       case 3:
-        move = std::make_unique<illias::MoveOmni3W>(moving_wheel);
+        moving = std::make_unique<illias::MoveOmni3W>(moving_wheel);
         break;
       case 4:
-        RCLCPP_INFO(this->get_logger(), "hya");
-        move = std::make_unique<illias::MoveOmni4W>(moving_wheel);
+        moving = std::make_unique<illias::MoveOmni4W>(moving_wheel);
     }
   } else if (moving_wheel.type_name == "steering") {
-    move = std::make_unique<illias::MoveSteering>(moving_wheel);
+    cmd_rotate = std::make_unique<float[]>(2 * moving_wheel.quantity);
+    moving = std::make_unique<illias::MoveSteering>(moving_wheel);
   } else if (moving_wheel.type_name == "mechanam") {
   } else {
     RCLCPP_ERROR(this->get_logger(), "invalid wheel type");
   }
+}
+
+void WheelCtrlRos2::update(){
+  current_pos = measure->get_current_pos();
+  
+  //copy from moving->wheel_cmd_rotate to cmd_rotate
+  if(moving_wheel.type_name=="omni"){
+    for(int i=0;i<moving_wheel.quantity;i++){
+      cmd_rotate[i] = moving->wheel_cmd_rotate[i];
+    }
+  } else if(moving_wheel.type_name=="steering"){
+    for(int i=0;i<2*moving_wheel.quantity;i++){
+      cmd_rotate[i] = moving->wheel_cmd_rotate[i];
+    }
+  }
+
+  //publish
+  pub_rogilink2_frame();
+  pub_odometry();
+}
+
+void WheelCtrlRos2::pub_rogilink2_frame(){
+  auto msg = rogilink2_interfaces::msg::Frame();
+  for (int i = 0;i<moving_wheel.quantity;i++){
+    msg.hard_id = moving_id[i];
+    memcpy(&msg.data, &moving->wheel_cmd_rotate[i], sizeof(float));
+    frame_pub->publish(msg);
+  }
+}
+
+void WheelCtrlRos2::pub_odometry(){
+  auto msg = nav_msgs::msg::Odometry();
+  msg.header.stamp = this->now();
+  msg.header.frame_id = "odom";
+  msg.child_frame_id = "base_link";
+  msg.pose.pose.position.x = current_pos.x;
+  msg.pose.pose.position.y = current_pos.y;
+  msg.pose.pose.position.z = 0;
+  msg.pose.pose.orientation = tf2::createQuaternionMsgFromYaw(current_pos.theta);
+  msg.twist.twist.linear.x = current_pos.v;
+  msg.twist.twist.linear.y = 0;
+  msg.twist.twist.angular.z = current_pos.w;
+  odom_pub->publish(msg);
 }
 
 int main(int argc, char *argv[]) {

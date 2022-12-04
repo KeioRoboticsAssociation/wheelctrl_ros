@@ -51,6 +51,11 @@ void illias::MeasureSteering::cal_disp(const float encoder[],const int &length) 
 
   // past_posを更新
   past_pos = current_pos;
+
+  // set current_vel
+  this->current_vel.x = delta.x * w_param.loop_rate;
+  this->current_vel.y = delta.y * w_param.loop_rate;
+  this->current_vel.theta = delta.theta * w_param.loop_rate;
 }
 
 void illias::MoveSteering::cal_cmd(const CMD &cmd,const float &table_angle) {

@@ -47,6 +47,11 @@ void illias::MeasureOmni3W::cal_disp(const float encoder[], const int &length) {
 
   // past_posを更新
   past_pos = current_pos;
+
+  // set current_vel
+  this->current_vel.x = delta.x * w_param.loop_rate;
+  this->current_vel.y = delta.y * w_param.loop_rate;
+  this->current_vel.theta = delta.theta * w_param.loop_rate;
 }
 
 void illias::MoveOmni3W::cal_cmd(const CMD &cmd) {

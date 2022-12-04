@@ -12,7 +12,8 @@ typedef struct WHEEL_PARAMETER {
   std::string type_name;      //足回りの種類
   float radius;               //半径
   int quantity;             //タイヤの数
-  float gear_ratio;           //タイヤ1回転あたりのモーター回転数
+  float loop_rate;            //ループ周期
+  float gear_ratio;  //タイヤ1回転あたりのモーター回転数
   float gear_ratio_horizonal; //タイヤ1回転あたりのモーター回転数
 
   std::string coordinate;     
@@ -59,6 +60,7 @@ class Measuring {
   Measuring(const W_PARAM &_w_param,const POS &_past_pos)
   :w_param(_w_param),past_pos(_past_pos){
     current_pos = past_pos;
+    current_vel = {0,0,0};
   }
   virtual ~Measuring(){}
 
@@ -82,7 +84,7 @@ class Measuring {
   }
 
   // get current posture of robot (world coordinate)
-  POS get_pos() { return this->current_pos; }
+  POS get_current_pos() { return this->current_pos; }
 
   float rotate_to_meter(const float &rotate){
     return (rotate/this->w_param.gear_ratio) * 2 * M_PI * this->w_param.radius;
@@ -94,12 +96,12 @@ class Measuring {
   W_PARAM w_param;
   POS past_pos; //前の位置（固定座標系）
   POS current_pos;//現在の位置（固定座標系）
+  POS current_vel;//現在の速度（固定座標系）
 };
 
 class Moving {
  public:
   Moving(const W_PARAM &_w_param) : w_param(_w_param){
-    printf("kyan\n");
     if (w_param.type_name == "steering"){
       wheel_cmd_meter = std::make_unique<float[]>(2 * w_param.quantity);
       wheel_cmd_rotate = std::make_unique<float[]>(2 * w_param.quantity);
@@ -128,7 +130,7 @@ class Moving {
   }
   virtual void cal_cmd(const CMD &cmd, const float &table_angle){
     printf("%f,%f,%f,%f\n", cmd.x, cmd.y, cmd.theta, table_angle);
-    };
+  }
 
   float meter_to_rotate(const float &meter) {
     return meter * this->w_param.gear_ratio / (2 * M_PI * this->w_param.radius);

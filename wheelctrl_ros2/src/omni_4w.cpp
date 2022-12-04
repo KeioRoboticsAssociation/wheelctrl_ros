@@ -11,9 +11,8 @@ illias::MeasureOmni4W::MeasureOmni4W(const W_PARAM &_w_param,const POS &_past_po
 
 illias::MoveOmni4W::MoveOmni4W(const W_PARAM &_w_param)
 :Moving(_w_param){
-  printf("gya\n");
   if (w_param.type_name == "omni" && w_param.quantity == 4) {
-    printf("this is the subclass of the four-wheel measuring module\n");
+    printf("this is the subclass of the four-wheel moving module\n");
   } else {
     printf("please use another subclass\n");
   }
@@ -47,6 +46,11 @@ void illias::MeasureOmni4W::cal_disp(const float encoder[],const int &length) {
 
   // past_posを更新
   past_pos = current_pos;
+
+  // set current_vel
+  this->current_vel.x = delta.x * w_param.loop_rate;
+  this->current_vel.y = delta.y * w_param.loop_rate;
+  this->current_vel.theta = delta.theta * w_param.loop_rate;
 }
 
 void illias::MoveOmni4W::cal_cmd(const CMD &cmd) {
