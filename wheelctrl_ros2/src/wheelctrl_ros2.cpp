@@ -6,79 +6,90 @@
 #include "rogilink2_interfaces/srv/request_add_topic.hpp"
 #include "tf2/LinearMath/Quaternion.h"
 #include "tf2_ros/transform_broadcaster.h"
+#include "md_lib/odrive.hpp"
+#include "md_lib/md2022.hpp"
 
 using namespace chrono_literals;
 
 class WheelCtrlRos2:public rclcpp::Node{
     public:
     WheelCtrlRos2():Node("wheel_ctrl_ros2"){
+
+    }
+    void init(){
       RCLCPP_INFO(this->get_logger(), "ACTIVATED: wheelctrl_ros2");
       set_wheel_parameter();
       set_initial_pos();
       set_subclass();
-      frame_pub = this->create_publisher<rogilink2_interfaces::msg::Frame>("/rogilink2/send", 10);
+      frame_pub = this->create_publisher<rogilink2_interfaces::msg::Frame>(
+          "/rogilink2/send", 10);
       odom_pub = this->create_publisher<nav_msgs::msg::Odometry>("/odom", 10);
       tf_broadcaster = std::make_unique<tf2_ros::TransformBroadcaster>(*this);
-      cmd_sub = this->create_subscription<geometry_msgs::msg::Twist>("/cmd_vel", 10, std::bind(&WheelCtrlRos2::cmd_callback, this, std::placeholders::_1));
-      if(measuring_wheel.type_name=="steering"){
-        encoder_sub.resize(measuring_wheel.quantity * 2);
-        for (int i = 0; i < measuring_wheel.quantity*2;i++){
-          encoder_sub[i] =
-              this->create_subscription<rogilink2_interfaces::msg::Frame>(
-                  "/rogilink2/recieve_" + measuring_name[i], 10,
-                  [this,i](const rogilink2_interfaces::msg::Frame::SharedPtr msg) {
-                    memcpy(&encoder[i], msg->data.data(), sizeof(float));
-                  });
-        }
-      } else {
-        encoder_sub.resize(measuring_wheel.quantity);
-        for (int i = 0; i < measuring_wheel.quantity;i++){
-          encoder_sub[i] =
-              this->create_subscription<rogilink2_interfaces::msg::Frame>(
-                  "/rogilink2/recieve_" + measuring_name[i], 10,
-                  [this,i](const rogilink2_interfaces::msg::Frame::SharedPtr msg) {
-                    memcpy(&encoder[i], msg->data.data(), sizeof(float));
-                  });
-        }
-      }
+      cmd_sub = this->create_subscription<geometry_msgs::msg::Twist>(
+          "/cmd_vel", 10,
+          std::bind(&WheelCtrlRos2::cmd_callback, this, std::placeholders::_1));
+      // if (measuring_wheel.type_name == "steering") {
+      //   encoder_sub.resize(measuring_wheel.quantity * 2);
+      //   for (int i = 0; i < measuring_wheel.quantity * 2; i++) {
+      //     encoder_sub[i] =
+      //         this->create_subscription<rogilink2_interfaces::msg::Frame>(
+      //             "/rogilink2/recieve_" + measuring_name[i], 10,
+      //             [this,
+      //              i](const rogilink2_interfaces::msg::Frame::SharedPtr msg) {
+      //               memcpy(&encoder[i], msg->data.data(), sizeof(float));
+      //             });
+      //   }
+      // } else {
+      //   encoder_sub.resize(measuring_wheel.quantity);
+      //   for (int i = 0; i < measuring_wheel.quantity; i++) {
+      //     encoder_sub[i] =
+      //         this->create_subscription<rogilink2_interfaces::msg::Frame>(
+      //             "/rogilink2/recieve_" + measuring_name[i], 10,
+      //             [this,
+      //              i](const rogilink2_interfaces::msg::Frame::SharedPtr msg) {
+      //               memcpy(&encoder[i], msg->data.data(), sizeof(float));
+      //             });
+      //   }
+      // }
       mytimer =
           this->create_wall_timer(5ms, std::bind(&WheelCtrlRos2::update, this));
     }
 
-    private:
-     void set_wheel_parameter();
-     void set_initial_pos();
-     void set_subclass();
-     void update();
-     void pub_rogilink2_frame();
-     void pub_odometry();
-     void cmd_callback(geometry_msgs::msg::Twist::SharedPtr msg);
-     std::unique_ptr<illias::Measuring> measure;
-     std::unique_ptr<illias::Moving> moving;
-     rclcpp::TimerBase::SharedPtr mytimer;
-     
-     // handles of measuring wheel
-     rclcpp::Publisher<nav_msgs::msg::Odometry>::SharedPtr odom_pub;
-     vector<rclcpp::Subscription<rogilink2_interfaces::msg::Frame>::SharedPtr>
-         encoder_sub;
-     std::unique_ptr<tf2_ros::TransformBroadcaster> tf_broadcaster;
+   private:
+    void set_wheel_parameter();
+    void set_initial_pos();
+    void set_subclass();
+    void update();
+    void pub_rogilink2_frame();
+    void pub_odometry();
+    void cmd_callback(geometry_msgs::msg::Twist::SharedPtr msg);
+    std::unique_ptr<illias::Measuring> measure;
+    std::unique_ptr<illias::Moving> moving;
+    rclcpp::TimerBase::SharedPtr mytimer;
 
-     // handles of moving wheel
-     rclcpp::Publisher<rogilink2_interfaces::msg::Frame>::SharedPtr frame_pub;
-     rclcpp::Subscription<geometry_msgs::msg::Twist>::SharedPtr cmd_sub;
+    // handles of measuring wheel
+    rclcpp::Publisher<nav_msgs::msg::Odometry>::SharedPtr odom_pub;
+    vector<rclcpp::Subscription<rogilink2_interfaces::msg::Frame>::SharedPtr>
+        encoder_sub;
+    std::unique_ptr<tf2_ros::TransformBroadcaster> tf_broadcaster;
 
-     illias::W_PARAM moving_wheel;
-     illias::W_PARAM measuring_wheel;
-     illias::POS current_pos;
-     illias::POS current_vel;
-     illias::CMD cmd;
-     std::unique_ptr<float[]> cmd_rotate;
-     std::unique_ptr<float[]> encoder;
-     std::string robot_name;
-     std::vector<std::string> moving_name;
-     std::vector<std::string> measuring_name;
+    // handles of moving wheel
+    rclcpp::Publisher<rogilink2_interfaces::msg::Frame>::SharedPtr frame_pub;
+    rclcpp::Subscription<geometry_msgs::msg::Twist>::SharedPtr cmd_sub;
+    vector<std::shared_ptr<Md>> drivers;
+    illias::W_PARAM moving_wheel;
+    illias::W_PARAM measuring_wheel;
+    illias::POS current_pos;
+    illias::POS current_vel;
+    illias::CMD cmd;
+    std::unique_ptr<float[]> cmd_rotate;
+    std::unique_ptr<float[]> encoder;
+    std::string robot_name;
+    std::vector<std::string> moving_name;
+    std::vector<std::string> measuring_name;
 
-     bool AMCL = false;
+    bool AMCL = false;
+    
 };
 
 void WheelCtrlRos2::set_wheel_parameter(){
@@ -184,19 +195,19 @@ void WheelCtrlRos2::set_subclass(){
   if(measuring_wheel.type_name=="omni"){
     encoder = std::make_unique<float[]>(measuring_wheel.quantity);
     switch (measuring_wheel.quantity) {
-      case 2:
-        measure = std::make_unique<illias::MeasureOmni2W>(measuring_wheel,
-                                                          current_pos);
-        break;
-      case 3:
-        measure = std::make_unique<illias::MeasureOmni3W>(measuring_wheel,
-                                                          current_pos);
-        break;
-      case 4:
-        measure = std::make_unique<illias::MeasureOmni4W>(measuring_wheel,
-                                                          current_pos);
-        break;
-    }
+          case 2:
+            measure = std::make_unique<illias::MeasureOmni2W>(measuring_wheel,
+                                                              current_pos);
+            break;
+          case 3:
+            measure = std::make_unique<illias::MeasureOmni3W>(measuring_wheel,
+                                                              current_pos);
+            break;
+          case 4:
+            measure = std::make_unique<illias::MeasureOmni4W>(measuring_wheel,
+                                                              current_pos);
+            break;
+        }
   } else if (measuring_wheel.type_name == "steering") {
     encoder = std::make_unique<float[]>(2 * measuring_wheel.quantity);
     measure =
@@ -209,6 +220,13 @@ void WheelCtrlRos2::set_subclass(){
 
   if (moving_wheel.type_name == "omni") {
     cmd_rotate = std::make_unique<float[]>(moving_wheel.quantity);
+    for (int i = 0; i < 4; i++) {
+          drivers.push_back(std::make_shared<MD2022>(this, moving_name[i]));
+          drivers[i]->init();
+          drivers[i]->setMode(Md::Mode::Velocity);
+          drivers[i]->setPosition(0.0);
+    }
+
     switch (moving_wheel.quantity) {
       case 3:
         moving = std::make_unique<illias::MoveOmni3W>(moving_wheel);
@@ -219,7 +237,22 @@ void WheelCtrlRos2::set_subclass(){
   } else if (moving_wheel.type_name == "steering") {
     cmd_rotate = std::make_unique<float[]>(2 * moving_wheel.quantity);
     moving = std::make_unique<illias::MoveSteering>(moving_wheel);
-  } else if (moving_wheel.type_name == "mechanam") {
+    drivers.resize(8);
+    for (int i = 0; i < 8; i++) {
+      if(i<4){
+        drivers.push_back(std::make_shared<ODrive>(this, moving_name[i]));
+        drivers[i]->init();
+        drivers[i]->setMode(Md::Mode::Velocity);
+        drivers[i]->setPosition(0.0);
+      }else
+      {
+        drivers.push_back(std::make_shared<MD2022>(this, moving_name[i]));
+        drivers[i]->init();
+        drivers[i]->setMode(Md::Mode::Position);
+        drivers[i]->setPosition(0.0);
+      }
+    }
+    } else if (moving_wheel.type_name == "mechanam") {
   } else {
     RCLCPP_ERROR(this->get_logger(), "invalid wheel type");
   }
@@ -241,6 +274,18 @@ void WheelCtrlRos2::cmd_callback(const geometry_msgs::msg::Twist::SharedPtr msg)
 }
 
 void WheelCtrlRos2::update(){
+  //get encoder
+  if(measuring_wheel.type_name=="omni"){
+    for(int i=0;i<measuring_wheel.quantity;i++){
+      encoder[i] = drivers[i]->getPosition();
+    }
+  } else if (measuring_wheel.type_name == "steering") {
+    for(int i=0;i<2*measuring_wheel.quantity;i++){
+      encoder[i] = drivers[i]->getPosition();
+    }
+  } else if (measuring_wheel.type_name == "mechanam") {
+  }
+
   current_pos = measure->get_current_pos();
   current_vel = measure->get_current_vel();
 
@@ -264,15 +309,15 @@ void WheelCtrlRos2::pub_rogilink2_frame(){
   auto msg = rogilink2_interfaces::msg::Frame();
   if(moving_wheel.type_name=="omni"){
     for (int i = 0; i < moving_wheel.quantity; i++) {
-      msg.name = moving_name[i];
-      memcpy(&msg.data, &moving->wheel_cmd_rotate[i], sizeof(float));
-      frame_pub->publish(msg);
+      drivers[i]->setVelocity(moving->wheel_cmd_rotate[i]);
     }
   } else if (moving_wheel.type_name == "steering") {
     for (int i = 0; i < 2*moving_wheel.quantity; i++) {
-      msg.name = moving_name[i];
-      memcpy(&msg.data, &moving->wheel_cmd_rotate[i], sizeof(float));
-      frame_pub->publish(msg);
+      if(i<4){
+        drivers[i]->setVelocity(moving->wheel_cmd_rotate[i]);
+      }else{
+        drivers[i]->setPosition(moving->wheel_cmd_rotate[i]);
+      }
     }
   }
 }
@@ -314,7 +359,9 @@ void WheelCtrlRos2::pub_odometry(){
 
 int main(int argc, char *argv[]) {
   rclcpp::init(argc, argv);
-  rclcpp::spin(std::make_shared<WheelCtrlRos2>());
+  auto node = std::make_shared<WheelCtrlRos2>();
+  node->init();
+  rclcpp::spin(node);
   rclcpp::shutdown();
   return 0;
 }

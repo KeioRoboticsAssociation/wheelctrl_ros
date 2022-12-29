@@ -135,8 +135,8 @@ class Moving {
   float meter_to_rotate(const float &meter) {
     return meter * this->w_param.gear_ratio / (2 * M_PI * this->w_param.radius);
   }
-  float rad_to_meter(const float &rad) {
-    return rad * this->w_param.gear_ratio / (2 * M_PI);
+  float rad_to_rotate(const float &rad) {
+    return rad /(2 * M_PI);
   }
 
   std::unique_ptr<float[]> wheel_cmd_meter;
