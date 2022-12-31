@@ -21,4 +21,20 @@ A ROS meta package for wheel control for RogiLink
 現在異位置は    Rogilinkー＞座標変換ー＞nav_msgs::msg::Odom /odom をpub
 という流れをとる。
 
+## yamlの書き方
+type_name : "omni"か"steering"か"mechanam"
+radius    : タイヤ半径
+quantity  : タイヤの個数
+loop_rate : 制御周期 Hz
+gear_ratio: ギア比（仮置き）
+gear_ratio_horizonal: ギア比（ステア）
+coordinate: タイヤの位置を記述する座標を指定"cartesian"か"polar" x-y座標か極座標か
+Wheel_name: ロギリンクで使うタイヤの名前
+
+### cartesianのとき
+length_xとlength_yで長方形の４すみにタイヤ
+
+### polarのとき
+distanceが中心-タイヤの距離
+argumentsが極座標でのタイヤの偏角（正面が准線）
 
