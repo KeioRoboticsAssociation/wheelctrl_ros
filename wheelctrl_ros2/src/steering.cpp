@@ -88,7 +88,7 @@ void illias::MoveSteering::cal_cmd(const CMD &cmd,const float &table_angle) {
     if(i<4){
       wheel_cmd_rotate[i] = meter_to_rotate(wheel_cmd_meter[i]);
     }else{
-      wheel_cmd_rotate[i] = rad_to_rotate(wheel_cmd_meter[i]*w_param.gear_ratio_horizonal);
+      wheel_cmd_rotate[i] = rad_to_rotate(wheel_cmd_meter[i]*w_param.gear_ratio_horizonal-table_angle);
     }
   } 
 }
