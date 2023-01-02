@@ -65,7 +65,7 @@ class Measuring {
   virtual ~Measuring(){}
 
   //convert encoder data into robot posture(world coordinate)
-  virtual void cal_disp(const float encoder[],const int &length){
+  virtual void cal_disp(std::shared_ptr<float[]> encoder,const int &length){
     printf("please use subclass");
     for (int i = 0; i < length;i++)
     {
@@ -75,7 +75,7 @@ class Measuring {
   }
 
   // convert encoder data into robot posture(world coordinate)
-  virtual void cal_disp(const float encoder[],const int &length,const float &imu){//エンコーダーの値から現在の座標を計算
+  virtual void cal_disp(std::shared_ptr<float[]> encoder,const int &length,const float &imu){//エンコーダーの値から現在の座標を計算
     printf("please use subclass");
     for (int i = 0; i < length;i++){
       printf("%f ", encoder[i]);

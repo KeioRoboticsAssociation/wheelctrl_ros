@@ -8,8 +8,9 @@ class MeasureOmni4W : public Measuring {
  public:
   MeasureOmni4W(const W_PARAM &_w_param, const POS &_past_pos);
   ~MeasureOmni4W(){}
-  void cal_disp(const float encoder[], const int &length);
-  void cal_disp(const float encoder[], const int &length, const float &imu) {
+  void cal_disp(std::shared_ptr<float[]> encoder, const int &length);
+  void cal_disp(std::shared_ptr<float[]> encoder, const int &length,
+                const float &imu) {
     for (int i = 0; i < length; i++) {
       printf("%f,", encoder[i]);
     }

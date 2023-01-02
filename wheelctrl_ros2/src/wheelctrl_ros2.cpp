@@ -83,8 +83,8 @@ class WheelCtrlRos2:public rclcpp::Node{
     illias::POS current_pos;
     illias::POS current_vel;
     illias::CMD cmd;
-    std::unique_ptr<float[]> cmd_rotate;
-    std::unique_ptr<float[]> encoder;
+    std::shared_ptr<float[]> cmd_rotate;
+    std::shared_ptr<float[]> encoder;
     std::string robot_name;
     std::vector<std::string> moving_name;
     std::vector<std::string> measuring_name;
@@ -289,22 +289,25 @@ void WheelCtrlRos2::update(){
     for(int i=0;i<measuring_wheel.quantity;i++){
       encoder[i] = drivers[i]->getPosition();
     }
+    measure->cal_disp(encoder,measuring_wheel.quantity);
   } else if (measuring_wheel.type_name == "steering") {
     for(int i=0;i<2*measuring_wheel.quantity;i++){
       encoder[i] = drivers[i]->getPosition();
     }
+    measure->cal_disp(encoder, 8);
   } else if (measuring_wheel.type_name == "mechanam") {
   }
 
   current_pos = measure->get_current_pos();
   current_vel = measure->get_current_vel();
 
-  //copy from moving->wheel_cmd_rotate to cmd_rotate
-  if(moving_wheel.type_name=="omni"){
+      // copy from moving->wheel_cmd_rotate to cmd_rotate
+      if (moving_wheel.type_name == "omni") {
     for(int i=0;i<moving_wheel.quantity;i++){
       cmd_rotate[i] = moving->wheel_cmd_rotate[i];
     }
-  } else if(moving_wheel.type_name=="steering"){
+  }
+  else if (moving_wheel.type_name == "steering") {
     for(int i=0;i<2*moving_wheel.quantity;i++){
       cmd_rotate[i] = moving->wheel_cmd_rotate[i];
     }

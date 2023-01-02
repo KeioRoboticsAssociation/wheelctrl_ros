@@ -17,7 +17,8 @@ illias::MoveOmni3W::MoveOmni3W(const W_PARAM &_w_param):Moving(_w_param){
   }
 }
 
-void illias::MeasureOmni3W::cal_disp(const float encoder[], const int &length) {
+void illias::MeasureOmni3W::cal_disp(std::shared_ptr<float[]> encoder,
+                                     const int &length) {
   POS delta;
 
   delta.x = 0;

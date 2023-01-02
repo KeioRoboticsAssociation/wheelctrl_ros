@@ -18,7 +18,8 @@ illias::MoveOmni4W::MoveOmni4W(const W_PARAM &_w_param)
   }
 }
 
-void illias::MeasureOmni4W::cal_disp(const float encoder[],const int &length) {
+void illias::MeasureOmni4W::cal_disp(std::shared_ptr<float[]> encoder,
+                                     const int &length) {
   POS delta;
   // エンコーダーの値を代入
   delta.x = 0;

@@ -18,7 +18,8 @@ illias::MoveSteering::MoveSteering(const W_PARAM &_w_param) : Moving(_w_param) {
   }
 }
 
-void illias::MeasureSteering::cal_disp(const float encoder[],const int &length) {
+void illias::MeasureSteering::cal_disp(std::shared_ptr<float[]> encoder,
+                                       const int &length) {
   POS delta;
   if (length != 8) {
     std::printf("invalid argument size");
