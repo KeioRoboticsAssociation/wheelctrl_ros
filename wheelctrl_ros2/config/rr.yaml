@@ -8,8 +8,8 @@ wheelctrl_ros2:
       radius: 0.051
       quantity: 4
       loop_rate: 200.0
-      gear_ratio: 1
-      gear_ratio_horizonal: 1
+      gear_ratio: 1.0
+      gear_ratio_horizonal: 1.0
       coordinates: "cartesian"
       length_x: 0.5
       length_y: 0.5
@@ -20,8 +20,8 @@ wheelctrl_ros2:
       radius: 0.051
       quantity: 4
       loop_rate: 200.0
-      gear_ratio: 1
-      gear_ratio_horizonal: 1
+      gear_ratio: 1.0
+      gear_ratio_horizonal: 1.0
       coordinates: "cartesian"
       length_x: 0.5
       length_y: 0.5

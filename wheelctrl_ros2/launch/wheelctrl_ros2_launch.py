@@ -14,7 +14,7 @@ def generate_launch_description():
         emulate_tty = True,
         parameters=[os.path.join(
             get_package_share_directory('wheelctrl_ros2'),
-            'config','er.yaml')]
+            'config','rr.yaml')]
         
     )
     

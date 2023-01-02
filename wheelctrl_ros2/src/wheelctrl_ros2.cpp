@@ -21,6 +21,7 @@ class WheelCtrlRos2:public rclcpp::Node{
       set_wheel_parameter();
       set_initial_pos();
       set_subclass();
+      RCLCPP_INFO(this->get_logger(), "wheelctrl_ros2 initialized");
       frame_pub = this->create_publisher<rogilink2_interfaces::msg::Frame>(
           "/rogilink2/send", 10);
       odom_pub = this->create_publisher<nav_msgs::msg::Odometry>("/odom", 10);
@@ -149,7 +150,7 @@ void WheelCtrlRos2::set_wheel_parameter(){
       (float)this->get_parameter("moving_wheel.length_x").as_double();
   moving_wheel.length_y =
       (float)this->get_parameter("moving_wheel.length_y").as_double();
-  moving_name = this->get_parameter("moving_wheel.wheel_name").as_string_array(); 
+  moving_name = this->get_parameter("moving_wheel.wheel_name").as_string_array();
 
   // measuring wheel
   measuring_wheel.type_name =
@@ -175,7 +176,7 @@ void WheelCtrlRos2::set_wheel_parameter(){
       (float)this->get_parameter("measuring_wheel.length_x").as_double();
   measuring_wheel.length_y =
       (float)this->get_parameter("measuring_wheel.length_y").as_double();
-  measuring_name = this->get_parameter("measuring_wheel.wheel_name").as_string_array();  
+  measuring_name = this->get_parameter("measuring_wheel.wheel_name").as_string_array();
 
   for (int i = 0; i < (int)moving_wheel.arguments.size();i++){
     moving_wheel.arguments[i] = moving_wheel.arguments[i] * M_PI / 180;
@@ -210,8 +211,8 @@ void WheelCtrlRos2::set_subclass(){
         }
   } else if (measuring_wheel.type_name == "steering") {
     encoder = std::make_unique<float[]>(2 * measuring_wheel.quantity);
-    measure =
-        std::make_unique<illias::MeasureSteering>(measuring_wheel, current_pos);
+    measure = std::make_unique<illias::MeasureSteering>(measuring_wheel,
+                                                            current_pos);
   } else if (measuring_wheel.type_name == "mechanam") {
     encoder = std::make_unique<float[]>(measuring_wheel.quantity);
   } else {
@@ -220,30 +221,38 @@ void WheelCtrlRos2::set_subclass(){
 
   if (moving_wheel.type_name == "omni") {
     cmd_rotate = std::make_unique<float[]>(moving_wheel.quantity);
-    for (int i = 0; i < 4; i++) {
-          drivers.push_back(std::make_shared<MD2022>(this, moving_name[i]));
-          drivers[i]->init();
-          drivers[i]->setMode(Md::Mode::Velocity);
-          drivers[i]->setPosition(0.0);
-    }
-
+  
     switch (moving_wheel.quantity) {
       case 3:
         moving = std::make_unique<illias::MoveOmni3W>(moving_wheel);
+        for (int i = 0; i < 3; i++) {
+          drivers.push_back(std::make_shared<MD2022>(this, moving_name[i]));
+          drivers.at(i)->init();
+          drivers.at(i)->setMode(Md::Mode::Velocity);
+          drivers.at(i)->setPosition(0.0);
+        }
         break;
       case 4:
         moving = std::make_unique<illias::MoveOmni4W>(moving_wheel);
+        for (int i = 0; i < 4; i++) {
+          drivers.push_back(std::make_shared<MD2022>(this, moving_name[i]));
+          drivers.at(i)->init();
+          drivers.at(i)->setMode(Md::Mode::Velocity);
+          drivers.at(i)->setPosition(0.0);
+        }
+        break;
     }
   } else if (moving_wheel.type_name == "steering") {
     cmd_rotate = std::make_unique<float[]>(2 * moving_wheel.quantity);
     moving = std::make_unique<illias::MoveSteering>(moving_wheel);
-    drivers.resize(8);
+    RCLCPP_INFO(this->get_logger(), "steering wheel start");
     for (int i = 0; i < 8; i++) {
       if(i<4){
         drivers.push_back(std::make_shared<ODrive>(this, moving_name[i]));
-        drivers[i]->init();
-        drivers[i]->setMode(Md::Mode::Velocity);
-        drivers[i]->setPosition(0.0);
+        RCLCPP_INFO(this->get_logger(), "steering wheel start %d", i);
+        drivers.at(i)->init();
+        drivers.at(i)->setMode(Md::Mode::Velocity);
+        drivers.at(i)->setPosition(0.0);
       }else
       {
         drivers.push_back(std::make_shared<MD2022>(this, moving_name[i]));
@@ -252,6 +261,7 @@ void WheelCtrlRos2::set_subclass(){
         drivers[i]->setPosition(0.0);
       }
     }
+    RCLCPP_INFO(this->get_logger(), "steering wheel end");
     } else if (moving_wheel.type_name == "mechanam") {
   } else {
     RCLCPP_ERROR(this->get_logger(), "invalid wheel type");

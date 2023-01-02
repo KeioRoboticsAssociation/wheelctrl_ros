@@ -12,7 +12,7 @@ illias::MeasureSteering::MeasureSteering(const W_PARAM &_w_param,
 
 illias::MoveSteering::MoveSteering(const W_PARAM &_w_param) : Moving(_w_param) {
   if (w_param.type_name == "steering") {
-    printf("this is the subclass of the steering measure module\n");
+    printf("this is the subclass of the steering moving module\n");
   } else {
     printf("please use another subclass\n");
   }
@@ -61,7 +61,7 @@ void illias::MeasureSteering::cal_disp(const float encoder[],const int &length) 
 void illias::MoveSteering::cal_cmd(const CMD &cmd,const float &table_angle) {
   wheel_cmd_meter[0] =
       sqrt(pow(cmd.x - w_param.distance * cmd.theta * sin(table_angle), 2) +
-           pow(cmd.y + w_param.distance * cmd.theta * sin(table_angle), 2));
+           pow(cmd.y + w_param.distance * cmd.theta * cos(table_angle), 2));
   wheel_cmd_meter[1] =
       sqrt(pow(cmd.x - w_param.distance * cmd.theta * cos(table_angle), 2) +
            pow(cmd.y - w_param.distance * cmd.theta * sin(table_angle), 2));
@@ -72,7 +72,7 @@ void illias::MoveSteering::cal_cmd(const CMD &cmd,const float &table_angle) {
       sqrt(pow(cmd.x + w_param.distance * cmd.theta * cos(table_angle), 2) +
            pow(cmd.y + w_param.distance * cmd.theta * sin(table_angle), 2));
   wheel_cmd_meter[4] =
-      atan2(cmd.y + w_param.distance * cmd.theta * sin(table_angle),
+      atan2(cmd.y + w_param.distance * cmd.theta * cos(table_angle),
             cmd.x - w_param.distance * cmd.theta * sin(table_angle));
   wheel_cmd_meter[5] =
       atan2(cmd.y - w_param.distance * cmd.theta * sin(table_angle),
