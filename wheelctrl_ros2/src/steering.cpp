@@ -21,29 +21,25 @@ illias::MoveSteering::MoveSteering(const W_PARAM &_w_param) : Moving(_w_param) {
 void illias::MeasureSteering::cal_disp(std::shared_ptr<float[]> encoder,
                                        const int &length) {
   POS delta;
+  delta.x = 0;
+  delta.y = 0;
+  delta.theta = 0;
   if (length != 8) {
     std::printf("invalid argument size");
-    delta.x = 0;
-    delta.y = 0;
-    delta.theta = 0;
   } else {
-    float a = (float)w_param.arguments[0];
-    float b = (float)w_param.arguments[1];
-    float c = (float)w_param.arguments[2];
-    float n = 1 / (cos(c) * (sin(b) - sin(a)) + cos(b) * (sin(a) - sin(c)) +
-                   cos(a) * (sin(c) - sin(b)));
-    delta.x =
-        n * (encoder[0] * (cos(c) - cos(b)) +
-             encoder[1] * (cos(a) - cos(c) + encoder[2] * (cos(b) - cos(a))));
-    delta.y =
-        n * (encoder[0] * (sin(c) - sin(b)) +
-             encoder[1] * (sin(a) - sin(c) + encoder[2] * (sin(b) - sin(a))));
-    delta.theta = (-n * w_param.distance) *
-                   (encoder[0] * (cos(b) * sin(c) - sin(b) * cos(c)) +
-                    encoder[1] * (cos(c) * sin(a) - sin(c) * cos(a)) +
-                    encoder[2] * (cos(a) * sin(b) - sin(a) * cos(b)));
+    float table_arg = atan2(w_param.length_y, w_param.length_x);
+    for (int i = 0; i < 4;i++)
+    {
+      delta.x += 0.25 * this->rotate_to_meter(encoder[i]) * cos(encoder[i + 4]);
+      delta.y += 0.25 * this->rotate_to_meter(encoder[i]) * sin(encoder[i + 4]);
+    }
+    delta.theta = this->rotate_to_meter(encoder[0])*sin(encoder[4]-table_arg)-
+                  this->rotate_to_meter(encoder[1])*sin(encoder[5]+table_arg)-
+                  this->rotate_to_meter(encoder[2])*sin(encoder[6]-table_arg)+
+                  this->rotate_to_meter(encoder[3])*sin(encoder[7]+table_arg);
+    delta.theta /= (4*sqrt(pow(w_param.length_x/2,2)+pow(w_param.length_y/2,2)));
   }
-  //ロボット座標系から現在の固定座標に変換
+
   this->current_pos.x = this->past_pos.x + cos(past_pos.theta) * delta.x -
                         sin(past_pos.theta) * delta.y;
   this->current_pos.y = this->past_pos.y + sin(past_pos.theta) * delta.x +
