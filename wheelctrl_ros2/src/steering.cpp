@@ -56,30 +56,30 @@ void illias::MeasureSteering::cal_disp(std::shared_ptr<float[]> encoder,
 }
 
 void illias::MoveSteering::cal_cmd(const CMD &cmd,const float &table_angle) {
-  wheel_cmd_meter[0] =
-      sqrt(pow(cmd.x - w_param.distance * cmd.theta * sin(table_angle), 2) +
-           pow(cmd.y + w_param.distance * cmd.theta * cos(table_angle), 2));
-  wheel_cmd_meter[1] =
-      sqrt(pow(cmd.x - w_param.distance * cmd.theta * cos(table_angle), 2) +
-           pow(cmd.y - w_param.distance * cmd.theta * sin(table_angle), 2));
-  wheel_cmd_meter[2] =
-      sqrt(pow(cmd.x + w_param.distance * cmd.theta * sin(table_angle), 2) +
-           pow(cmd.y - w_param.distance * cmd.theta * cos(table_angle), 2));
-  wheel_cmd_meter[3] =
-      sqrt(pow(cmd.x + w_param.distance * cmd.theta * cos(table_angle), 2) +
-           pow(cmd.y + w_param.distance * cmd.theta * sin(table_angle), 2));
-  wheel_cmd_meter[4] =
-      atan2(cmd.y + w_param.distance * cmd.theta * cos(table_angle),
-            cmd.x - w_param.distance * cmd.theta * sin(table_angle));
-  wheel_cmd_meter[5] =
-      atan2(cmd.y - w_param.distance * cmd.theta * sin(table_angle),
-            cmd.x - w_param.distance * cmd.theta * cos(table_angle));
-  wheel_cmd_meter[6] =
-      atan2(cmd.y - w_param.distance * cmd.theta * cos(table_angle),
-            cmd.x + w_param.distance * cmd.theta * sin(table_angle));
-  wheel_cmd_meter[7] =
-      atan2(cmd.y + w_param.distance * cmd.theta * sin(table_angle),
-            cmd.x + w_param.distance * cmd.theta * cos(table_angle));
+  float vx = 0;
+  float vy = 0;
+  float dist = sqrt(pow(w_param.length_x, 2) + pow(w_param.length_y, 2));
+  float table_arg = atan2(w_param.length_y, w_param.length_x);
+
+  vx = cmd.x + dist * cmd.theta * cos(M_PI / 2 + table_arg);
+  vy = cmd.y + dist * cmd.theta * sin(M_PI / 2 + table_arg);
+  wheel_cmd_meter[0] = cal_r(vx, vy);
+  wheel_cmd_meter[4] = atan2(vy, vx);
+
+  vx = cmd.x + dist * cmd.theta * cos(M_PI * 3 / 4 - table_arg);
+  vy = cmd.y + dist * cmd.theta * sin(M_PI * 3 / 4 - table_arg);
+  wheel_cmd_meter[1] = cal_r(vx, vy);
+  wheel_cmd_meter[5] = atan2(vy, vx);
+
+  vx = cmd.x + dist * cmd.theta * cos(M_PI * 3 / 4 + table_arg);
+  vy = cmd.y + dist * cmd.theta * sin(M_PI * 3 / 4 + table_arg);
+  wheel_cmd_meter[2] = cal_r(vx, vy);
+  wheel_cmd_meter[6] = atan2(vy, vx);
+
+  vx = cmd.x + dist * cmd.theta * cos(M_PI / 2 - table_arg);
+  vy = cmd.y + dist * cmd.theta * sin(M_PI / 2 - table_arg);
+  wheel_cmd_meter[3] = cal_r(vx, vy);
+  wheel_cmd_meter[7] = atan2(vy, vx);
 
   for(int i = 0; i < 8;i++){
     if(i<4){

@@ -54,6 +54,10 @@ inline float csc(float arg) {
   }
 }
 
+inline float cal_r(float x,float y){
+  return sqrt(x*x + y*y);
+}
+
 // base class of measuring wheels
 class Measuring {
  public:
