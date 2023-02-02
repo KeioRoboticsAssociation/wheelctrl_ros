@@ -1,27 +1,27 @@
-wheelctrl_ros2:  
+wheelctrl_ros2:
   ros__parameters:
     robot_param:
       name: "Elephant Robot"
       AMCL: True
-    
+
     moving_wheel:
       type_name: "omni"
-      radius: 0.051
+      radius: 0.0635
       quantity: 4
       loop_rate: 200.0
       gear_ratio: 1.0
       coordinate: "polar"
-      distance: 0.7
+      distance: 0.49
       arguments: [45.0,135.0,225.0,315.0]
-      wheel_name: ["FR","BR","FL","BL"]
-    
+      wheel_name: ["FL","BL","BR","FR"]
+
     measuring_wheel:
       type_name: "omni"
-      radius: 0.03
-      quantity: 2
+      radius: 0.0635
+      quantity: 4
       loop_rate: 200.0
       gear_ratio: 1.0
       coordinate: "polar"
-      distance: 0.1
-      arguments: [0.0,90.0]
-      wheel_name: ["FB","RL"]
+      distance: 0.49
+      arguments: [45.0,135.0,225.0,315.0]
+      wheel_name: ["FL","BL","BR","FR"]
