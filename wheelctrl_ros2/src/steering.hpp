@@ -6,27 +6,22 @@
 namespace illias{
 class MeasureSteering : public Measuring {
  public:
-  MeasureSteering(const W_PARAM &_w_param,const POS &_past_pos);
+  MeasureSteering(const U_PARAM &_u_param,const POS &_past_pos);
   ~MeasureSteering(){}
-  void cal_disp(std::shared_ptr<float[]> encoder, const int &length);
-  void cal_disp(std::shared_ptr<float[]> encoder, const int &length,
-                const float &imu) {
-    for (int i = 0; i < length; i++) {
-      printf("%f,", encoder[i]);
-    }
-    printf("%f\n", imu);
-  }
+  void cal_disp(std::shared_ptr<float[]> encoder, float imu = 0 ,bool is_transformed = false);
+  void set_initial_wheel_angle(float w0,float w1,float w2,float w3);
+
+ private:
+  float past_theta[4];
 };
 
 class MoveSteering : public Moving {
  public:
-  MoveSteering(const W_PARAM &_w_param);
-  ~MoveSteering(){}
-  void cal_cmd(const CMD &cmd) { printf("%f,%f,%f", cmd.x, cmd.y, cmd.theta); }
-  void cal_cmd(const CMD &cmd, const float &table_angle,const float curvature) {
-    printf("%f,%f,%f,%f,%f\n", cmd.x, cmd.y, cmd.theta, table_angle, curvature);
-  }
-  virtual void cal_cmd(const CMD &cmd, const float &table_angle);
+  MoveSteering(const U_PARAM &_u_param);
+  ~MoveSteering() {}
+  void cal_cmd(const CMD &cmd,bool is_transformed = false);
+
+ private:
 };
 }
 

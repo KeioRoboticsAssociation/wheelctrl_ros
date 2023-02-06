@@ -1,152 +1,151 @@
 #pragma once
-#include "rclcpp/rclcpp.hpp"
+#include <iostream>
 #include <math.h>
 #include <string>
 #include <vector>
+#include <memory>
 
 using namespace std;
 
-namespace illias{
+namespace illias {
+// 構造体の定義
 
-typedef struct WHEEL_PARAMETER {
-  std::string type_name;      //足回りの種類
-  float radius;               //半径
-  int quantity;             //タイヤの数
-  float loop_rate;            //ループ周期
-  float gear_ratio;  //タイヤ1回転あたりのモーター回転数
-  float gear_ratio_horizonal; //タイヤ1回転あたりのモーター回転数
-
-  std::string coordinate;     
-  float distance;             //中心からタイヤまでの距離
-  std::vector<double> arguments;//どの角度についているのか
-
-  float length_x;//x軸方向の長さ
-  float length_y;//y軸方向の長さ
+// タイヤのパラメータ
+typedef struct WHEEL_PARAMETER{
+  float distance;//ロボット中心からの距離
+  float argument;//ロボット正面からの偏角
 } W_PARAM, *P_W_PARAM;
 
+// 足回りのパラメータ
+typedef struct UNDERSIDE_PARAMETER {
+  string type_name;       //足回りの種類
+  float radius;           //タイヤ半径
+  int quantity;         //タイヤの数
+  float gear_ratio;       //ギア比（タイヤ１回転あたりモーター回転量）
+  float gear_ratio_steer; //ギア比（ステア）
+  float loop_rate;        //制御周期
+  vector<W_PARAM> wheels; // 各タイヤのパラメタ
+} U_PARAM, *P_U_PARAM;
+
+// ロボットの姿勢
 typedef struct POSTURE {
   float x;
   float y;
-  float theta;
+  float w;// オメガの代わり
 } POS, *P_POS;
 
+// 足回りの指令値
 typedef struct COMMAND {
   float x;
   float y;
-  float theta;
+  float w;
 } CMD, *P_CMD;
+// ここまで構造体の定義
 
-inline float change_range(float arg){
-  if(arg>M_PI){
-    return arg - 2*M_PI;
-  }else if(arg < -M_PI){
-    return arg + 2*M_PI;
-  }else{
-    return arg;
-  }
+// ここから関数の定義
+
+// POSTURE同士の加減とスカラ倍
+inline POS operator+(const POS &a, const POS &b) { 
+  POS c;
+  c.x = a.x + b.x;
+  c.y = a.y + b.y;
+  c.w = a.w + b.w;
+  return c;
+}
+inline POS operator*(const POS &a, const float &f) { 
+  POS c;
+  c.x = a.x * f;
+  c.y = a.y * f;
+  c.w = a.w * f;
+  return c;
+}
+inline POS operator/(const POS &a, const float &f) { 
+  POS c;
+  c.x = a.x / f;
+  c.y = a.y / f;
+  c.w = a.w / f;
+  return c;
 }
 
-inline float csc(float arg) {
-  if (sin(arg) != 0){
-    return 1 / sin(arg);
-  }else{
+// 二次元ベクトルの大きさを計算
+inline float cal_r(float x, float y) { return sqrt(pow(x, 2) + pow(y, 2)); }
+
+// 余割を計算
+inline float csc(float x){
+  if (x == 0){
     return 0;
+  } else {
+    return 1 / sin(x);
   }
 }
 
-inline float cal_r(float x,float y){
-  return sqrt(x*x + y*y);
-}
+// ここまで関数の定義
 
-// base class of measuring wheels
+
+//測定用クラス
 class Measuring {
- public:
-  Measuring(const W_PARAM &_w_param,const POS &_past_pos)
-  :w_param(_w_param),past_pos(_past_pos){
-    current_pos = past_pos;
-    current_vel = {0,0,0};
-  }
-  virtual ~Measuring(){}
+  public:
+  //コンストラクタ
+   Measuring(const U_PARAM &_u_param,const POS &_initial_pos)
+   :u_param(_u_param),past_pos(_initial_pos){
+     current_pos = past_pos;
+     current_vel = {0, 0, 0};
+   }              
+   //デストラクタ
+   virtual ~Measuring(){};
+   //変位を計算
+   virtual void cal_disp(std::shared_ptr<float[]> encoder, const float imu = 0,
+                         bool is_transformed = false)
+   {
+     cout << "ERROR : please use subclass" << endl;
+     current_vel.x = 0;
+     current_vel.y = 0;
+     current_vel.w = 0;
+     current_pos = current_pos + (current_vel / u_param.loop_rate);
+   };
+   //現在位置を取得
+   inline POS get_current_pos() { return current_pos; }
+   //現在速度を取得
+   inline POS get_current_vel() { return current_vel; }
 
-  //convert encoder data into robot posture(world coordinate)
-  virtual void cal_disp(std::shared_ptr<float[]> encoder,const int &length){
-    printf("please use subclass");
-    for (int i = 0; i < length;i++)
-    {
-      printf("%f ", encoder[i]);
-    }
-    printf("\n");
-  }
-
-  // convert encoder data into robot posture(world coordinate)
-  virtual void cal_disp(std::shared_ptr<float[]> encoder,const int &length,const float &imu){//エンコーダーの値から現在の座標を計算
-    printf("please use subclass");
-    for (int i = 0; i < length;i++){
-      printf("%f ", encoder[i]);
-    }
-    printf("%f\n", imu);
-  }
-
-  // get current posture of robot (world coordinate)
-  POS get_current_pos() { return this->current_pos; }
-  POS get_current_vel() { return this->current_vel; }
-  float rotate_to_meter(const float &rotate){
-    return (rotate/this->w_param.gear_ratio) * 2 * M_PI * this->w_param.radius;
-  }
-  float rotate_to_rad(const float &rotate){
-    return (rotate / this->w_param.gear_ratio_horizonal) * 2 * M_PI;
-  }
- protected:
-  W_PARAM w_param;
-  POS past_pos; //前の位置（固定座標系）
-  POS current_pos;//現在の位置（固定座標系）
-  POS current_vel;//現在の速度（固定座標系）
+  protected:
+   // 回転を距離に変換
+   inline float rot_to_meter(float rot) {
+     return rot * 2 * M_PI * u_param.radius / u_param.gear_ratio;
+   }
+   // 回転をラジアンに変換
+   inline float rot_to_rad(float rot) {
+     return rot * 2 * M_PI / u_param.gear_ratio_steer;
+   }
+   U_PARAM u_param;  // 足回りのパラメータ
+   POS current_pos; // 現在位置
+   POS current_vel; // 現在の速度
+   POS past_pos;    // 過去の位置
 };
 
+//移動用クラス
 class Moving {
- public:
-  Moving(const W_PARAM &_w_param) : w_param(_w_param){
-    if (w_param.type_name == "steering"){
-      wheel_cmd_meter = std::make_unique<float[]>(2 * w_param.quantity);
-      wheel_cmd_rotate = std::make_unique<float[]>(2 * w_param.quantity);
+  public:
+   // コンストラクタ
+   Moving(const U_PARAM &_u_param) : u_param(_u_param){};
+   // デストラクタ
+   virtual ~Moving();
+   // 指令値を各タイヤに計算
+   virtual void cal_cmd(const CMD &cmd, bool is_transformed = false);
 
-      for (int i = 0; i < 2*w_param.quantity; i++) {
-        wheel_cmd_meter[i] = 0;
-        wheel_cmd_rotate[i] = 0;
-      }
-    }else{
-      wheel_cmd_meter = std::make_unique<float[]>(w_param.quantity);
-      wheel_cmd_rotate = std::make_unique<float[]>(w_param.quantity);
-      for (int i = 0; i < w_param.quantity; i++) {
-        wheel_cmd_meter[i] = 0;
-        wheel_cmd_rotate[i] = 0;
-      }
-    }
-  }
-  virtual ~Moving(){}
-  virtual void cal_cmd(const CMD &cmd) { 
-    printf("please use subclass");
-    printf("%f,%f,%f\n", cmd.x, cmd.y, cmd.theta);
-  }
-  virtual void cal_cmd(const CMD &cmd, const float &table_angle,const float curvature){
-    printf("please use subclass");
-    printf("%f,%f,%f,%f,%f\n", cmd.x, cmd.y, cmd.theta, table_angle, curvature);
-  }
-  virtual void cal_cmd(const CMD &cmd, const float &table_angle){
-    printf("%f,%f,%f,%f\n", cmd.x, cmd.y, cmd.theta, table_angle);
-  }
-
-  float meter_to_rotate(const float &meter) {
-    return meter * this->w_param.gear_ratio / (2 * M_PI * this->w_param.radius);
-  }
-  float rad_to_rotate(const float &rad) {
-    return rad /(2 * M_PI);
-  }
-
-  std::unique_ptr<float[]> wheel_cmd_meter;
-  std::unique_ptr<float[]> wheel_cmd_rotate;
+   std::shared_ptr<float[]> wheel_cmd_meter;
+   std::shared_ptr<float[]> wheel_cmd_rot;
 
  protected:
-  W_PARAM w_param;
+  // 移動距離を回転数に換算
+  inline float meter_to_rot(float meter) {
+     return u_param.gear_ratio * meter / (2 * M_PI * u_param.radius);
+  }
+  // ラジアンを回転数に換算
+  inline float rad_to_rot(float rad) {
+     return u_param.gear_ratio_steer * rad / (2 * M_PI);
+  }
+
+  U_PARAM u_param;  // 足回りのパラメータ
 };
 }

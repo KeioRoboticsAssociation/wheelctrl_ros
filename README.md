@@ -22,19 +22,34 @@ A ROS meta package for wheel control for RogiLink
 という流れをとる。
 
 ## yamlの書き方
+### 変形もしないし、測定輪もない場合（基本構成）
 type_name : "omni"か"steering"か"mechanam"
 radius    : タイヤ半径
 quantity  : タイヤの個数
 loop_rate : 制御周期 Hz
 gear_ratio: ギア比（仮置き）
 gear_ratio_horizonal: ギア比（ステア）
-coordinate: タイヤの位置を記述する座標を指定"cartesian"か"polar" x-y座標か極座標か
-Wheel_name: ロギリンクで使うタイヤの名前
+Wheel_name: Rogilinkで使うタイヤの名前
+distance  : 中心-タイヤ距離
+argument  : 正面からの偏角
 
-### cartesianのとき
-length_xとlength_yで長方形の４すみにタイヤ
+※：変形機能との兼ね合いでdistanceはタイヤの数と同じ要素数の配列にしてください
 
-### polarのとき
-distanceが中心-タイヤの距離
-argumentsが極座標でのタイヤの偏角（正面が准線）
+### 変形する場合
+distance,argumentを
 
+``` yaml
+（省略）
+wheel_name: [FL,BL,BR,FR]
+before:
+    distance: [0.7, 0.7, 0.7, 0.7]
+    argument: [45.0, 135.0, 225.0, 315.0]
+after:
+    distance: [0.7, 0.7, 0.8, 0.8]
+    argument: [45.0, 135.0, 225.0, 315.0]
+```
+のように書いてください
+
+### 測定輪を使う場合
+測定輪について、
+measuring_wheel: の下に書いてください

@@ -78,8 +78,8 @@ class WheelCtrlRos2:public rclcpp::Node{
     rclcpp::Publisher<rogilink2_interfaces::msg::Frame>::SharedPtr frame_pub;
     rclcpp::Subscription<geometry_msgs::msg::Twist>::SharedPtr cmd_sub;
     vector<std::shared_ptr<Md>> drivers;
-    illias::W_PARAM moving_wheel;
-    illias::W_PARAM measuring_wheel;
+    illias::U_PARAM moving_wheel;
+    illias::U_PARAM measuring_wheel;
     illias::POS current_pos;
     illias::POS current_vel;
     illias::CMD cmd;
@@ -189,7 +189,7 @@ void WheelCtrlRos2::set_wheel_parameter(){
 void WheelCtrlRos2::set_initial_pos() { 
   current_pos.x = 0;
   current_pos.y = 0;
-  current_pos.theta = 0;
+  current_pos.w = 0;
 }
 
 void WheelCtrlRos2::set_subclass(){
@@ -271,11 +271,11 @@ void WheelCtrlRos2::set_subclass(){
 void WheelCtrlRos2::cmd_callback(const geometry_msgs::msg::Twist::SharedPtr msg) {
   cmd.x = msg->linear.x;
   cmd.y = msg->linear.y;
-  cmd.theta = msg->angular.z;
+  cmd.w = msg->angular.z;
   if(moving_wheel.type_name=="omni"){
     moving->cal_cmd(cmd);
   } else if (moving_wheel.type_name == "steering") {
-    moving->cal_cmd(cmd, current_pos.theta);
+    moving->cal_cmd(cmd, current_pos.w);
   } else if (moving_wheel.type_name == "mechanam") {
     moving->cal_cmd(cmd);
   } else {
@@ -301,15 +301,15 @@ void WheelCtrlRos2::update(){
   current_pos = measure->get_current_pos();
   current_vel = measure->get_current_vel();
 
-      // copy from moving->wheel_cmd_rotate to cmd_rotate
+      // copy from moving->wheel_cmd_rot to cmd_rotate
       if (moving_wheel.type_name == "omni") {
     for(int i=0;i<moving_wheel.quantity;i++){
-      cmd_rotate[i] = moving->wheel_cmd_rotate[i];
+      cmd_rotate[i] = moving->wheel_cmd_rot[i];
     }
   }
   else if (moving_wheel.type_name == "steering") {
     for(int i=0;i<2*moving_wheel.quantity;i++){
-      cmd_rotate[i] = moving->wheel_cmd_rotate[i];
+      cmd_rotate[i] = moving->wheel_cmd_rot[i];
     }
   }
 
@@ -322,14 +322,14 @@ void WheelCtrlRos2::pub_rogilink2_frame(){
   auto msg = rogilink2_interfaces::msg::Frame();
   if(moving_wheel.type_name=="omni"){
     for (int i = 0; i < moving_wheel.quantity; i++) {
-      drivers[i]->setVelocity(moving->wheel_cmd_rotate[i]);
+      drivers[i]->setVelocity(moving->wheel_cmd_rot[i]);
     }
   } else if (moving_wheel.type_name == "steering") {
     for (int i = 0; i < 2*moving_wheel.quantity; i++) {
       if(i<4){
-        drivers[i]->setVelocity(moving->wheel_cmd_rotate[i]);
+        drivers[i]->setVelocity(moving->wheel_cmd_rot[i]);
       }else{
-        drivers[i]->setPosition(moving->wheel_cmd_rotate[i]);
+        drivers[i]->setPosition(moving->wheel_cmd_rot[i]);
       }
     }
   }
@@ -345,11 +345,11 @@ void WheelCtrlRos2::pub_odometry(){
   msg.pose.pose.position.z = 0;
   msg.pose.pose.orientation.x = 0;
   msg.pose.pose.orientation.y = 0;
-  msg.pose.pose.orientation.z = sin(current_pos.theta / 2);
-  msg.pose.pose.orientation.w = cos(current_pos.theta / 2);
+  msg.pose.pose.orientation.z = sin(current_pos.w / 2);
+  msg.pose.pose.orientation.w = cos(current_pos.w / 2);
   msg.twist.twist.linear.x = current_vel.x;
   msg.twist.twist.linear.y = current_vel.y;
-  msg.twist.twist.angular.z = current_vel.theta;
+  msg.twist.twist.angular.z = current_vel.w;
   odom_pub->publish(msg);
   if(!AMCL){
     geometry_msgs::msg::TransformStamped transform;
@@ -360,7 +360,7 @@ void WheelCtrlRos2::pub_odometry(){
     transform.transform.translation.y = current_pos.y;
     transform.transform.translation.z = 0;
     tf2::Quaternion q;
-    q.setRPY(0, 0, current_pos.theta);
+    q.setRPY(0, 0, current_pos.w);
     transform.transform.rotation.x = q.x();
     transform.transform.rotation.y = q.y();
     transform.transform.rotation.z = q.z();
@@ -494,7 +494,7 @@ int main(int argc, char *argv[]) {
 //         msg) {
 //           cmd_vel.x = msg->linear.x;
 //           cmd_vel.y = msg->linear.y;
-//           cmd_vel.theta = msg->angular.z;
+//           cmd_vel.w = msg->angular.z;
 //         });
 
 //     // set measuring_wheel

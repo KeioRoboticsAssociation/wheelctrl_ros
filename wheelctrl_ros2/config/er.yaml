@@ -3,7 +3,9 @@ wheelctrl_ros2:
     robot_param:
       name: "Elephant Robot"
       AMCL: True
-    
+      measure: False
+      transform: False
+
     moving_wheel:
       type_name: "omni"
       radius: 0.051
@@ -13,7 +15,7 @@ wheelctrl_ros2:
       coordinate: "polar"
       distance: 0.7
       arguments: [45.0,135.0,225.0,315.0]
-      wheel_name: ["FR","BR","FL","BL"]
+      wheel_name: ["FL","BL","BR","FR"]
     
     measuring_wheel:
       type_name: "omni"

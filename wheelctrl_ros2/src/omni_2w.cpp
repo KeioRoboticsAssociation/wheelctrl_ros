@@ -1,44 +1,34 @@
 #include "omni_2w.hpp"
 
-illias::MeasureOmni2W::MeasureOmni2W(const W_PARAM &_w_param,
-                                     const POS &_past_pos)
-    : illias::Measuring(_w_param,_past_pos) {
-      if(w_param.type_name=="omni"&&w_param.quantity==2){
-        printf("this is the subclass of two-wheel measuring module\n");
-      }else{
-        printf("you should use another subclass\n");
-      }
-    }
+illias::MeasureOmni2W::MeasureOmni2W(const U_PARAM &_u_param,
+                                     const POS &_initial_pos)
+    : illias::Measuring(_u_param,_initial_pos) {
+  if (u_param.type_name == "omni" && u_param.quantity == 2) {
+    printf("this is the subclass of two-wheel measuring module\n");
+  } else {
+    printf("you should use another subclass\n");
+  }
+}
 
-    void illias::MeasureOmni2W::cal_disp(std::shared_ptr<float[]> encoder,
-                                         const int &length, const float &imu) {
-      POS delta;
+void illias::MeasureOmni2W::cal_disp(std::shared_ptr<float[]> encoder,
+                                     const float imu = 0,
+                                     bool is_transformed = false) {
+  POS delta;
 
-      // エンコーダーの値を代入
-      if (length != 2) {
-        std::printf("invalid argument size");
-        delta.x = 0;
-        delta.y = 0;
-        delta.theta = 0;
-      } else {
-        delta.x = this->rotate_to_meter(encoder[0]) - imu * w_param.distance;
-        delta.y = this->rotate_to_meter(encoder[1]) - imu * w_param.distance;
-        delta.theta = imu;
-      }
+  delta.x = this->rot_to_meter(encoder[0]) - imu * u_param.wheels[0].distance;
+  delta.y = this->rot_to_meter(encoder[1]) - imu * u_param.wheels[1].distance;
+  delta.w = imu;
 
-      // ロボット座標系から現在の固定座標に変換
-      this->current_pos.x = this->past_pos.x + cos(past_pos.theta) * delta.x -
-                            sin(past_pos.theta) * delta.y;
-      this->current_pos.y = this->past_pos.y + sin(past_pos.theta) * delta.x +
-                            cos(past_pos.theta) * delta.y;
-      this->current_pos.theta =
-          change_range(this->past_pos.theta + delta.theta);
+  // ロボット座標系から現在の固定座標に変換
+  this->current_pos.x = this->past_pos.x + cos(past_pos.w) * delta.x -
+                        sin(past_pos.w) * delta.y;
+  this->current_pos.y = this->past_pos.y + sin(past_pos.w) * delta.x +
+                        cos(past_pos.w) * delta.y;
+  this->current_pos.w = this->past_pos.w + delta.w;
 
-      // past_posを更新
-      past_pos = current_pos;
+  // past_posを更新
+  this->past_pos = this->current_pos;
 
-      // set current_vel
-      this->current_vel.x = delta.x * w_param.loop_rate;
-      this->current_vel.y = delta.y * w_param.loop_rate;
-      this->current_vel.theta = delta.theta * w_param.loop_rate;
-    }
+  // set current_vel
+  this->current_vel = delta * this->u_param.loop_rate;
+}
