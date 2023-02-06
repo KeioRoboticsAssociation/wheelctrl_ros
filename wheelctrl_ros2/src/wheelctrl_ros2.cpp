@@ -137,20 +137,13 @@ void WheelCtrlRos2::set_wheel_parameter(){
       (float)this->get_parameter("moving_wheel.loop_rate").as_double();
   moving_wheel.gear_ratio =
       (float)this->get_parameter("moving_wheel.gear_ratio").as_double();
-  moving_wheel.gear_ratio_horizonal =
+  moving_wheel.gear_ratio_steer =
       (float)this->get_parameter("moving_wheel.gear_ratio_horizonal")
           .as_double();
-  moving_wheel.coordinate =
-      this->get_parameter("moving_wheel.coordinate").as_string();
-  moving_wheel.distance =
-      (float)this->get_parameter("moving_wheel.distance").as_double();
-  moving_wheel.arguments =
+  std::vector<double> dist_buff1 =
+      this->get_parameter("moving_wheel.distance").as_double_array();
+  std::vector<double> arg_buff1 =
       this->get_parameter("moving_wheel.arguments").as_double_array();
-  moving_wheel.length_x =
-      (float)this->get_parameter("moving_wheel.length_x").as_double();
-  moving_wheel.length_y =
-      (float)this->get_parameter("moving_wheel.length_y").as_double();
-  moving_name = this->get_parameter("moving_wheel.wheel_name").as_string_array();
 
   // measuring wheel
   measuring_wheel.type_name =
@@ -163,26 +156,21 @@ void WheelCtrlRos2::set_wheel_parameter(){
       (float)this->get_parameter("measuring_wheel.loop_rate").as_double();
   measuring_wheel.gear_ratio =
       (float)this->get_parameter("measuring_wheel.gear_ratio").as_double();
-  measuring_wheel.gear_ratio_horizonal =
+  measuring_wheel.gear_ratio_steer =
       (float)this->get_parameter("measuring_wheel.gear_ratio_horizonal")
           .as_double();
-  measuring_wheel.coordinate =
-      this->get_parameter("measuring_wheel.coordinate").as_string();
-  measuring_wheel.distance =
-      (float)this->get_parameter("measuring_wheel.distance").as_double();
-  measuring_wheel.arguments =
+  std::vector<double> dist_buff2 =
+      this->get_parameter("measuring_wheel.distance").as_double_array();
+  std::vector<double> arg_buff2 =
       this->get_parameter("measuring_wheel.arguments").as_double_array();
-  measuring_wheel.length_x =
-      (float)this->get_parameter("measuring_wheel.length_x").as_double();
-  measuring_wheel.length_y =
-      (float)this->get_parameter("measuring_wheel.length_y").as_double();
-  measuring_name = this->get_parameter("measuring_wheel.wheel_name").as_string_array();
 
-  for (int i = 0; i < (int)moving_wheel.arguments.size();i++){
-    moving_wheel.arguments[i] = moving_wheel.arguments[i] * M_PI / 180;
+  for (int i = 0;i<dist_buff1.size();i++){
+    moving_wheel.wheels[i].distance = dist_buff1[i];
+    moving_wheel.wheels[i].argument = arg_buff1[i];
   }
-  for (int i = 0; i < (int)measuring_wheel.arguments.size(); i++) {
-    measuring_wheel.arguments[i] = measuring_wheel.arguments[i] * M_PI / 180;
+  for (int i = 0;i<dist_buff2.size();i++){
+    measuring_wheel.wheels[i].distance = dist_buff2[i];
+    measuring_wheel.wheels[i].argument = arg_buff2[i];
   }
 }
 
