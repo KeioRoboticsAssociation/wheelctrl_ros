@@ -13,7 +13,7 @@ wheelctrl_ros2:
       coordinates: "cartesian"
       length_x: 0.5
       length_y: 0.5
-      wheel_name: ["FR","BR","FL","BL","FR_S","BR_S","FL_S","BL_S"]
+      wheel_name: ["FL", "RL", "RR", "FR", "FL_S", "RL_S", "RR_S", "FR_S"]
     
     measuring_wheel:
       type_name: "steering"
@@ -25,4 +25,4 @@ wheelctrl_ros2:
       coordinates: "cartesian"
       length_x: 0.5
       length_y: 0.5
-      wheel_name: ["FR","BR","FL","BL","FR_S","BR_S","FL_S","BL_S"]
+      wheel_name: ["FL", "RL", "RR", "FR", "FL_S", "RL_S", "RR_S", "FR_S"]
