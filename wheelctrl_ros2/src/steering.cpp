@@ -65,7 +65,11 @@ void illias::MeasureSteering::cal_disp(std::shared_ptr<float[]> encoder,
       }
     }
 
-      // ロボット座標系から現在の固定座標に変換
+    for(int i = 0;i < 4;i++){
+      past_theta[i] = theta[i];
+    }
+
+    // ロボット座標系から現在の固定座標に変換
     this->current_pos.x = this->past_pos.x + cos(past_pos.w) * delta.x -
                           sin(past_pos.w) * delta.y;
     this->current_pos.y = this->past_pos.y + sin(past_pos.w) * delta.x +
@@ -79,4 +83,26 @@ void illias::MeasureSteering::cal_disp(std::shared_ptr<float[]> encoder,
     this->current_vel.x = delta.x * u_param.loop_rate;
     this->current_vel.y = delta.y * u_param.loop_rate;
     this->current_vel.w = delta.w * u_param.loop_rate;
+}
+
+void illias::MoveSteering::cal_cmd(const CMD &cmd,bool is_transformed = false){
+  float vx, vy = {0};
+  if (!is_transformed) {
+    for (int i = 0; i < 4;i++){
+        vx = cmd.x + cmd.w * u_param.wheels[i].distance *
+                         cos(u_param.wheels[i].argument + M_PI / 2);
+        vy = cmd.y + cmd.w * u_param.wheels[i].distance *
+                         sin(u_param.wheels[i].argument + M_PI / 2);
+        wheel_cmd_rot[i] = meter_to_rot(sqrt(vx * vx + vy * vy));
+        wheel_cmd_rot[i + 4] = rad_to_rot(atan2(vx, vy));
+    }
+  } else {
+    for (int i = 0; i < 4; i++) {
+        vx = cmd.x + cmd.w * u_param.wheels[i+4].distance *
+                         cos(u_param.wheels[i+4].argument + M_PI / 2);
+        vy = cmd.y + cmd.w * u_param.wheels[i+4].distance *
+                         sin(u_param.wheels[i+4].argument + M_PI / 2);
+        wheel_cmd_rot[i] = meter_to_rot(sqrt(vx * vx + vy * vy));
+        wheel_cmd_rot[i + 4] = rad_to_rot(atan2(vx, vy));
+    }
 }
