@@ -263,7 +263,7 @@ void WheelCtrlRos2::cmd_callback(const geometry_msgs::msg::Twist::SharedPtr msg)
   if(moving_wheel.type_name=="omni"){
     moving->cal_cmd(cmd);
   } else if (moving_wheel.type_name == "steering") {
-    moving->cal_cmd(cmd, current_pos.w);
+    moving->cal_cmd(cmd);
   } else if (moving_wheel.type_name == "mechanam") {
     moving->cal_cmd(cmd);
   } else {
