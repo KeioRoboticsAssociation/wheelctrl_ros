@@ -18,8 +18,7 @@ illias::MoveOmni3W::MoveOmni3W(const U_PARAM &_u_param):Moving(_u_param){
 }
 
 void illias::MeasureOmni3W::cal_disp(std::shared_ptr<float[]> encoder,
-                                     float imu = 0,
-                                     bool is_transformed = false) {
+                                     float imu, bool is_transformed) {
   POS delta;
 
   delta.x = 0;
@@ -52,7 +51,7 @@ void illias::MeasureOmni3W::cal_disp(std::shared_ptr<float[]> encoder,
   this->current_vel.w = delta.w * u_param.loop_rate;
 }
 
-void illias::MoveOmni3W::cal_cmd(const CMD &cmd,bool is_transformed = false) {
+void illias::MoveOmni3W::cal_cmd(const CMD &cmd,bool is_transformed) {
   float a = (float)this->u_param.wheels[0].argument;
   float b = (float)this->u_param.wheels[1].argument;
   float c = (float)this->u_param.wheels[2].argument;

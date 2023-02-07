@@ -28,8 +28,7 @@ void illias::MeasureSteering::set_initial_wheel_angle(float w0, float w1,
 }
 
 void illias::MeasureSteering::cal_disp(std::shared_ptr<float[]> encoder,
-                                       float imu = 0,
-                                       bool is_transformed = false) {
+                                       float imu, bool is_transformed) {
     POS delta = {0};
     
     float vel[4] = {0};
@@ -85,7 +84,7 @@ void illias::MeasureSteering::cal_disp(std::shared_ptr<float[]> encoder,
     this->current_vel.w = delta.w * u_param.loop_rate;
 }
 
-void illias::MoveSteering::cal_cmd(const CMD &cmd,bool is_transformed = false){
+void illias::MoveSteering::cal_cmd(const CMD &cmd,bool is_transformed){
   float vx, vy = {0};
   if (!is_transformed) {
     for (int i = 0; i < 4;i++){
@@ -105,4 +104,5 @@ void illias::MoveSteering::cal_cmd(const CMD &cmd,bool is_transformed = false){
         wheel_cmd_rot[i] = meter_to_rot(sqrt(vx * vx + vy * vy));
         wheel_cmd_rot[i + 4] = rad_to_rot(atan2(vx, vy));
     }
+  }
 }

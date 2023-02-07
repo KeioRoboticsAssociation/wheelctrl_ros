@@ -92,7 +92,7 @@ class Measuring {
      current_vel = {0, 0, 0};
    }              
    //デストラクタ
-   virtual ~Measuring(){};
+   virtual ~Measuring(){}
    //変位を計算
    virtual void cal_disp(std::shared_ptr<float[]> encoder, const float imu = 0,
                          bool is_transformed = false)
@@ -129,9 +129,11 @@ class Moving {
    // コンストラクタ
    Moving(const U_PARAM &_u_param) : u_param(_u_param){};
    // デストラクタ
-   virtual ~Moving();
+   virtual ~Moving(){}
    // 指令値を各タイヤに計算
-   virtual void cal_cmd(const CMD &cmd, bool is_transformed = false);
+   virtual void cal_cmd(const CMD &cmd, bool is_transformed = false){
+     cout << "ERROR : please use subclass" << endl;
+   };
 
    std::shared_ptr<float[]> wheel_cmd_meter;
    std::shared_ptr<float[]> wheel_cmd_rot;

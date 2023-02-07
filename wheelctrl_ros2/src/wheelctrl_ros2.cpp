@@ -164,11 +164,11 @@ void WheelCtrlRos2::set_wheel_parameter(){
   std::vector<double> arg_buff2 =
       this->get_parameter("measuring_wheel.arguments").as_double_array();
 
-  for (int i = 0;i<dist_buff1.size();i++){
+  for (int i = 0;i<(int)dist_buff1.size();i++){
     moving_wheel.wheels[i].distance = dist_buff1[i];
     moving_wheel.wheels[i].argument = arg_buff1[i];
   }
-  for (int i = 0;i<dist_buff2.size();i++){
+  for (int i = 0;i<(int)dist_buff2.size();i++){
     measuring_wheel.wheels[i].distance = dist_buff2[i];
     measuring_wheel.wheels[i].argument = arg_buff2[i];
   }

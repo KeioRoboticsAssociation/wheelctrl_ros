@@ -19,8 +19,8 @@ illias::MoveOmni4W::MoveOmni4W(const U_PARAM &_u_param)
 }
 
 void illias::MeasureOmni4W::cal_disp(std::shared_ptr<float[]> encoder,
-                                     float imu = 0,
-                                     bool is_transformed = false) {
+                                     float imu, bool is_transformed)
+{
   POS delta = {0};
   // エンコーダーの値を代入
     float v0 = rot_to_meter(encoder[0]);
@@ -48,7 +48,7 @@ void illias::MeasureOmni4W::cal_disp(std::shared_ptr<float[]> encoder,
     this->current_vel.w = delta.w * u_param.loop_rate;
 }
 
-void illias::MoveOmni4W::cal_cmd(const CMD &cmd,bool is_transformed = false) {
+void illias::MoveOmni4W::cal_cmd(const CMD &cmd,bool is_transformed) {
   float arg = 1 / sqrt(2);
   wheel_cmd_meter[0] =
       arg * (-cmd.x + cmd.y) + u_param.wheels[0].distance * cmd.w;
