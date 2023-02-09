@@ -94,7 +94,7 @@ class Measuring {
    //デストラクタ
    virtual ~Measuring(){}
    //変位を計算
-   virtual void cal_disp(std::shared_ptr<float[]> encoder, const float imu = 0,
+   virtual void cal_disp(std::vector<float> encoder, const float imu = 0,
                          bool is_transformed = false)
    {
      cout << "ERROR : please use subclass" << endl;
@@ -127,7 +127,15 @@ class Measuring {
 class Moving {
   public:
    // コンストラクタ
-   Moving(const U_PARAM &_u_param) : u_param(_u_param){};
+   Moving(const U_PARAM &_u_param) : u_param(_u_param) {
+     printf("constructor");
+     for (int i = 0; i < (u_param.type_name == "steering" ? u_param.quantity * 2
+                                                          : u_param.quantity);
+          i++) {
+       wheel_cmd_meter[i] = 0;
+       wheel_cmd_rot[i] = 0;
+     }
+  };
    // デストラクタ
    virtual ~Moving(){}
    // 指令値を各タイヤに計算

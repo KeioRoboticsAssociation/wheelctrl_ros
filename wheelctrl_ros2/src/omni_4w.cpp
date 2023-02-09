@@ -18,7 +18,7 @@ illias::MoveOmni4W::MoveOmni4W(const U_PARAM &_u_param)
   }
 }
 
-void illias::MeasureOmni4W::cal_disp(std::shared_ptr<float[]> encoder,
+void illias::MeasureOmni4W::cal_disp(std::vector<float> encoder,
                                      float imu, bool is_transformed)
 {
   POS delta = {0};

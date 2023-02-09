@@ -26,7 +26,7 @@ void illias::MeasureSteering::set_initial_wheel_angle(float w0, float w1,
   past_theta[3] = w3;
 }
 
-void illias::MeasureSteering::cal_disp(std::shared_ptr<float[]> encoder,
+void illias::MeasureSteering::cal_disp(std::vector<float> encoder,
                                        float imu, bool is_transformed) {
   POS delta = {0};
 

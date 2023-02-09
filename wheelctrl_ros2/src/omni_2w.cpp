@@ -10,7 +10,7 @@ illias::MeasureOmni2W::MeasureOmni2W(const U_PARAM &_u_param,
   }
 }
 
-void illias::MeasureOmni2W::cal_disp(std::shared_ptr<float[]> encoder,
+void illias::MeasureOmni2W::cal_disp(std::vector<float> encoder,
                                      const float imu, bool is_transformed) {
   POS delta;
 
