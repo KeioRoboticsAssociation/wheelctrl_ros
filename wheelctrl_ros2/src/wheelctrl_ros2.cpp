@@ -1,31 +1,31 @@
 #include "general_wheelctrl.hpp"
 #include "geometry_msgs/msg/twist.hpp"
+#include "md_lib/md2022.hpp"
+#include "md_lib/odrive.hpp"
 #include "nav_msgs/msg/odometry.hpp"
 #include "rclcpp/rclcpp.hpp"
 #include "rogilink2_interfaces/msg/frame.hpp"
 #include "rogilink2_interfaces/srv/request_add_topic.hpp"
+#include "sensor.hpp"
 #include "tf2/LinearMath/Quaternion.h"
 #include "tf2_ros/transform_broadcaster.h"
-#include "md_lib/odrive.hpp"
-#include "md_lib/md2022.hpp"
-#include "sensor.hpp"
 
 using namespace chrono_literals;
 using namespace illias;
 
 class WheelCtrlRos2 : public rclcpp::Node {
-  public:
-   WheelCtrlRos2() : Node("wheel_ctrl_ros2") { sim_mode = true; }
-   void init() {
-     RCLCPP_INFO(this->get_logger(), "ACTIVATED: wheelctrl_ros2");
-     set_wheel_parameter();
-     set_subclass();
-     set_handles();
-     set_initial_pos();
-     RCLCPP_INFO(this->get_logger(), "wheelctrl_ros2 initialized");
-     
-     mytimer =
-         this->create_wall_timer(5ms, std::bind(&WheelCtrlRos2::update, this));
+ public:
+  WheelCtrlRos2() : Node("wheel_ctrl_ros2") { sim_mode = true; }
+  void init() {
+    RCLCPP_INFO(this->get_logger(), "ACTIVATED: wheelctrl_ros2");
+    set_wheel_parameter();
+    set_subclass();
+    set_handles();
+    set_initial_pos();
+    RCLCPP_INFO(this->get_logger(), "wheelctrl_ros2 initialized");
+
+    mytimer =
+        this->create_wall_timer(5ms, std::bind(&WheelCtrlRos2::update, this));
   }
 
  private:
@@ -68,100 +68,97 @@ class WheelCtrlRos2 : public rclcpp::Node {
   bool sim_mode;
 };
 
-void WheelCtrlRos2::set_wheel_parameter(){
+void WheelCtrlRos2::set_wheel_parameter() {
   RCLCPP_INFO(this->get_logger(), "set_wheel_parameter");
-    this->declare_parameter("robot_param.name", "undefined");
-    this->declare_parameter("robot_param.AMCL", false);
+  this->declare_parameter("robot_param.name", "undefined");
+  this->declare_parameter("robot_param.AMCL", false);
 
-    this->declare_parameter("moving_wheel.type_name", "steering");
-    this->declare_parameter("moving_wheel.radius", 0.0);
-    this->declare_parameter("moving_wheel.quantity", 0);
-    this->declare_parameter("moving_wheel.loop_rate", 200.0);
-    this->declare_parameter("moving_wheel.gear_ratio", 1.0);
-    this->declare_parameter("moving_wheel.gear_ratio_steer", 1.0);
-    this->declare_parameter("moving_wheel.distance", vector<double>(8,0.0));
-    this->declare_parameter("moving_wheel.arguments", vector<double>(8,
-    0.0)); 
-    this->declare_parameter("moving_wheel.wheel_name", vector<std::string>(8,
-    "undefined"));
+  this->declare_parameter("moving_wheel.type_name", "steering");
+  this->declare_parameter("moving_wheel.radius", 0.0);
+  this->declare_parameter("moving_wheel.quantity", 0);
+  this->declare_parameter("moving_wheel.loop_rate", 200.0);
+  this->declare_parameter("moving_wheel.gear_ratio", 1.0);
+  this->declare_parameter("moving_wheel.gear_ratio_steer", 1.0);
+  this->declare_parameter("moving_wheel.distance", vector<double>(8, 0.0));
+  this->declare_parameter("moving_wheel.arguments", vector<double>(8, 0.0));
+  this->declare_parameter("moving_wheel.wheel_name",
+                          vector<std::string>(8, "undefined"));
 
-    this->declare_parameter("measuring_wheel.type_name", "steering");
-    this->declare_parameter("measuring_wheel.radius", 0.0);
-    this->declare_parameter("measuring_wheel.quantity", 0);
-    this->declare_parameter("measuring_wheel.loop_rate", 200.0);
-    this->declare_parameter("measuring_wheel.gear_ratio", 1.0);
-    this->declare_parameter("measuring_wheel.gear_ratio_steer", 1.0);
-    this->declare_parameter("measuring_wheel.distance", vector<double>(8, 0.0));
-    this->declare_parameter("measuring_wheel.arguments",
-                            vector<double>(8, 0.0));
-    this->declare_parameter("measuring_wheel.wheel_name",
-    vector<std::string>(8, "undefined"));
+  this->declare_parameter("measuring_wheel.type_name", "steering");
+  this->declare_parameter("measuring_wheel.radius", 0.0);
+  this->declare_parameter("measuring_wheel.quantity", 0);
+  this->declare_parameter("measuring_wheel.loop_rate", 200.0);
+  this->declare_parameter("measuring_wheel.gear_ratio", 1.0);
+  this->declare_parameter("measuring_wheel.gear_ratio_steer", 1.0);
+  this->declare_parameter("measuring_wheel.distance", vector<double>(8, 0.0));
+  this->declare_parameter("measuring_wheel.arguments", vector<double>(8, 0.0));
+  this->declare_parameter("measuring_wheel.wheel_name",
+                          vector<std::string>(8, "undefined"));
 
-    robot_name = this->get_parameter("robot_param.name").as_string();
-    AMCL = this->get_parameter("robot_param.AMCL").as_bool();
+  robot_name = this->get_parameter("robot_param.name").as_string();
+  AMCL = this->get_parameter("robot_param.AMCL").as_bool();
 
-    // moving_wheel
-    moving_wheel.type_name =
-        this->get_parameter("moving_wheel.type_name").as_string();
-    moving_wheel.radius =
-        (float)this->get_parameter("moving_wheel.radius").as_double();
-    moving_wheel.quantity =
-        (float)this->get_parameter("moving_wheel.quantity").as_int();
-    moving_wheel.loop_rate =
-        (float)this->get_parameter("moving_wheel.loop_rate").as_double();
-    moving_wheel.gear_ratio =
-        (float)this->get_parameter("moving_wheel.gear_ratio").as_double();
-    moving_wheel.gear_ratio_steer =
-        (float)this->get_parameter("moving_wheel.gear_ratio_steer")
-            .as_double();
-    std::vector<double> dist_buff1 =
-        this->get_parameter("moving_wheel.distance").as_double_array();
-    std::vector<double> arg_buff1 =
-        this->get_parameter("moving_wheel.arguments").as_double_array();
-    std::vector<std::string> name_buff1 =
-        this->get_parameter("moving_wheel.wheel_name").as_string_array();
+  // moving_wheel
+  moving_wheel.type_name =
+      this->get_parameter("moving_wheel.type_name").as_string();
+  moving_wheel.radius =
+      (float)this->get_parameter("moving_wheel.radius").as_double();
+  moving_wheel.quantity =
+      (float)this->get_parameter("moving_wheel.quantity").as_int();
+  moving_wheel.loop_rate =
+      (float)this->get_parameter("moving_wheel.loop_rate").as_double();
+  moving_wheel.gear_ratio =
+      (float)this->get_parameter("moving_wheel.gear_ratio").as_double();
+  moving_wheel.gear_ratio_steer =
+      (float)this->get_parameter("moving_wheel.gear_ratio_steer").as_double();
+  std::vector<double> dist_buff1 =
+      this->get_parameter("moving_wheel.distance").as_double_array();
+  std::vector<double> arg_buff1 =
+      this->get_parameter("moving_wheel.arguments").as_double_array();
+  std::vector<std::string> name_buff1 =
+      this->get_parameter("moving_wheel.wheel_name").as_string_array();
 
-    // measuring wheel
-    measuring_wheel.type_name =
-        this->get_parameter("measuring_wheel.type_name").as_string();
-    measuring_wheel.radius =
-        (float)this->get_parameter("measuring_wheel.radius").as_double();
-    measuring_wheel.quantity =
-        (float)this->get_parameter("measuring_wheel.quantity").as_int();
-    measuring_wheel.loop_rate =
-        (float)this->get_parameter("measuring_wheel.loop_rate").as_double();
-    measuring_wheel.gear_ratio =
-        (float)this->get_parameter("measuring_wheel.gear_ratio").as_double();
-    measuring_wheel.gear_ratio_steer =
-        (float)this->get_parameter("measuring_wheel.gear_ratio_steer")
-            .as_double();
-    std::vector<double> dist_buff2 =
-        this->get_parameter("measuring_wheel.distance").as_double_array();
-    std::vector<double> arg_buff2 =
-        this->get_parameter("measuring_wheel.arguments").as_double_array();
-    std::vector<std::string> name_buff2 =
-        this->get_parameter("measuring_wheel.wheel_name").as_string_array();
+  // measuring wheel
+  measuring_wheel.type_name =
+      this->get_parameter("measuring_wheel.type_name").as_string();
+  measuring_wheel.radius =
+      (float)this->get_parameter("measuring_wheel.radius").as_double();
+  measuring_wheel.quantity =
+      (float)this->get_parameter("measuring_wheel.quantity").as_int();
+  measuring_wheel.loop_rate =
+      (float)this->get_parameter("measuring_wheel.loop_rate").as_double();
+  measuring_wheel.gear_ratio =
+      (float)this->get_parameter("measuring_wheel.gear_ratio").as_double();
+  measuring_wheel.gear_ratio_steer =
+      (float)this->get_parameter("measuring_wheel.gear_ratio_steer")
+          .as_double();
+  std::vector<double> dist_buff2 =
+      this->get_parameter("measuring_wheel.distance").as_double_array();
+  std::vector<double> arg_buff2 =
+      this->get_parameter("measuring_wheel.arguments").as_double_array();
+  std::vector<std::string> name_buff2 =
+      this->get_parameter("measuring_wheel.wheel_name").as_string_array();
 
-    illias::W_PARAM wheel_param;
-    for (int i = 0; i < (int)moving_wheel.quantity; i++) {
-      wheel_param.distance = (float)dist_buff1[i];
-      wheel_param.argument = (float)arg_buff1[i];
-      moving_wheel.wheels.push_back(wheel_param);
-    }
-    for (int i = 0;i<(int)measuring_wheel.quantity;i++){
-      wheel_param.distance = (float)dist_buff2[i];
-      wheel_param.argument = (float)arg_buff2[i];
-      moving_wheel.wheels.push_back(wheel_param);
-    }
-    RCLCPP_INFO(this->get_logger(), "parameter setting end");
+  illias::W_PARAM wheel_param;
+  for (int i = 0; i < (int)moving_wheel.quantity; i++) {
+    wheel_param.distance = (float)dist_buff1[i];
+    wheel_param.argument = (float)arg_buff1[i];
+    moving_wheel.wheels.push_back(wheel_param);
+  }
+  for (int i = 0; i < (int)measuring_wheel.quantity; i++) {
+    wheel_param.distance = (float)dist_buff2[i];
+    wheel_param.argument = (float)arg_buff2[i];
+    moving_wheel.wheels.push_back(wheel_param);
+  }
+  RCLCPP_INFO(this->get_logger(), "parameter setting end");
 }
 
 void WheelCtrlRos2::set_subclass() {
   RCLCPP_INFO(this->get_logger(), "set_subclass : measuring");
-  
-  if(measuring_wheel.type_name == "omni"){
+
+  if (measuring_wheel.type_name == "omni") {
     encoder.resize(measuring_wheel.quantity);
-    switch(measuring_wheel.quantity){
+    switch (measuring_wheel.quantity) {
       case 2:
         measure = std::make_shared<illias::MeasureOmni2W>(measuring_wheel,
                                                           current_pos);
@@ -177,7 +174,7 @@ void WheelCtrlRos2::set_subclass() {
       default:
         RCLCPP_INFO(this->get_logger(), "please set proper wheel quantity");
     }
-  }else if(measuring_wheel.type_name == "steering"){
+  } else if (measuring_wheel.type_name == "steering") {
     encoder.resize(2 * measuring_wheel.quantity);
     RCLCPP_INFO(this->get_logger(), "steering wheel setting start");
     measure =
@@ -189,18 +186,18 @@ void WheelCtrlRos2::set_subclass() {
   RCLCPP_INFO(this->get_logger(), "subclass setting end : measuring");
 
   RCLCPP_INFO(this->get_logger(), "set_subclass : moving");
-  if(moving_wheel.type_name == "omni"){
+  if (moving_wheel.type_name == "omni") {
     cmd_rotate.resize(moving_wheel.quantity);
     if (!sim_mode) {
-      for (int i = 0; i < moving_wheel.quantity;i++){
+      for (int i = 0; i < moving_wheel.quantity; i++) {
         drivers.push_back(std::make_shared<ODrive>(this, moving_name[i]));
         RCLCPP_INFO(this->get_logger(), "omni wheel start %d", i);
         drivers.at(i)->init();
         drivers.at(i)->setMode(Md::Mode::Velocity);
         drivers.at(i)->setPosition(0.0);
-      } 
+      }
     }
-    switch(moving_wheel.quantity){
+    switch (moving_wheel.quantity) {
       case 3:
         moving = std::make_shared<illias::MoveOmni3W>(moving_wheel);
         break;
@@ -213,7 +210,7 @@ void WheelCtrlRos2::set_subclass() {
   } else if (moving_wheel.type_name == "steering") {
     cmd_rotate.resize(2 * moving_wheel.quantity);
     RCLCPP_INFO(this->get_logger(), "hya");
-      // RCLCPP_INFO(this->get_logger(), "%f", moving_wheel.wheels[7].distance);
+    // RCLCPP_INFO(this->get_logger(), "%f", moving_wheel.wheels[7].distance);
     moving = std::make_shared<illias::MoveSteering>(moving_wheel);
     RCLCPP_INFO(this->get_logger(), "nya");
     if (!sim_mode) {
@@ -238,7 +235,7 @@ void WheelCtrlRos2::set_subclass() {
   RCLCPP_INFO(this->get_logger(), "subclass setting end : moving");
 }
 
-void WheelCtrlRos2::set_handles(){
+void WheelCtrlRos2::set_handles() {
   RCLCPP_INFO(this->get_logger(), "set_handles");
   frame_pub = this->create_publisher<rogilink2_interfaces::msg::Frame>(
       "/rogilink2/send", 10);
@@ -250,13 +247,13 @@ void WheelCtrlRos2::set_handles(){
         cmd.y = msg->linear.y;
         cmd.w = msg->angular.z;
       });
-  
-  if(!sim_mode){
+
+  if (!sim_mode) {
     int sub_num = measuring_wheel.type_name == "steering"
                       ? 2 * measuring_wheel.quantity
                       : measuring_wheel.quantity;
     encoder_sub.resize(sub_num);
-    for (int i = 0; i < sub_num;i++){
+    for (int i = 0; i < sub_num; i++) {
       encoder_sub[i] =
           this->create_subscription<rogilink2_interfaces::msg::Frame>(
               "/rogilink2/recieve_" + measuring_name[i], 10,
@@ -267,7 +264,6 @@ void WheelCtrlRos2::set_handles(){
   }
   photo = std::make_unique<Sensor>(this, "steer_sensor");
   RCLCPP_INFO(this->get_logger(), "set_handles end");
-
 }
 
 void WheelCtrlRos2::set_initial_pos() {
@@ -275,14 +271,15 @@ void WheelCtrlRos2::set_initial_pos() {
   current_pos.y = 0;
   current_pos.w = 0;
 
-  //set steer angle
-  if(moving_wheel.type_name == "steering"){
-    for (int i = 0; i < 4;i++){
+  // set steer angle
+  if (moving_wheel.type_name == "steering") {
+    for (int i = 0; i < 4; i++) {
       drivers[i + 4]->setMode(Md::Mode::Velocity);
     }
     bool is_completed = false;
     float offset[4] = {5 / 12, -1 / 3, 1 / 3, -5 / 12};
     while (is_completed) {
+      rclcpp::spin_some(this->shared_from_this());
       std::vector<int> val = photo->read();
       for (int i = 0; i < 4; i++) {
         cmd_rotate[i] = 0;
@@ -303,14 +300,14 @@ void WheelCtrlRos2::set_initial_pos() {
 }
 
 void WheelCtrlRos2::update() {
-//get current possition
-  if(measuring_wheel.type_name=="steering"){
-    for (int i = 0; i < 2 * measuring_wheel.quantity;i++){
+  // get current possition
+  if (measuring_wheel.type_name == "steering") {
+    for (int i = 0; i < 2 * measuring_wheel.quantity; i++) {
       encoder[i] =
           i < 4 ? drivers[i]->getVelocity() : drivers[i]->getPosition();
     }
   } else {
-    for (int i = 0; i < measuring_wheel.quantity;i++){
+    for (int i = 0; i < measuring_wheel.quantity; i++) {
       encoder[i] = drivers[i]->getVelocity();
     }
   }
@@ -322,7 +319,7 @@ void WheelCtrlRos2::update() {
   float cmd_num = moving_wheel.type_name == "steering"
                       ? 2 * moving_wheel.quantity
                       : moving_wheel.quantity;
-  for (int i = 0; i < cmd_num;i++){
+  for (int i = 0; i < cmd_num; i++) {
     cmd_rotate[i] = moving->wheel_cmd_rot[i];
   }
 
@@ -331,23 +328,23 @@ void WheelCtrlRos2::update() {
   pub_odometry();
 }
 
-void WheelCtrlRos2::pub_rogilink2_frame(){
-  if(moving_wheel.type_name=="steering"){
-    for (int i = 0; i < 2 * moving_wheel.quantity;i++){
-      if(i<4){
+void WheelCtrlRos2::pub_rogilink2_frame() {
+  if (moving_wheel.type_name == "steering") {
+    for (int i = 0; i < 2 * moving_wheel.quantity; i++) {
+      if (i < 4) {
         drivers[i]->setVelocity(moving->wheel_cmd_rot[i]);
       } else {
         drivers[i]->setPosition(moving->wheel_cmd_rot[i]);
       }
-    } 
+    }
   } else {
-    for (int i = 0; i < moving_wheel.quantity;i++){
+    for (int i = 0; i < moving_wheel.quantity; i++) {
       drivers[i]->setVelocity(moving->wheel_cmd_rot[i]);
     }
   }
 }
 
-void WheelCtrlRos2::pub_odometry(){
+void WheelCtrlRos2::pub_odometry() {
   auto msg = nav_msgs::msg::Odometry();
   msg.header.stamp = this->now();
   msg.header.frame_id = "odom";
