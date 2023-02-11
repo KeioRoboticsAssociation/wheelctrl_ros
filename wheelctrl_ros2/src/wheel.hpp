@@ -128,7 +128,12 @@ class Moving {
   public:
    // コンストラクタ
    Moving(const U_PARAM &_u_param) : u_param(_u_param) {
-     printf("constructor");
+     wheel_cmd_meter.resize(u_param.type_name == "steering"
+                                ? u_param.quantity * 2
+                                : u_param.quantity);
+     wheel_cmd_rot.resize(u_param.type_name == "steering" ? u_param.quantity * 2
+                                                          : u_param.quantity);
+                                                          
      for (int i = 0; i < (u_param.type_name == "steering" ? u_param.quantity * 2
                                                           : u_param.quantity);
           i++) {
@@ -143,8 +148,8 @@ class Moving {
      cout << "ERROR : please use subclass" << endl;
    };
 
-   std::shared_ptr<float[]> wheel_cmd_meter;
-   std::shared_ptr<float[]> wheel_cmd_rot;
+   std::vector<float> wheel_cmd_meter;
+   std::vector<float> wheel_cmd_rot;
 
  protected:
   // 移動距離を回転数に換算

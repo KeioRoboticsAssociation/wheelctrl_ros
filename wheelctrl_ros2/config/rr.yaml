@@ -9,8 +9,8 @@ wheelctrl_ros2:
       radius: 0.051
       quantity: 4
       loop_rate: 200.0
-      gear_ratio: 1.0
-      gear_ratio_steer: 1.0
+      gear_ratio: 1.898889538281707
+      gear_ratio_steer: 3.6666666666666666666667
       distance: [0.7,0.7,0.7,0.7,0.9,0.9,0.7,0.7]
       arguments: [45.0,135.0,225.0,315.0,30.0,135.0,225.0,330.0]
       wheel_name: ["FR","BR","FL","BL","FR_S","BR_S","FL_S","BL_S"]
