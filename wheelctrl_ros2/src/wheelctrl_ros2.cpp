@@ -227,7 +227,7 @@ void WheelCtrlRos2::set_subclass() {
     if (!sim_mode) {
       for (int i = 0; i < moving_wheel.quantity;i++){
         drivers.push_back(std::make_shared<ODrive>(this, moving_name[i]));
-        RCLCPP_INFO(this->get_logger(), "steering wheel start %d", i);
+        RCLCPP_INFO(this->get_logger(), "omni wheel start %d", i);
         drivers.at(i)->init();
         drivers.at(i)->setMode(Md::Mode::Velocity);
         drivers.at(i)->setPosition(0.0);
@@ -244,10 +244,10 @@ void WheelCtrlRos2::set_subclass() {
         RCLCPP_INFO(this->get_logger(), "please set proper wheel quantity");
     }
   } else if (moving_wheel.type_name == "steering") {
-    RCLCPP_INFO(this->get_logger(), "nya");
     cmd_rotate.resize(2 * moving_wheel.quantity);
     RCLCPP_INFO(this->get_logger(), "hya");
     moving = std::make_shared<illias::MoveSteering>(moving_wheel);
+    RCLCPP_INFO(this->get_logger(), "nya");
     if (!sim_mode) {
       for (int i = 0; i < 8; i++) {
         if (i < 4) {
