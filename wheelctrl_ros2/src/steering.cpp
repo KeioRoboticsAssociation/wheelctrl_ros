@@ -12,9 +12,9 @@ illias::MeasureSteering::MeasureSteering(const U_PARAM &_u_param,
 
 illias::MoveSteering::MoveSteering(const U_PARAM &_u_param) : Moving(_u_param) {
   if (u_param.type_name == "steering" && u_param.quantity == 4) {
-    printf("this is a steering wheel package");
+    printf("this is a steering wheel package\n");
   } else {
-    printf("you shouled use another subclass");
+    printf("you shouled use another subclass\n");
   }
 }
 

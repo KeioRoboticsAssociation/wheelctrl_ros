@@ -2,9 +2,7 @@ wheelctrl_ros2:
   ros__parameters:
     robot_param:
       name: "Elephant Robot"
-      AMCL: True
-      measure: False
-      transform: False
+      mode: "sim"
 
     moving_wheel:
       type_name: "omni"

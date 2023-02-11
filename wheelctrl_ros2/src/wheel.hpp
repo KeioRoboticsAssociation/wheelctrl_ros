@@ -12,7 +12,7 @@ namespace illias {
 
 // タイヤのパラメータ
 typedef struct WHEEL_PARAMETER{
-  float distance;//ロボット中心からの距離
+  float distance;  // ロボット中心からの距離
   float argument;//ロボット正面からの偏角
 } W_PARAM, *P_W_PARAM;
 

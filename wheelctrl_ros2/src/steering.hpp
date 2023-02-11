@@ -20,8 +20,15 @@ class MoveSteering : public Moving {
   MoveSteering(const U_PARAM &_u_param);
   ~MoveSteering() {}
   void cal_cmd(const CMD &cmd,bool is_transformed = false);
+  inline void set_current_wheel_angle(float w0,float w1,float w2,float w3){
+    current_wheel_angle[0] = w0;
+    current_wheel_angle[1] = w1;
+    current_wheel_angle[2] = w2;
+    current_wheel_angle[3] = w3;
+  }
 
  private:
+ float current_wheel_angle[4];
 };
 }
 
