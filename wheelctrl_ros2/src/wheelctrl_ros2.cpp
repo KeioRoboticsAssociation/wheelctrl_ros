@@ -328,8 +328,9 @@ void WheelCtrlRos2::update() {
   // publish
   if(!sim_mode){
     pub_rogilink2_frame();
+    pub_odometry();
   }
-  pub_odometry();
+
 }
 
 void WheelCtrlRos2::pub_rogilink2_frame() {
