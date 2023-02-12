@@ -161,6 +161,7 @@ class Moving {
     steer_angle[1] = 0;
     steer_angle[2] = 0;
     steer_angle[3] = 0;
+
    };
    // デストラクタ
    virtual ~Moving(){}
@@ -168,6 +169,7 @@ class Moving {
    virtual void cal_cmd(const CMD &cmd, bool is_transformed = false){
      cout << "ERROR : please use subclass" << endl;
    };
+
 
    std::vector<float> wheel_cmd_meter;
    std::vector<float> wheel_cmd_rot;

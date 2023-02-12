@@ -15,13 +15,15 @@ using namespace illias;
 
 class WheelCtrlRos2 : public rclcpp::Node {
  public:
-  WheelCtrlRos2() : Node("wheel_ctrl_ros2") { sim_mode = true; }
+  WheelCtrlRos2() : Node("wheel_ctrl_ros2") { sim_mode = false; }
   void init() {
     RCLCPP_INFO(this->get_logger(), "ACTIVATED: wheelctrl_ros2");
     set_wheel_parameter();
     set_subclass();
     set_handles();
-    set_initial_pos();
+    if (!sim_mode) {
+      set_initial_pos();
+    }
     RCLCPP_INFO(this->get_logger(), "wheelctrl_ros2 initialized");
 
     mytimer =
@@ -142,12 +144,12 @@ void WheelCtrlRos2::set_wheel_parameter() {
   illias::W_PARAM wheel_param;
   for (int i = 0; i < (int)moving_wheel.quantity; i++) {
     wheel_param.distance = (float)dist_buff1[i];
-    wheel_param.argument = (float)arg_buff1[i];
+    wheel_param.argument = (float)arg_buff1[i] * M_PI / 180;
     moving_wheel.wheels.push_back(wheel_param);
   }
   for (int i = 0; i < (int)measuring_wheel.quantity; i++) {
     wheel_param.distance = (float)dist_buff2[i];
-    wheel_param.argument = (float)arg_buff2[i];
+    wheel_param.argument = (float)arg_buff2[i] * M_PI / 180;
     moving_wheel.wheels.push_back(wheel_param);
   }
   RCLCPP_INFO(this->get_logger(), "parameter setting end");
@@ -246,6 +248,8 @@ void WheelCtrlRos2::set_handles() {
         cmd.x = msg->linear.x;
         cmd.y = msg->linear.y;
         cmd.w = msg->angular.z;
+        RCLCPP_INFO(this->get_logger(), "cmd_vel : %f, %f, %f", cmd.x, cmd.y,
+                    cmd.w);
       });
 
   if (!sim_mode) {
@@ -300,23 +304,29 @@ void WheelCtrlRos2::set_initial_pos() {
 }
 
 void WheelCtrlRos2::update() {
-  // get current possition
-  if (measuring_wheel.type_name == "steering") {
-    for (int i = 0; i < 2 * measuring_wheel.quantity; i++) {
-      encoder[i] =
-          i < 4 ? drivers[i]->getVelocity() : drivers[i]->getPosition();
+  // RCLCPP_INFO(this->get_logger(),"update");
+  if(!sim_mode){
+    // get current possition
+    if (measuring_wheel.type_name == "steering") {
+      for (int i = 0; i < 2 * measuring_wheel.quantity; i++) {
+        encoder[i] =
+            i < 4 ? drivers[i]->getVelocity() : drivers[i]->getPosition();
+      }
+    } else {
+      for (int i = 0; i < measuring_wheel.quantity; i++) {
+        encoder[i] = drivers[i]->getVelocity();
+      }
     }
-  } else {
-    for (int i = 0; i < measuring_wheel.quantity; i++) {
-      encoder[i] = drivers[i]->getVelocity();
-    }
+    measure->cal_disp(encoder);
+    current_pos = measure->get_current_pos();
+    current_vel = measure->get_current_vel();
   }
-  measure->cal_disp(encoder);
-  current_pos = measure->get_current_pos();
-  current_vel = measure->get_current_vel();
-
   //set cmd
-  moving->cal_cmd(cmd);
+  // RCLCPP_INFO(this->get_logger(), "%f,%f,%f", cmd.x, cmd.y, cmd.w);
+  // cmd.x = 0;
+  // cmd.y = 0;
+  // cmd.w = 1;
+  moving->cal_cmd(cmd,false);
   // set wheel_cmd
   float cmd_num = moving_wheel.type_name == "steering"
                       ? 2 * moving_wheel.quantity
@@ -324,13 +334,13 @@ void WheelCtrlRos2::update() {
   for (int i = 0; i < cmd_num; i++) {
     cmd_rotate[i] = moving->wheel_cmd_rot[i];
   }
-
+  RCLCPP_INFO(this->get_logger(),"vel: %f,%f,%f,%f",cmd_rotate[0],cmd_rotate[1],cmd_rotate[2],cmd_rotate[3]);
+  RCLCPP_INFO(this->get_logger(),"arg: %f,%f,%f,%f",cmd_rotate[4],cmd_rotate[5],cmd_rotate[6],cmd_rotate[7]);
   // publish
   if(!sim_mode){
     pub_rogilink2_frame();
     pub_odometry();
   }
-
 }
 
 void WheelCtrlRos2::pub_rogilink2_frame() {

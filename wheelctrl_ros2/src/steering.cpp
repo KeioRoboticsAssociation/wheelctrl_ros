@@ -91,6 +91,7 @@ void illias::MoveSteering::cal_cmd(const CMD &cmd, bool is_transformed) {
                        cos(u_param.wheels[i].argument + M_PI / 2);
       vy = cmd.y + cmd.w * u_param.wheels[i].distance *
                        sin(u_param.wheels[i].argument + M_PI / 2);
+
       wheel_cmd_rot[i] = meter_to_rot(sqrt(vx * vx + vy * vy));
       wheel_cmd_rot[i + 4] = rad_to_rot(atan2(vx, vy));
     }
