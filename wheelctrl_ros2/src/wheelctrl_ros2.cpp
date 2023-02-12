@@ -318,6 +318,8 @@ void WheelCtrlRos2::update() {
   current_pos = measure->get_current_pos();
   current_vel = measure->get_current_vel();
 
+  //set cmd
+  moving->cal_cmd(cmd);
   // set wheel_cmd
   float cmd_num = moving_wheel.type_name == "steering"
                       ? 2 * moving_wheel.quantity
@@ -327,7 +329,9 @@ void WheelCtrlRos2::update() {
   }
 
   // publish
-  pub_rogilink2_frame();
+  if(!sim_mode){
+    pub_rogilink2_frame();
+  }
   pub_odometry();
 }
 

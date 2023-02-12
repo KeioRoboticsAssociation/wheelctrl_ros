@@ -79,6 +79,23 @@ inline float csc(float x){
   }
 }
 
+// 多めの回転を許容
+inline float ex_rot(float current_rot,float command_rot){
+  float ex_rot = 0;
+  if(current_rot - command_rot > M_PI){
+    ex_rot = command_rot + 1;
+  } else if (current_rot - command_rot < -M_PI) {
+    ex_rot = command_rot - 1;
+  } else {
+    ex_rot = command_rot;
+  }
+  if (ex_rot > 2){
+    ex_rot = ex_rot - 2;
+  } else if (ex_rot < -2){
+    ex_rot = ex_rot + 2;
+  }
+}
+
 // ここまで関数の定義
 
 
@@ -140,7 +157,11 @@ class Moving {
        wheel_cmd_meter[i] = 0;
        wheel_cmd_rot[i] = 0;
      }
-  };
+    steer_angle[0] = 0;
+    steer_angle[1] = 0;
+    steer_angle[2] = 0;
+    steer_angle[3] = 0;
+   };
    // デストラクタ
    virtual ~Moving(){}
    // 指令値を各タイヤに計算
@@ -162,5 +183,6 @@ class Moving {
   }
 
   U_PARAM u_param;  // 足回りのパラメータ
+  float steer_angle[4]; // ステアリングの現在角度
 };
 }
