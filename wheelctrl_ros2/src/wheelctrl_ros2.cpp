@@ -15,7 +15,7 @@ using namespace illias;
 
 class WheelCtrlRos2 : public rclcpp::Node {
  public:
-  WheelCtrlRos2() : Node("wheel_ctrl_ros2") { sim_mode = false; }
+  WheelCtrlRos2() : Node("wheel_ctrl_ros2") { sim_mode = true; }
   void init() {
     RCLCPP_INFO(this->get_logger(), "ACTIVATED: wheelctrl_ros2");
     set_wheel_parameter();
@@ -117,7 +117,7 @@ void WheelCtrlRos2::set_wheel_parameter() {
       this->get_parameter("moving_wheel.distance").as_double_array();
   std::vector<double> arg_buff1 =
       this->get_parameter("moving_wheel.arguments").as_double_array();
-  std::vector<std::string> name_buff1 =
+  std::vector<std::string> moving_name =
       this->get_parameter("moving_wheel.wheel_name").as_string_array();
 
   // measuring wheel
@@ -138,7 +138,7 @@ void WheelCtrlRos2::set_wheel_parameter() {
       this->get_parameter("measuring_wheel.distance").as_double_array();
   std::vector<double> arg_buff2 =
       this->get_parameter("measuring_wheel.arguments").as_double_array();
-  std::vector<std::string> name_buff2 =
+  std::vector<std::string> measuring_name =
       this->get_parameter("measuring_wheel.wheel_name").as_string_array();
 
   illias::W_PARAM wheel_param;
@@ -323,9 +323,9 @@ void WheelCtrlRos2::update() {
   }
   //set cmd
   // RCLCPP_INFO(this->get_logger(), "%f,%f,%f", cmd.x, cmd.y, cmd.w);
-  // cmd.x = 0;
-  // cmd.y = 0;
-  // cmd.w = 1;
+  cmd.x = 0;
+  cmd.y = 0;
+  cmd.w = 1;
   moving->cal_cmd(cmd,false);
   // set wheel_cmd
   float cmd_num = moving_wheel.type_name == "steering"

@@ -111,5 +111,4 @@ void illias::MoveSteering::cal_cmd(const CMD &cmd, bool is_transformed) {
       steer_angle[i] = wheel_cmd_rot[i + 4];
     }
   }
-  
 }
