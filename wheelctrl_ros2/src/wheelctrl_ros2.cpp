@@ -15,7 +15,7 @@ using namespace illias;
 
 class WheelCtrlRos2 : public rclcpp::Node {
  public:
-  WheelCtrlRos2() : Node("wheel_ctrl_ros2") { sim_mode = false; }
+  WheelCtrlRos2() : Node("wheel_ctrl_ros2") { sim_mode = true; }
   void init() {
     RCLCPP_INFO(this->get_logger(), "ACTIVATED: wheelctrl_ros2");
     set_wheel_parameter();
@@ -334,9 +334,9 @@ void WheelCtrlRos2::update() {
   }
   // set cmd
   //  RCLCPP_INFO(this->get_logger(), "%f,%f,%f", cmd.x, cmd.y, cmd.w);
-  //  cmd.x = 0;
-  //  cmd.y = 0;
-  //  cmd.w = 1;
+  cmd.x = 0;
+  cmd.y = 0;
+  cmd.w = 1;
   moving->cal_cmd(cmd, false);
   // set wheel_cmd
   float cmd_num = moving_wheel.type_name == "steering"
