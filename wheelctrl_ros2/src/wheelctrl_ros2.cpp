@@ -117,7 +117,7 @@ void WheelCtrlRos2::set_wheel_parameter() {
       this->get_parameter("moving_wheel.distance").as_double_array();
   std::vector<double> arg_buff1 =
       this->get_parameter("moving_wheel.arguments").as_double_array();
-  std::vector<std::string> name_buff1 =
+  moving_name =
       this->get_parameter("moving_wheel.wheel_name").as_string_array();
 
   // measuring wheel
@@ -138,7 +138,7 @@ void WheelCtrlRos2::set_wheel_parameter() {
       this->get_parameter("measuring_wheel.distance").as_double_array();
   std::vector<double> arg_buff2 =
       this->get_parameter("measuring_wheel.arguments").as_double_array();
-  std::vector<std::string> name_buff2 =
+  measuring_name =
       this->get_parameter("measuring_wheel.wheel_name").as_string_array();
 
   illias::W_PARAM wheel_param;
@@ -150,7 +150,7 @@ void WheelCtrlRos2::set_wheel_parameter() {
   for (int i = 0; i < (int)measuring_wheel.quantity; i++) {
     wheel_param.distance = (float)dist_buff2[i];
     wheel_param.argument = (float)arg_buff2[i] * M_PI / 180;
-    moving_wheel.wheels.push_back(wheel_param);
+    measuring_wheel.wheels.push_back(wheel_param);
   }
   RCLCPP_INFO(this->get_logger(), "parameter setting end");
 }
@@ -225,7 +225,6 @@ void WheelCtrlRos2::set_subclass() {
           drivers.at(i)->setPosition(0.0);
         } else {
           drivers.push_back(std::make_shared<MD2022>(this, moving_name[i]));
-          drivers[i]->init();
           drivers[i]->setMode(Md::Mode::Position);
           drivers[i]->setPosition(0.0);
         }
@@ -280,32 +279,44 @@ void WheelCtrlRos2::set_initial_pos() {
     for (int i = 0; i < 4; i++) {
       drivers[i + 4]->setMode(Md::Mode::Velocity);
     }
-    bool is_completed = false;
-    float offset[4] = {5 / 12, -1 / 3, 1 / 3, -5 / 12};
-    while (is_completed) {
+    int completed_count = false;
+    float offset[4] = {5.0 / 12, -1.0 / 3, 1.0 / 3, -5.0 / 12};
+    while (completed_count != 4) {
+      std::this_thread::sleep_for(std::chrono::milliseconds(10));
+      completed_count = 0;
       rclcpp::spin_some(this->shared_from_this());
       std::vector<int> val = photo->read();
+      if (val.size() != 4) {
+        RCLCPP_INFO(this->get_logger(), "No sensor data");
+        continue;
+      }
+      RCLCPP_INFO(this->get_logger(), "%d, %d, %d, %d", val[0], val[1], val[2],
+                  val[3]);
+
       for (int i = 0; i < 4; i++) {
         cmd_rotate[i] = 0;
-        if (val[i] <= 256) {
+        if (val[i] <= 1024) {
           drivers[i + 4]->setVelocity(0);
-          drivers[i + 4]->resetEncoder(offset[i]);
-          is_completed *= 1;
+          drivers[i + 4]->setMode(Md::Mode::Idle);
+          drivers[i + 4]->resetEncoder(offset[i] *
+                                       moving_wheel.gear_ratio_steer);
+          completed_count++;
         } else {
-          drivers[i + 4]->setVelocity(0.25);
-          is_completed *= 0;
+          drivers[i + 4]->setVelocity(0.1);
         }
       }
     }
     for (int i = 0; i < 4; i++) {
+      drivers[i + 4]->setPosition(0);
       drivers[i + 4]->setMode(Md::Mode::Position);
+      std::this_thread::sleep_for(std::chrono::microseconds(50));
     }
   }
 }
 
 void WheelCtrlRos2::update() {
   // RCLCPP_INFO(this->get_logger(),"update");
-  if(!sim_mode){
+  if (!sim_mode) {
     // get current possition
     if (measuring_wheel.type_name == "steering") {
       for (int i = 0; i < 2 * measuring_wheel.quantity; i++) {
@@ -321,12 +332,12 @@ void WheelCtrlRos2::update() {
     current_pos = measure->get_current_pos();
     current_vel = measure->get_current_vel();
   }
-  //set cmd
-  // RCLCPP_INFO(this->get_logger(), "%f,%f,%f", cmd.x, cmd.y, cmd.w);
-  // cmd.x = 0;
-  // cmd.y = 0;
-  // cmd.w = 1;
-  moving->cal_cmd(cmd,false);
+  // set cmd
+  //  RCLCPP_INFO(this->get_logger(), "%f,%f,%f", cmd.x, cmd.y, cmd.w);
+  //  cmd.x = 0;
+  //  cmd.y = 0;
+  //  cmd.w = 1;
+  moving->cal_cmd(cmd, false);
   // set wheel_cmd
   float cmd_num = moving_wheel.type_name == "steering"
                       ? 2 * moving_wheel.quantity
@@ -334,10 +345,12 @@ void WheelCtrlRos2::update() {
   for (int i = 0; i < cmd_num; i++) {
     cmd_rotate[i] = moving->wheel_cmd_rot[i];
   }
-  RCLCPP_INFO(this->get_logger(),"vel: %f,%f,%f,%f",cmd_rotate[0],cmd_rotate[1],cmd_rotate[2],cmd_rotate[3]);
-  RCLCPP_INFO(this->get_logger(),"arg: %f,%f,%f,%f",cmd_rotate[4],cmd_rotate[5],cmd_rotate[6],cmd_rotate[7]);
+  RCLCPP_INFO(this->get_logger(), "vel: %f,%f,%f,%f", cmd_rotate[0],
+              cmd_rotate[1], cmd_rotate[2], cmd_rotate[3]);
+  RCLCPP_INFO(this->get_logger(), "arg: %f,%f,%f,%f", cmd_rotate[4],
+              cmd_rotate[5], cmd_rotate[6], cmd_rotate[7]);
   // publish
-  if(!sim_mode){
+  if (!sim_mode) {
     pub_rogilink2_frame();
     pub_odometry();
   }
