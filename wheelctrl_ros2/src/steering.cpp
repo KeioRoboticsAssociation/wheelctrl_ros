@@ -93,7 +93,9 @@ void illias::MoveSteering::cal_cmd(const CMD &cmd, bool is_transformed) {
                        sin(u_param.wheels[i].argument + M_PI / 2);
 
       wheel_cmd_rot[i] = meter_to_rot(sqrt(vx * vx + vy * vy));
-      wheel_cmd_rot[i + 4] = rad_to_rot(atan2(vx, vy));
+      printf("%f ", atan2(vy, vx));
+      printf("\n");
+      wheel_cmd_rot[i + 4] = rad_to_rot(atan2(vy, vx));
     }
   } else {
     for (int i = 0; i < 4; i++) {
@@ -102,7 +104,7 @@ void illias::MoveSteering::cal_cmd(const CMD &cmd, bool is_transformed) {
       vy = cmd.y + cmd.w * u_param.wheels[i + 4].distance *
                        sin(u_param.wheels[i + 4].argument + M_PI / 2);
       wheel_cmd_rot[i] = meter_to_rot(sqrt(vx * vx + vy * vy));
-      wheel_cmd_rot[i + 4] = rad_to_rot(atan2(vx, vy));
+      wheel_cmd_rot[i + 4] = rad_to_rot(atan2(vy,vx));
       if (steer_angle[i] > 0.25 && wheel_cmd_rot[i + 4] < 0) {
         wheel_cmd_rot[i + 4] += 1;
       } else if (steer_angle[i] < -0.25 && wheel_cmd_rot[i + 4] > 0) {
