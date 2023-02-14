@@ -220,7 +220,7 @@ void WheelCtrlRos2::set_subclass() {
         if (i < 4) {
           drivers.push_back(std::make_shared<ODrive>(this, moving_name[i]));
           RCLCPP_INFO(this->get_logger(), "steering wheel start %d", i);
-          // drivers.at(i)->init();
+          drivers.at(i)->init();
           drivers.at(i)->setMode(Md::Mode::Velocity);
           drivers.at(i)->setPosition(0.0);
         } else {

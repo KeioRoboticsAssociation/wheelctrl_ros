@@ -1,6 +1,8 @@
 #ifndef _STEERING_
 #define _STEERING_
 
+#include <string.h>
+
 #include "wheel.hpp"
 
 namespace illias {
@@ -26,12 +28,12 @@ class MoveSteering : public Moving {
     current_wheel_angle[1] = w1;
     current_wheel_angle[2] = w2;
     current_wheel_angle[3] = w3;
-    vel_sign = 1.0;
+    // memset(vel_sign, 1, sizeof(vel_sign));
   }
 
  private:
   float current_wheel_angle[4];
-  float vel_sign;
+  // float vel_sign[4] = {1.0, 1.0, 1.0, 1.0};
 };
 }  // namespace illias
 

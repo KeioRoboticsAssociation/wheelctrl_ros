@@ -87,6 +87,7 @@ void illias::MoveSteering::cal_cmd(const CMD &cmd, bool is_transformed) {
   float vx, vy = {0};
   if (!is_transformed) {
     for (int i = 0; i < 4; i++) {
+      int vel_sign = 1;
       vx = cmd.x + cmd.w * u_param.wheels[i].distance *
                        cos(u_param.wheels[i].argument + M_PI / 2);
       vy = cmd.y + cmd.w * u_param.wheels[i].distance *
@@ -105,7 +106,7 @@ void illias::MoveSteering::cal_cmd(const CMD &cmd, bool is_transformed) {
         cmd_angle += M_PI;
         vel_sign *= -1;
       }
-      printf("%f,%f\n", cmd_angle, steer_angle[i]);
+      // printf("%f,%f\n", cmd_angle, steer_angle[i]);
       wheel_cmd_rot[i] = vel_sign * meter_to_rot(sqrt(vx * vx + vy * vy));
       wheel_cmd_rot[i + 4] = rad_to_rot(cmd_angle);
       if (vx == 0 && vy == 0) {
@@ -113,10 +114,13 @@ void illias::MoveSteering::cal_cmd(const CMD &cmd, bool is_transformed) {
       }
       steer_angle[i] = cmd_angle;
     }
-    // printf("%f,%f,%f,%f\n", steer_angle[0], steer_angle[1], steer_angle[2],
-    //        steer_angle[3]);
+    // printf("[ang] %f,%f,%f,%f\n", steer_angle[0], steer_angle[1],
+    //        steer_angle[2], steer_angle[3]);
+    // printf("[vel] %f,%f,%f,%f\n", wheel_cmd_rot[0], wheel_cmd_rot[1],
+    //        wheel_cmd_rot[2], wheel_cmd_rot[3]);
   } else {
     for (int i = 0; i < 4; i++) {
+      int vel_sign = 1;
       vx = cmd.x + cmd.w * u_param.wheels[i + 4].distance *
                        cos(u_param.wheels[i + 4].argument + M_PI / 2);
       vy = cmd.y + cmd.w * u_param.wheels[i + 4].distance *
@@ -135,7 +139,7 @@ void illias::MoveSteering::cal_cmd(const CMD &cmd, bool is_transformed) {
         cmd_angle += M_PI;
         vel_sign *= -1;
       }
-      printf("%f,%f\n", cmd_angle, steer_angle[i]);
+      // printf("%f,%f\n", cmd_angle, steer_angle[i]);
       wheel_cmd_rot[i] = vel_sign * meter_to_rot(sqrt(vx * vx + vy * vy));
       wheel_cmd_rot[i + 4] = rad_to_rot(cmd_angle);
       if (vx == 0 && vy == 0) {
