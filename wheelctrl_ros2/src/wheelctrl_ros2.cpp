@@ -220,7 +220,7 @@ void WheelCtrlRos2::set_subclass() {
         if (i < 4) {
           drivers.push_back(std::make_shared<ODrive>(this, moving_name[i]));
           RCLCPP_INFO(this->get_logger(), "steering wheel start %d", i);
-          drivers.at(i)->init();
+          // drivers.at(i)->init();
           drivers.at(i)->setMode(Md::Mode::Velocity);
           drivers.at(i)->setPosition(0.0);
         } else {
@@ -247,8 +247,8 @@ void WheelCtrlRos2::set_handles() {
         cmd.x = msg->linear.x;
         cmd.y = msg->linear.y;
         cmd.w = msg->angular.z;
-        RCLCPP_INFO(this->get_logger(), "cmd_vel : %f, %f, %f", cmd.x, cmd.y,
-                    cmd.w);
+        // RCLCPP_INFO(this->get_logger(), "cmd_vel : %f, %f, %f", cmd.x, cmd.y,
+        //             cmd.w);
       });
 
   if (!sim_mode) {
@@ -345,10 +345,10 @@ void WheelCtrlRos2::update() {
   for (int i = 0; i < cmd_num; i++) {
     cmd_rotate[i] = moving->wheel_cmd_rot[i];
   }
-  RCLCPP_INFO(this->get_logger(), "vel: %f,%f,%f,%f", cmd_rotate[0],
-              cmd_rotate[1], cmd_rotate[2], cmd_rotate[3]);
-  RCLCPP_INFO(this->get_logger(), "arg: %f,%f,%f,%f", cmd_rotate[4],
-              cmd_rotate[5], cmd_rotate[6], cmd_rotate[7]);
+  // RCLCPP_INFO(this->get_logger(), "vel: %f,%f,%f,%f", cmd_rotate[0],
+  //             cmd_rotate[1], cmd_rotate[2], cmd_rotate[3]);
+  // RCLCPP_INFO(this->get_logger(), "arg: %f,%f,%f,%f", cmd_rotate[4],
+  //             cmd_rotate[5], cmd_rotate[6], cmd_rotate[7]);
   // publish
   if (!sim_mode) {
     pub_rogilink2_frame();

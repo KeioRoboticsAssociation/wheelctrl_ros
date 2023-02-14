@@ -26,10 +26,12 @@ class MoveSteering : public Moving {
     current_wheel_angle[1] = w1;
     current_wheel_angle[2] = w2;
     current_wheel_angle[3] = w3;
+    vel_sign = 1.0;
   }
 
  private:
   float current_wheel_angle[4];
+  float vel_sign;
 };
 }  // namespace illias
 
