@@ -276,14 +276,16 @@ void WheelCtrlRos2::set_initial_pos() {
 
   // set steer angle
   if (moving_wheel.type_name == "steering") {
+    photo->start();
     for (int i = 0; i < 4; i++) {
       drivers[i + 4]->setMode(Md::Mode::Velocity);
+      drivers[i + 4]->setVelocity(0.1);
+      std::this_thread::sleep_for(10ms);
     }
-    int completed_count = false;
+    int completed_count = 0;
     float offset[4] = {5.0 / 12, -1.0 / 3, 1.0 / 3, -5.0 / 12};
-    while (completed_count != 4) {
-      std::this_thread::sleep_for(std::chrono::milliseconds(10));
-      completed_count = 0;
+    while (completed_count != 0b1111) {
+      std::this_thread::sleep_for(10ms);
       rclcpp::spin_some(this->shared_from_this());
       std::vector<int> val = photo->read();
       if (val.size() != 4) {
@@ -294,23 +296,25 @@ void WheelCtrlRos2::set_initial_pos() {
                   val[3]);
 
       for (int i = 0; i < 4; i++) {
-        cmd_rotate[i] = 0;
+        if (completed_count & (1 << i)) continue;
+        // cmd_rotate[i] = 0;
         if (val[i] <= 1024) {
           drivers[i + 4]->setVelocity(0);
           drivers[i + 4]->setMode(Md::Mode::Idle);
-          drivers[i + 4]->resetEncoder(offset[i] *
-                                       moving_wheel.gear_ratio_steer);
-          completed_count++;
-        } else {
-          drivers[i + 4]->setVelocity(0.1);
+
+          completed_count |= (1 << i);
         }
       }
     }
+    std::this_thread::sleep_for(100ms);
     for (int i = 0; i < 4; i++) {
+      drivers[i + 4]->resetEncoder(offset[i] * moving_wheel.gear_ratio_steer);
+      std::this_thread::sleep_for(std::chrono::microseconds(50));
       drivers[i + 4]->setPosition(0);
       drivers[i + 4]->setMode(Md::Mode::Position);
       std::this_thread::sleep_for(std::chrono::microseconds(50));
     }
+    photo->stop();
   }
 }
 
