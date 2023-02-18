@@ -192,7 +192,7 @@ void WheelCtrlRos2::set_subclass() {
     cmd_rotate.resize(moving_wheel.quantity);
     if (!sim_mode) {
       for (int i = 0; i < moving_wheel.quantity; i++) {
-        drivers.push_back(std::make_shared<ODrive>(this, moving_name[i]));
+        drivers.push_back(std::make_shared<MD2022>(this, moving_name[i]));
         RCLCPP_INFO(this->get_logger(), "omni wheel start %d", i);
         drivers.at(i)->init();
         drivers.at(i)->setMode(Md::Mode::Velocity);
