@@ -27,7 +27,7 @@ class WheelCtrlRos2 : public rclcpp::Node {
     RCLCPP_INFO(this->get_logger(), "wheelctrl_ros2 initialized");
 
     mytimer =
-        this->create_wall_timer(5ms, std::bind(&WheelCtrlRos2::update, this));
+        this->create_wall_timer(10ms, std::bind(&WheelCtrlRos2::update, this));
   }
 
  private:
