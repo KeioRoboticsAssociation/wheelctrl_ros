@@ -196,7 +196,7 @@ void WheelCtrlRos2::set_subclass() {
         RCLCPP_INFO(this->get_logger(), "omni wheel start %d", i);
         drivers.at(i)->init();
         drivers.at(i)->setMode(Md::Mode::Velocity);
-        drivers.at(i)->setPosition(0.0);
+        drivers.at(i)->setVelocity(0.0);
       }
     }
     switch (moving_wheel.quantity) {
