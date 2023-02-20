@@ -110,11 +110,11 @@ void illias::MoveSteering::cal_cmd(const CMD &cmd, bool is_transformed) {
       wheel_cmd_rot[i] = -1 * vel_sign * meter_to_rot(sqrt(vx * vx + vy * vy));
       wheel_cmd_rot[i + 4] = rad_to_rot(cmd_angle);
       if (vx == 0 && vy == 0) {
-        if(steer_angle[i]>M_PI){
-          steer_angle[i] -= 2 * M_PI;
-        }else if(steer_angle[i]<-M_PI){
-          steer_angle[i] += 2 * M_PI;
-        }
+        // if(steer_angle[i]>M_PI){
+        //   steer_angle[i] -= 2 * M_PI;
+        // }else if(steer_angle[i]<-M_PI){
+        //   steer_angle[i] += 2 * M_PI;
+        // }
         wheel_cmd_rot[i + 4] = rad_to_rot(steer_angle[i]);
       }
       steer_angle[i] = cmd_angle;
