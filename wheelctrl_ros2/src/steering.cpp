@@ -96,8 +96,16 @@ void illias::MoveSteering::cal_cmd(const CMD &cmd, bool is_transformed) {
       float cmd_angle = raw_angle;
       if (steer_angle[i] > M_PI / 2 && cmd_angle < 0) {
         cmd_angle += 2 * M_PI;
+      } else if (steer_angle[i] > 3 * M_PI / 2 && cmd_angle > 0) {
+        cmd_angle += 2 * M_PI;
+      } else if (steer_angle[i] > 5 * M_PI / 2 && cmd_angle < 0) {
+        cmd_angle += 4 * M_PI;
       } else if (steer_angle[i] < -M_PI / 2 && cmd_angle > 0) {
         cmd_angle -= 2 * M_PI;
+      } else if (steer_angle[i] < -3 * M_PI / 2 && cmd_angle < 0) {
+        cmd_angle -= 2 * M_PI;
+      } else if (steer_angle[i] < -5 * M_PI / 2 && cmd_angle > 0) {
+        cmd_angle -= 4 * M_PI;
       }
       if (cmd_angle - steer_angle[i] > M_PI / 2) {
         cmd_angle -= M_PI;
