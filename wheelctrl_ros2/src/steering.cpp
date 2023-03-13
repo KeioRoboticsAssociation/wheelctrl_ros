@@ -92,43 +92,85 @@ void illias::MoveSteering::cal_cmd(const CMD &cmd, bool is_transformed) {
                        cos(u_param.wheels[i].argument + M_PI / 2);
       vy = cmd.y + cmd.w * u_param.wheels[i].distance *
                        sin(u_param.wheels[i].argument + M_PI / 2);
+      vx = vx == -0.0 ? 0.0 : vx;
+      vy = vy == -0.0 ? 0.0 : vy;
       float raw_angle = atan2(vy, vx);
       float cmd_angle = raw_angle;
-      if (steer_angle[i] > M_PI / 2 && cmd_angle < 0) {
-        cmd_angle += 2 * M_PI;
-      } else if (steer_angle[i] > 3 * M_PI / 2 && cmd_angle > 0) {
-        cmd_angle += 2 * M_PI;
-      } else if (steer_angle[i] > 5 * M_PI / 2 && cmd_angle < 0) {
-        cmd_angle += 4 * M_PI;
-      } else if (steer_angle[i] < -M_PI / 2 && cmd_angle > 0) {
-        cmd_angle -= 2 * M_PI;
-      } else if (steer_angle[i] < -3 * M_PI / 2 && cmd_angle < 0) {
-        cmd_angle -= 2 * M_PI;
-      } else if (steer_angle[i] < -5 * M_PI / 2 && cmd_angle > 0) {
-        cmd_angle -= 4 * M_PI;
-      }
-      if (cmd_angle - steer_angle[i] > M_PI / 2) {
-        cmd_angle -= M_PI;
-        vel_sign *= -1;
-      } else if (cmd_angle - steer_angle[i] < -M_PI / 2) {
-        cmd_angle += M_PI;
-        vel_sign *= -1;
+      // printf("[cmd] %f\n", cmd_angle);
+      bool flag = true;
+      if (vx != 0 || vy != 0) {
+        if (cmd_angle > 0) {
+          if (-4 * M_PI < steer_angle[i] && steer_angle[i] < -5 * M_PI / 2) {
+            cmd_angle -= 4 * M_PI;
+          } else if (-5 * M_PI / 2 <= steer_angle[i] &&
+                     steer_angle[i] < -M_PI / 2) {
+            cmd_angle -= 2 * M_PI;
+          } else if (-M_PI / 2 <= steer_angle[i] &&
+                     steer_angle[i] < 3 * M_PI / 2) {
+            // cmd_angle += 0;
+          } else if (3 * M_PI / 2 <= steer_angle[i] &&
+                     steer_angle[i] < 7 * M_PI / 2) {
+            cmd_angle += 2 * M_PI;
+          } else {
+            // cmd_angle += 0;
+            flag = false;
+          }
+        } else if (cmd_angle < 0) {
+          if (-7 * M_PI / 2 < steer_angle[i] &&
+              steer_angle[i] < -3 * M_PI / 2) {
+            cmd_angle -= 2 * M_PI;
+          } else if (steer_angle[i] < M_PI / 2) {
+            // cmd_angle -= 0 * M_PI;
+            if (steer_angle[i] < -2 * M_PI) {
+              flag = false;
+            }
+          } else if (steer_angle[i] < 5 * M_PI / 2) {
+            cmd_angle += 2 * M_PI;
+          } else if (steer_angle[i] < 4 * M_PI) {
+            cmd_angle += 4 * M_PI;
+          } else {
+            // cmd_angle = 0;
+            flag = false;
+          }
+        } else {
+          if (-3 * M_PI < steer_angle[i] && steer_angle[i] < -M_PI) {
+            cmd_angle = -2 * M_PI;
+          } else if (steer_angle[i] < M_PI) {
+            cmd_angle = 0;
+          } else if (steer_angle[i] < 3 * M_PI) {
+            cmd_angle = 2 * M_PI;
+          } else {
+            cmd_angle = 0;
+            flag = false;
+          }
+        }
+        if (flag) {
+          if (cmd_angle - steer_angle[i] > M_PI / 2) {
+            cmd_angle -= M_PI;
+            vel_sign *= -1;
+          } else if (cmd_angle - steer_angle[i] < -M_PI / 2) {
+            cmd_angle += M_PI;
+            vel_sign *= -1;
+          }
+        }
+        wheel_cmd_rot[i] =
+            -1 * vel_sign * meter_to_rot(sqrt(vx * vx + vy * vy));
+        wheel_cmd_rot[i + 4] = rad_to_rot(cmd_angle);
+        steer_angle[i] = cmd_angle;
       }
       // printf("%f,%f\n", cmd_angle, steer_angle[i]);
-      wheel_cmd_rot[i] = -1 * vel_sign * meter_to_rot(sqrt(vx * vx + vy * vy));
-      wheel_cmd_rot[i + 4] = rad_to_rot(cmd_angle);
       if (vx == 0 && vy == 0) {
         // if(steer_angle[i]>M_PI){
         //   steer_angle[i] -= 2 * M_PI;
         // }else if(steer_angle[i]<-M_PI){
         //   steer_angle[i] += 2 * M_PI;
         // }
+        wheel_cmd_rot[i] = 0;
         wheel_cmd_rot[i + 4] = rad_to_rot(steer_angle[i]);
       }
-      steer_angle[i] = cmd_angle;
     }
-    // printf("[ang] %f,%f,%f,%f\n", steer_angle[0], steer_angle[1],
-    //        steer_angle[2], steer_angle[3]);
+    printf("[ang] %f,%f,%f,%f\n", steer_angle[0], steer_angle[1],
+           steer_angle[2], steer_angle[3]);
     // printf("[vel] %f,%f,%f,%f\n", wheel_cmd_rot[0], wheel_cmd_rot[1],
     //        wheel_cmd_rot[2], wheel_cmd_rot[3]);
   } else {
