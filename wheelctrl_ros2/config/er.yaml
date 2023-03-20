@@ -10,7 +10,7 @@ wheelctrl_ros2:
       loop_rate: 200.0
       gear_ratio: 1.0
       distance: [0.39138,0.39138,0.39138]
-      arguments: [30.0,150.0,270.0]
+      arguments: [60.0,180.0,300.0]
       wheel_name: ["FL","B","FR"]
 
     measuring_wheel:
@@ -20,6 +20,6 @@ wheelctrl_ros2:
       loop_rate: 200.0
       gear_ratio: 1.0
       distance: [0.39138,0.39138,0.39138]
-      arguments: [30.0,150.0,270.0]
+      arguments: [60.0,180.0,300.0]
       wheel_name: ["FL","B","FR"]
 
