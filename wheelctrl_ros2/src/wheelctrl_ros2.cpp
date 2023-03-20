@@ -270,6 +270,7 @@ void WheelCtrlRos2::set_handles() {
 }
 
 void WheelCtrlRos2::set_initial_pos() {
+  RCLCPP_INFO(this->get_logger(), "set_initial_pos");
   current_pos.x = 0;
   current_pos.y = 0;
   current_pos.w = 0;
@@ -283,7 +284,8 @@ void WheelCtrlRos2::set_initial_pos() {
       std::this_thread::sleep_for(10ms);
     }
     int completed_count = 0;
-    float offset[4] = {5.0 / 12, -1.0 / 3, 1.0 / 3, -5.0 / 12};
+    float offset[4] = {5.0 / 12 - 0.008, -1.0 / 3 - 0.005, 1.0 / 3 - 0.002,
+                       -5.0 / 12 - 0.005};
     while (completed_count != 0b1111) {
       std::this_thread::sleep_for(10ms);
       rclcpp::spin_some(this->shared_from_this());
@@ -292,9 +294,8 @@ void WheelCtrlRos2::set_initial_pos() {
         RCLCPP_INFO(this->get_logger(), "No sensor data");
         continue;
       }
-      // RCLCPP_INFO(this->get_logger(), "%d, %d, %d, %d", val[0], val[1],
-      // val[2],
-      //             val[3]);
+      RCLCPP_INFO(this->get_logger(), "%d, %d, %d, %d", val[0], val[1], val[2],
+                  val[3]);
 
       for (int i = 0; i < 4; i++) {
         if (completed_count & (1 << i)) continue;
@@ -317,6 +318,7 @@ void WheelCtrlRos2::set_initial_pos() {
     }
     photo->stop();
   }
+  RCLCPP_INFO(this->get_logger(), "set_initial_pos end");
 }
 
 void WheelCtrlRos2::update() {
