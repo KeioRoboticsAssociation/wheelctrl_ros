@@ -29,7 +29,6 @@ void illias::MeasureSteering::set_initial_wheel_angle(float w0, float w1,
 void illias::MeasureSteering::cal_disp(std::vector<float> encoder, float imu,
                                        bool is_transformed) {
   POS delta = {0};
-  
 
   float vel[4] = {0};
   float theta[4] = {0};
@@ -67,7 +66,7 @@ void illias::MeasureSteering::cal_disp(std::vector<float> encoder, float imu,
   for (int i = 0; i < 4; i++) {
     past_theta[i] = theta[i];
   }
-
+  printf("[delta] %f %f %f\n", delta.x, delta.y, delta.w);
   // ロボット座標系から現在の固定座標に変換
   this->current_pos.x =
       this->past_pos.x + cos(past_pos.w) * delta.x - sin(past_pos.w) * delta.y;

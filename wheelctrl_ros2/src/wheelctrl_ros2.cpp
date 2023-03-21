@@ -339,13 +339,8 @@ void WheelCtrlRos2::update() {
     measure->cal_disp(encoder);
     current_pos = measure->get_current_pos();
     current_vel = measure->get_current_vel();
-    RCLCPP_INFO(this->get_logger(), "wheel:%f,%f,%f,%f", encoder[0], encoder[1],
-                encoder[2], encoder[3]);
-    RCLCPP_INFO(this->get_logger(), "steer:%f,%f,%f,%f", encoder[4], encoder[5],
-                encoder[6], encoder[7]);
-
-    RCLCPP_INFO(this->get_logger(), "pos: %f,%f,%f", current_pos.x,
-                current_pos.y, current_pos.w);
+    // RCLCPP_INFO(this->get_logger(), "pos: %f,%f,%f", current_pos.x,
+    //             current_pos.y, current_pos.w);
   }
   // set cmd
   //  RCLCPP_INFO(this->get_logger(), "%f,%f,%f", cmd.x, cmd.y, cmd.w);
