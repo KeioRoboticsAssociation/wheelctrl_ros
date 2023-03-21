@@ -69,6 +69,10 @@ void illias::MeasureSteering::cal_disp(std::vector<float> encoder, float imu,
   for (int i = 0; i < 4; i++) {
     past_theta[i] = theta[i];
   }
+  printf("[wheel] %f %f %f %f\n", encoder[0], encoder[1], encoder[2],
+         encoder[3]);
+  printf("[steer] %f %f %f %f\n", encoder[4], encoder[5], encoder[6],
+         encoder[7]);
   printf("[r_x] %f %f %f %f]\n", r_x[0], r_x[1], r_x[2], r_x[3]);
   printf("[r_y] %f %f %f %f]\n", r_y[0], r_y[1], r_y[2], r_y[3]);
   printf("[delta] %f %f %f\n", delta.x, delta.y, delta.w);
