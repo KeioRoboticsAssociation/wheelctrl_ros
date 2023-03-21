@@ -48,8 +48,8 @@ void illias::MeasureSteering::cal_disp(std::vector<float> encoder, float imu,
             : (1 - cos(theta[i] - past_theta[i])) / (theta[i] - past_theta[i]);
     r_x[i] = vel[i] * (cos(past_theta[i]) * A - sin(past_theta[i]) * B);
     r_y[i] = vel[i] * (sin(past_theta[i]) * A + cos(past_theta[i]) * B);
-    r_x[i] = fabs(r_x[i]) < 0.00001 ? 0.0 : r_x[i];
-    r_y[i] = fabs(r_y[i]) < 0.00001 ? 0.0 : r_y[i];
+    r_x[i] = fabs(r_x[i]) < 0.01 ? 0.0 : r_x[i];
+    r_y[i] = fabs(r_y[i]) < 0.01 ? 0.0 : r_y[i];
   }
 
   delta.x = (r_x[0] + r_x[1] + r_x[2] + r_x[3]) / 4;
