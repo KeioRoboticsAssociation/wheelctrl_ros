@@ -294,8 +294,8 @@ void WheelCtrlRos2::set_initial_pos() {
         RCLCPP_INFO(this->get_logger(), "No sensor data");
         continue;
       }
-      RCLCPP_INFO(this->get_logger(), "%d, %d, %d, %d", val[0], val[1], val[2],
-                  val[3]);
+      // RCLCPP_INFO(this->get_logger(), "%d, %d, %d, %d", val[0], val[1], val[2],
+      //             val[3]);
 
       for (int i = 0; i < 4; i++) {
         if (completed_count & (1 << i)) continue;
