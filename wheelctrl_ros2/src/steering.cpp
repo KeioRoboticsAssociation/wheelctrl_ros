@@ -29,6 +29,7 @@ void illias::MeasureSteering::set_initial_wheel_angle(float w0, float w1,
 void illias::MeasureSteering::cal_disp(std::vector<float> encoder, float imu,
                                        bool is_transformed) {
   POS delta = {0};
+  
 
   float vel[4] = {0};
   float theta[4] = {0};
@@ -169,8 +170,8 @@ void illias::MoveSteering::cal_cmd(const CMD &cmd, bool is_transformed) {
         wheel_cmd_rot[i + 4] = rad_to_rot(steer_angle[i]);
       }
     }
-    printf("[ang] %f,%f,%f,%f\n", steer_angle[0], steer_angle[1],
-           steer_angle[2], steer_angle[3]);
+    // printf("[ang] %f,%f,%f,%f\n", steer_angle[0], steer_angle[1],
+    //        steer_angle[2], steer_angle[3]);
     // printf("[vel] %f,%f,%f,%f\n", wheel_cmd_rot[0], wheel_cmd_rot[1],
     //        wheel_cmd_rot[2], wheel_cmd_rot[3]);
   } else {

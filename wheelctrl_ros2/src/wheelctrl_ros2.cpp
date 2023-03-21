@@ -294,7 +294,8 @@ void WheelCtrlRos2::set_initial_pos() {
         RCLCPP_INFO(this->get_logger(), "No sensor data");
         continue;
       }
-      // RCLCPP_INFO(this->get_logger(), "%d, %d, %d, %d", val[0], val[1], val[2],
+      // RCLCPP_INFO(this->get_logger(), "%d, %d, %d, %d", val[0], val[1],
+      // val[2],
       //             val[3]);
 
       for (int i = 0; i < 4; i++) {
@@ -338,6 +339,11 @@ void WheelCtrlRos2::update() {
     measure->cal_disp(encoder);
     current_pos = measure->get_current_pos();
     current_vel = measure->get_current_vel();
+    RCLCPP_INFO(this->get_logger(), "wheel:%f,%f,%f,%f", encoder[0], encoder[1],
+                encoder[2], encoder[3]);
+    RCLCPP_INFO(this->get_logger(), "steer:%f,%f,%f,%f", encoder[4], encoder[5],
+                encoder[6], encoder[7]);
+
     RCLCPP_INFO(this->get_logger(), "pos: %f,%f,%f", current_pos.x,
                 current_pos.y, current_pos.w);
   }
