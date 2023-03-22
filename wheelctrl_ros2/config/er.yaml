@@ -2,6 +2,8 @@ wheelctrl_ros2:
   ros__parameters:
     robot_param:
       name: "Elephant Robot"
+      tf: true
+
 
     moving_wheel:
       type_name: "omni"

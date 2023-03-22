@@ -68,12 +68,14 @@ class WheelCtrlRos2 : public rclcpp::Node {
 
   bool AMCL = false;
   bool sim_mode;
+  bool tf_flag;
 };
 
 void WheelCtrlRos2::set_wheel_parameter() {
   RCLCPP_INFO(this->get_logger(), "set_wheel_parameter");
   this->declare_parameter("robot_param.name", "undefined");
   this->declare_parameter("robot_param.AMCL", false);
+  this->declare_parameter("robot_param.tf", true);
 
   this->declare_parameter("moving_wheel.type_name", "steering");
   this->declare_parameter("moving_wheel.radius", 0.0);
@@ -99,7 +101,7 @@ void WheelCtrlRos2::set_wheel_parameter() {
 
   robot_name = this->get_parameter("robot_param.name").as_string();
   AMCL = this->get_parameter("robot_param.AMCL").as_bool();
-
+  tf_flag = this->get_parameter("rotob_param.tf").as_bool();
   // moving_wheel
   moving_wheel.type_name =
       this->get_parameter("moving_wheel.type_name").as_string();
@@ -398,7 +400,7 @@ void WheelCtrlRos2::pub_odometry() {
   msg.twist.twist.linear.y = current_vel.y;
   msg.twist.twist.angular.z = current_vel.w;
   odom_pub->publish(msg);
-  if (!AMCL) {
+  if (tf_flag) {
     geometry_msgs::msg::TransformStamped transform;
     transform.header.stamp = this->now();
     transform.header.frame_id = "odom";
