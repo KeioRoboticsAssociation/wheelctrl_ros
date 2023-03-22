@@ -101,7 +101,7 @@ void WheelCtrlRos2::set_wheel_parameter() {
 
   robot_name = this->get_parameter("robot_param.name").as_string();
   AMCL = this->get_parameter("robot_param.AMCL").as_bool();
-  tf_flag = this->get_parameter("rotob_param.tf").as_bool();
+  tf_flag = this->get_parameter("robot_param.tf").as_bool();
   // moving_wheel
   moving_wheel.type_name =
       this->get_parameter("moving_wheel.type_name").as_string();
