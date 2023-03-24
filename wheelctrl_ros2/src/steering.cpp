@@ -54,10 +54,10 @@ void illias::MeasureSteering::cal_disp(std::vector<float> encoder, float imu,
 
   delta.x = (r_x[0] + r_x[1] + r_x[2] + r_x[3]) / 4;
   delta.y = (r_y[0] + r_y[1] + r_y[2] + r_y[3]) / 4;
-
+  delta.w = 0;
   if (!is_transformed) {
     for (int i = 0; i < 4; i++) {
-      delta.w = 0.25 * neo_atan2(r_y[i], r_x[i]) / u_param.wheels[i].distance;
+      delta.w += 0.25 * neo_atan2(r_y[i], r_x[i]) / u_param.wheels[i].distance;
     }
   } else {
     for (int i = 0; i < 4; i++) {
