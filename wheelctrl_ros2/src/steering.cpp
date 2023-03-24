@@ -52,8 +52,8 @@ void illias::MeasureSteering::cal_disp(std::vector<float> encoder, float imu,
     r_y[i] = fabs(r_y[i]) < 0.01 ? 0.0 : r_y[i];
   }
 
-  delta.x = (r_x[0] + r_x[1] + r_x[2] + r_x[3]) / 4;
-  delta.y = (r_y[0] + r_y[1] + r_y[2] + r_y[3]) / 4;
+  delta.x = (r_x[0] + r_x[1] + r_x[2] + r_x[3]) / 4 * -1;
+  delta.y = (r_y[0] + r_y[1] + r_y[2] + r_y[3]) / 4 * -1;
   delta.w = 0;
   if (!is_transformed) {
     for (int i = 0; i < 4; i++) {
