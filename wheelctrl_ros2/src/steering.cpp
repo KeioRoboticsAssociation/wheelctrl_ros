@@ -67,7 +67,7 @@ void illias::MeasureSteering::cal_disp(std::vector<float> encoder, float imu,
           0.25 * neo_atan2(r_y[i], r_x[i]) / u_param.wheels[i + 4].distance;
     }
   }
-
+  delta.w = fabs(delta.w) < 0.001 ? 0.0 : delta.w;
   for (int i = 0; i < 4; i++) {
     past_theta[i] = theta[i];
   }
