@@ -28,7 +28,7 @@ void illias::MeasureSteering::set_initial_wheel_angle(float w0, float w1,
 
 void illias::MeasureSteering::cal_disp(std::vector<float> encoder, float imu,
                                        bool is_transformed) {
-  POS delta = {0};
+  POS delta = {0, 0, 0};
 
   float vel[4] = {0};
   float theta[4] = {0};
@@ -73,9 +73,8 @@ void illias::MeasureSteering::cal_disp(std::vector<float> encoder, float imu,
   }
   printf("[wheel] %f %f %f %f\n", encoder[0], encoder[1], encoder[2],
          encoder[3]);
-  printf("[steer] %f %f %f %f\n", theta[4] * 180 / M_PI,
-         theta[5] * 180 / M_PI, theta[6] * 180 / M_PI,
-         theta[7] * 180 / M_PI);
+  printf("[steer] %f %f %f %f\n", theta[0] * 180 / M_PI, theta[1] * 180 / M_PI,
+         theta[2] * 180 / M_PI, theta[3] * 180 / M_PI);
   printf("[r_x] %f %f %f %f]\n", r_x[0], r_x[1], r_x[2], r_x[3]);
   printf("[r_y] %f %f %f %f]\n", r_y[0], r_y[1], r_y[2], r_y[3]);
   printf("[delta] %f %f %f\n", delta.x, delta.y, delta.w);
