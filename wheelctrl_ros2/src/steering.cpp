@@ -57,8 +57,9 @@ void illias::MeasureSteering::cal_disp(std::vector<float> encoder, float imu,
   delta.w = 0;
   if (!is_transformed) {
     for (int i = 0; i < 4; i++) {
-      delta.w += 0.25 * cal_r(r_x[i], r_y[i]) *
-                 sin(neo_atan2(r_y[i], r_x[i]) - u_param.wheels[i].argument) /
+      delta.w += 0.25 * cal_r(r_x[i] - delta.x, r_y[i] - delta.y) *
+                 sin(neo_atan2(r_y[i] - delta.y, r_x[i] - delta.x) -
+                     u_param.wheels[i].argument) /
                  u_param.wheels[i].distance;
     }
   } else {
@@ -77,7 +78,8 @@ void illias::MeasureSteering::cal_disp(std::vector<float> encoder, float imu,
          theta[2] * 180 / M_PI, theta[3] * 180 / M_PI);
   printf("[r_x] %f %f %f %f]\n", r_x[0], r_x[1], r_x[2], r_x[3]);
   printf("[r_y] %f %f %f %f]\n", r_y[0], r_y[1], r_y[2], r_y[3]);
-  printf("[delta] %f %f %f\n", delta.x, delta.y, delta.w);
+  printf("[delta] %f %f %f\n", delta.x, delta.y, delta.w * 180 / M_PI);
+
   // ロボット座標系から現在の固定座標に変換
   this->current_pos.x =
       this->past_pos.x + cos(past_pos.w) * delta.x - sin(past_pos.w) * delta.y;
