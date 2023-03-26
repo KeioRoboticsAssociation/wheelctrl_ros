@@ -57,10 +57,13 @@ void illias::MeasureSteering::cal_disp(std::vector<float> encoder, float imu,
   delta.w = 0;
   if (!is_transformed) {
     for (int i = 0; i < 4; i++) {
-      delta.w += 0.25 * cal_r(fraction(r_x[i] - delta.x), fraction(r_y[i] - delta.y)) *
-                 sin(neo_atan2(fraction(r_y[i] - delta.y), fraction(r_x[i] - delta.x)) -
-                     u_param.wheels[i].argument) /
-                 u_param.wheels[i].distance;
+      delta.w +=
+          0.25 *
+          cal_r(fraction(-r_x[i] - delta.x), fraction(-r_y[i] - delta.y)) *
+          sin(neo_atan2(fraction(-r_y[i] - delta.y),
+                        fraction(-r_x[i] - delta.x)) -
+              u_param.wheels[i].argument) /
+          u_param.wheels[i].distance;
     }
   } else {
     for (int i = 0; i < 4; i++) {
@@ -81,19 +84,21 @@ void illias::MeasureSteering::cal_disp(std::vector<float> encoder, float imu,
   printf("[delta] %f %f %f\n", delta.x, delta.y, delta.w * 180 / M_PI);
 
   // ロボット座標系から現在の固定座標に変換
-  this->current_pos.x =
-      this->past_pos.x + cos(past_pos.w) * delta.x - sin(past_pos.w) * delta.y;
-  this->current_pos.y =
-      this->past_pos.y + sin(past_pos.w) * delta.x + cos(past_pos.w) * delta.y;
-  this->current_pos.w = this->past_pos.w + delta.w;
+  this->current_pos.x = this->past_pos.x +
+                        cos(past_pos.w) * delta.x / u_param.loop_rate -
+                        sin(past_pos.w) * delta.y / u_param.loop_rate;
+  this->current_pos.y = this->past_pos.y +
+                        sin(past_pos.w) * delta.x / u_param.loop_rate +
+                        cos(past_pos.w) * delta.y / u_param.loop_rate;
+  this->current_pos.w = this->past_pos.w + delta.w / u_param.loop_rate;
 
   // past_posを更新
   past_pos = current_pos;
 
   // set current_vel
-  this->current_vel.x = delta.x * u_param.loop_rate;
-  this->current_vel.y = delta.y * u_param.loop_rate;
-  this->current_vel.w = delta.w * u_param.loop_rate;
+  this->current_vel.x = delta.x;
+  this->current_vel.y = delta.y;
+  this->current_vel.w = delta.w;
 }
 
 void illias::MoveSteering::cal_cmd(const CMD &cmd, bool is_transformed) {

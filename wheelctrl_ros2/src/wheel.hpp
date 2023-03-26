@@ -53,7 +53,7 @@ inline float neo_atan2(float y, float x) {
 
   return ans;
 }
-inline float fraction(float x) { return fabs(x) > 1e3 ? x : 0; }
+inline float fraction(float x) { return fabs(x) > 1e-3 ? x : 0; }
 // POSTURE同士の加減とスカラ倍
 inline POS operator+(const POS &a, const POS &b) {
   POS c;

@@ -3,7 +3,7 @@ wheelctrl_ros2:
     robot_param:
       name: "Rabbit Robot"
       mode: "sim"
-      tf: false
+      tf: true
 
     moving_wheel:
       type_name: "steering"
