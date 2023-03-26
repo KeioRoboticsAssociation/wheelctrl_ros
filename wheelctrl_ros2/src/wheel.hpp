@@ -132,6 +132,7 @@ class Measuring {
   inline POS get_current_pos() { return current_pos; }
   // 現在速度を取得
   inline POS get_current_vel() { return current_vel; }
+  inline void set_past_pos(POS _pos) { past_pos = _pos; }
 
  protected:
   // 回転を距離に変換

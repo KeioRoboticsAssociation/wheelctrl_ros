@@ -8,7 +8,10 @@
 #include "rogilink2_interfaces/srv/request_add_topic.hpp"
 #include "sensor.hpp"
 #include "tf2/LinearMath/Quaternion.h"
+#include "tf2/exceptions.h"
+#include "tf2_ros/buffer.h"
 #include "tf2_ros/transform_broadcaster.h"
+#include "tf2_ros/transform_listener.h"
 
 using namespace chrono_literals;
 using namespace illias;
@@ -37,6 +40,7 @@ class WheelCtrlRos2 : public rclcpp::Node {
   void set_initial_pos();
 
   void update();
+  void get_tf();
   void pub_rogilink2_frame();
   void pub_odometry();
 
@@ -65,6 +69,8 @@ class WheelCtrlRos2 : public rclcpp::Node {
   std::string robot_name;
   std::vector<std::string> moving_name;
   std::vector<std::string> measuring_name;
+  std::shared_ptr<tf2_ros::TransformListener> tf_listener_{nullptr};
+  std::unique_ptr<tf2_ros::Buffer> tf_buffer_;
 
   bool AMCL = false;
   bool sim_mode;
@@ -385,6 +391,28 @@ void WheelCtrlRos2::pub_rogilink2_frame() {
       drivers[i]->setVelocity(moving->wheel_cmd_rot[i]);
     }
   }
+}
+void WheelCtrlRos2::get_tf() {
+  geometry_msgs::msg::TransformStamped tf;
+
+  try {
+    tf = tf_buffer_->lookupTransform("odom", "base_link", tf2::TimePointZero);
+  } catch (const tf2::TransformException &ex) {
+    RCLCPP_INFO(this->get_logger(), "Could not transform odom to base_link: %s",
+                ex.what());
+    return;
+  }
+  POS tf_pos;
+  tf_pos.x = tf.transform.translation.x;
+  tf_pos.y = tf.transform.translation.y;
+
+  tf2::Quaternion q(tf.transform.rotation.x, tf.transform.rotation.y,
+                    tf.transform.rotation.z, tf.transform.rotation.w);
+  double roll, pitch, yaw;
+  tf2::Matrix3x3 m(q);
+  m.getRPY(roll, pitch, yaw);
+  tf_pos.w = (float)yaw;
+  measure->set_past_pos(tf_pos);
 }
 
 void WheelCtrlRos2::pub_odometry() {
