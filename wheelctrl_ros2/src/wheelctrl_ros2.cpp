@@ -252,7 +252,10 @@ void WheelCtrlRos2::set_handles() {
   frame_pub = this->create_publisher<rogilink2_interfaces::msg::Frame>(
       "/rogilink2/send", 10);
   odom_pub = this->create_publisher<nav_msgs::msg::Odometry>("/odom", 10);
-  tf_broadcaster = std::make_unique<tf2_ros::TransformBroadcaster>(*this);
+  if (tf_flag) {
+    tf_broadcaster = std::make_unique<tf2_ros::TransformBroadcaster>(*this);
+  }
+
   cmd_sub = this->create_subscription<geometry_msgs::msg::Twist>(
       "/cmd_vel", 10, [this](geometry_msgs::msg::Twist::ConstSharedPtr msg) {
         cmd.x = msg->linear.x;
