@@ -75,6 +75,9 @@ class WheelCtrlRos2 : public rclcpp::Node {
   bool AMCL = false;
   bool sim_mode;
   bool tf_flag;
+
+  std::string odom_frame_id;
+  std::string base_frame_id;
 };
 
 void WheelCtrlRos2::set_wheel_parameter() {
@@ -82,6 +85,8 @@ void WheelCtrlRos2::set_wheel_parameter() {
   this->declare_parameter("robot_param.name", "undefined");
   this->declare_parameter("robot_param.AMCL", false);
   this->declare_parameter("robot_param.tf", true);
+  this->declare_parameter("robot_param.odom_frame_id", "odom");
+  this->declare_parameter("robot_param.base_frame_id", "base_link");
 
   this->declare_parameter("moving_wheel.type_name", "steering");
   this->declare_parameter("moving_wheel.radius", 0.0);
@@ -108,6 +113,8 @@ void WheelCtrlRos2::set_wheel_parameter() {
   robot_name = this->get_parameter("robot_param.name").as_string();
   AMCL = this->get_parameter("robot_param.AMCL").as_bool();
   tf_flag = this->get_parameter("robot_param.tf").as_bool();
+  odom_frame_id = this->get_parameter("robot_param.odom_frame_id").as_string();
+  base_frame_id = this->get_parameter("robot_param.base_frame_id").as_string();
   // moving_wheel
   moving_wheel.type_name =
       this->get_parameter("moving_wheel.type_name").as_string();
@@ -257,7 +264,7 @@ void WheelCtrlRos2::set_handles() {
   }
 
   cmd_sub = this->create_subscription<geometry_msgs::msg::Twist>(
-      "/cmd_vel", 10, [this](geometry_msgs::msg::Twist::ConstSharedPtr msg) {
+      "cmd_vel", 10, [this](geometry_msgs::msg::Twist::ConstSharedPtr msg) {
         cmd.x = msg->linear.x;
         cmd.y = msg->linear.y;
         cmd.w = msg->angular.z;
@@ -273,7 +280,7 @@ void WheelCtrlRos2::set_handles() {
     for (int i = 0; i < sub_num; i++) {
       encoder_sub[i] =
           this->create_subscription<rogilink2_interfaces::msg::Frame>(
-              "/rogilink2/recieve_" + measuring_name[i], 10,
+              "rogilink2/recieve_" + measuring_name[i], 10,
               [this, i](const rogilink2_interfaces::msg::Frame::SharedPtr msg) {
                 memcpy(&encoder[i], msg->data.data(), sizeof(float));
               });
@@ -421,8 +428,8 @@ void WheelCtrlRos2::get_tf() {
 void WheelCtrlRos2::pub_odometry() {
   auto msg = nav_msgs::msg::Odometry();
   msg.header.stamp = this->now();
-  msg.header.frame_id = "odom";
-  msg.child_frame_id = "base_link";
+  msg.header.frame_id = odom_frame_id;
+  msg.child_frame_id = base_frame_id;
   msg.pose.pose.position.x = current_pos.x;
   msg.pose.pose.position.y = current_pos.y;
   msg.pose.pose.position.z = 0;
@@ -437,8 +444,8 @@ void WheelCtrlRos2::pub_odometry() {
   if (tf_flag) {
     geometry_msgs::msg::TransformStamped transform;
     transform.header.stamp = this->now();
-    transform.header.frame_id = "odom";
-    transform.child_frame_id = "base_link";
+    transform.header.frame_id = odom_frame_id;
+    transform.child_frame_id = base_frame_id;
     transform.transform.translation.x = current_pos.x;
     transform.transform.translation.y = current_pos.y;
     transform.transform.translation.z = 0;

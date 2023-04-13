@@ -1,27 +1,30 @@
-wheelctrl_ros2:
-  ros__parameters:
-    robot_param:
-      name: "Elephant Robot"
-      tf: true
+/er:
+  wheelctrl_ros2:
+    ros__parameters:
+      robot_param:
+        name: "Elephant Robot"
+        tf: true
+        odom_frame_id: "er/odom"
+        base_frame_id: "er/base_link"
 
 
-    moving_wheel:
-      type_name: "omni"
-      radius: 0.051
-      quantity: 3
-      loop_rate: 200.0
-      gear_ratio: 1.0
-      distance: [0.39138,0.39138,0.39138]
-      arguments: [60.0,180.0,300.0]
-      wheel_name: ["FL","B","FR"]
+      moving_wheel:
+        type_name: "omni"
+        radius: 0.051
+        quantity: 3
+        loop_rate: 200.0
+        gear_ratio: 1.0
+        distance: [0.39138,0.39138,0.39138]
+        arguments: [60.0,180.0,300.0]
+        wheel_name: ["FL","B","FR"]
 
-    measuring_wheel:
-      type_name: "omni"
-      radius: 0.051
-      quantity: 3
-      loop_rate: 200.0
-      gear_ratio: 1.0
-      distance: [0.39138,0.39138,0.39138]
-      arguments: [60.0,180.0,300.0]
-      wheel_name: ["FL","B","FR"]
+      measuring_wheel:
+        type_name: "omni"
+        radius: 0.051
+        quantity: 3
+        loop_rate: 200.0
+        gear_ratio: 1.0
+        distance: [0.39138,0.39138,0.39138]
+        arguments: [60.0,180.0,300.0]
+        wheel_name: ["FL","B","FR"]
 
