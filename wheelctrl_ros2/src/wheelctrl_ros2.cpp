@@ -262,6 +262,8 @@ void WheelCtrlRos2::set_handles() {
   if (tf_flag) {
     tf_broadcaster = std::make_unique<tf2_ros::TransformBroadcaster>(*this);
   }
+  tf_buffer_ = std::make_unique<tf2_ros::Buffer>(this->get_clock());
+  tf_listener_ = std::make_unique<tf2_ros::TransformListener>(*tf_buffer_);
 
   cmd_sub = this->create_subscription<geometry_msgs::msg::Twist>(
       "cmd_vel", 10, [this](geometry_msgs::msg::Twist::ConstSharedPtr msg) {
@@ -357,6 +359,7 @@ void WheelCtrlRos2::update() {
         encoder[i] = drivers[i]->getVelocity();
       }
     }
+    get_tf();
     measure->cal_disp(encoder);
     current_pos = measure->get_current_pos();
     current_vel = measure->get_current_vel();
@@ -406,7 +409,9 @@ void WheelCtrlRos2::get_tf() {
   geometry_msgs::msg::TransformStamped tf;
 
   try {
-    tf = tf_buffer_->lookupTransform("odom", "base_link", tf2::TimePointZero);
+    // 何故かrclcpp::Time(0)じゃないと変数でodom_frame_idとbase_frame_idを指定できない
+    tf = tf_buffer_->lookupTransform(odom_frame_id, base_frame_id,
+                                     rclcpp::Time(0));
   } catch (const tf2::TransformException &ex) {
     RCLCPP_INFO(this->get_logger(), "Could not transform odom to base_link: %s",
                 ex.what());
@@ -422,6 +427,7 @@ void WheelCtrlRos2::get_tf() {
   tf2::Matrix3x3 m(q);
   m.getRPY(roll, pitch, yaw);
   tf_pos.w = (float)yaw;
+
   measure->set_past_pos(tf_pos);
 }
 
