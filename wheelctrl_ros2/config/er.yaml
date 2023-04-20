@@ -12,7 +12,7 @@
         type_name: "omni"
         radius: 0.051
         quantity: 3
-        loop_rate: 200.0
+        loop_rate: 100.0
         gear_ratio: 1.0
         distance: [0.39138,0.39138,0.39138]
         arguments: [60.0,180.0,300.0]
@@ -22,7 +22,7 @@
         type_name: "omni"
         radius: 0.051
         quantity: 3
-        loop_rate: 200.0
+        loop_rate: 100.0
         gear_ratio: 1.0
         distance: [0.39138,0.39138,0.39138]
         arguments: [60.0,180.0,300.0]
