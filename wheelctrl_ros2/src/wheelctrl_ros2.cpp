@@ -251,7 +251,7 @@ void WheelCtrlRos2::set_handles() {
   RCLCPP_INFO(this->get_logger(), "set_handles");
   frame_pub = this->create_publisher<rogilink2_interfaces::msg::Frame>(
       "/rogilink2/send", 10);
-  odom_pub = this->create_publisher<nav_msgs::msg::Odometry>("/odom", 10);
+  odom_pub = this->create_publisher<nav_msgs::msg::Odometry>("/odom0", 10);
   if (tf_flag) {
     tf_broadcaster = std::make_unique<tf2_ros::TransformBroadcaster>(*this);
   }
