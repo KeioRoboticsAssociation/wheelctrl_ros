@@ -1,29 +1,32 @@
-wheelctrl_ros2:
-  ros__parameters:
-    robot_param:
-      name: "Rabbit Robot"
-      mode: "sim"
-      tf: false
+/rr:
+  wheelctrl_ros2:
+    ros__parameters:
+      robot_param:
+        name: "Rabbit Robot"
+        mode: "sim"
+        tf: false
+        odom_frame_link: "rr/odom"
+        base_frame_link: "rr/base_link"
 
-    moving_wheel:
-      type_name: "steering"
-      radius: 0.035
-      quantity: 4
-      loop_rate: 100.0
-      gear_ratio: 1.898889538281707
-      gear_ratio_steer: 3.6666666666666666666667
-      distance: [0.2864349839,0.2570355034,0.2570355034,0.2864349839,0.9,0.9,0.7,0.7]
-      arguments: [69.95475057,134.76356759,225.23643241,290.04524942,30.0,135.0,225.0,330.0]
-      wheel_name: ["FL", "RL", "RR", "FR", "FL_S", "RL_S", "RR_S", "FR_S"]
+      moving_wheel:
+        type_name: "steering"
+        radius: 0.035
+        quantity: 4
+        loop_rate: 100.0
+        gear_ratio: 1.898889538281707
+        gear_ratio_steer: 3.6666666666666666666667
+        distance: [0.2864349839,0.2570355034,0.2570355034,0.2864349839,0.9,0.9,0.7,0.7]
+        arguments: [69.95475057,134.76356759,225.23643241,290.04524942,30.0,135.0,225.0,330.0]
+        wheel_name: ["FL", "RL", "RR", "FR", "FL_S", "RL_S", "RR_S", "FR_S"]
 
-    measuring_wheel:
-      type_name: "steering"
-      radius: 0.035
-      quantity: 4
-      loop_rate: 100.0
-      gear_ratio: 1.898889538281707
-      gear_ratio_steer: 3.6666666666666666666667
-      distance: [0.2864349839,0.2570355034,0.2570355034,0.2864349839,0.9,0.9,0.7,0.7]
-      arguments: [69.95475057,134.76356759,225.23643241,290.04524942,30.0,135.0,225.0,330.0]
-      wheel_name: ["FL", "RL", "RR", "FR", "FL_S", "RL_S", "RR_S", "FR_S"]
+      measuring_wheel:
+        type_name: "steering"
+        radius: 0.035
+        quantity: 4
+        loop_rate: 100.0
+        gear_ratio: 1.898889538281707
+        gear_ratio_steer: 3.6666666666666666666667
+        distance: [0.2864349839,0.2570355034,0.2570355034,0.2864349839,0.9,0.9,0.7,0.7]
+        arguments: [69.95475057,134.76356759,225.23643241,290.04524942,30.0,135.0,225.0,330.0]
+        wheel_name: ["FL", "RL", "RR", "FR", "FL_S", "RL_S", "RR_S", "FR_S"]
 
