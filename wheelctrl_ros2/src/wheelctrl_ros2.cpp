@@ -1,13 +1,4 @@
-#include "general_wheelctrl.hpp"
-#include "geometry_msgs/msg/twist.hpp"
-#include "md_lib/md2022.hpp"
-#include "md_lib/odrive.hpp"
-#include "nav_msgs/msg/odometry.hpp"
-#include "rclcpp/rclcpp.hpp"
-#include "rogilink2_interfaces/msg/frame.hpp"
-#include "rogilink2_interfaces/srv/request_add_topic.hpp"
-#include "tf2/LinearMath/Quaternion.h"
-#include "tf2_ros/transform_broadcaster.h"
+#include "wheelctrl_ros2.hpp"
 
 using namespace chrono_literals;
 

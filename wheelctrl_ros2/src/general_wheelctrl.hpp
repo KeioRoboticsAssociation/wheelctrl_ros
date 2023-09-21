@@ -1,5 +1,4 @@
-#ifndef _GENERAL_WHEELCTRL_
-#define _GENERAL_WHEELCTRL_
+#pragma once
 
 #include <chrono>
 #include <functional>
@@ -12,6 +11,3 @@
 #include "omni_3w.hpp"
 #include "omni_4w.hpp"
 #include "steering.hpp"
-
-
-#endif
