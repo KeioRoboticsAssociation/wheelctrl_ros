@@ -4,9 +4,11 @@
 #include <string>
 #include <vector>
 
+#include "md_lib/md2022.hpp"
+#include "md_lib/odrive.hpp"
 #include "rclcpp/rclcpp.hpp"
 
-namespace illias {
+namespace illias_wheelctrl {
 typedef struct POSTURE {
   float x;      // x
   float y;      // y
@@ -20,7 +22,7 @@ typedef struct VELOCITY {
 
 class OmniWheel {
  public:
-  void set_params(float _rad, float _dist, float _arg,
+  void set_params(std::string _wheel_name, float _rad, float _dist, float _arg,
                   float _ratio);     // メンバー変数の設定
   void set_pos(float _rot);          // 現在地を登録
   float send_cmd(float _met);        // 指令値を送信
@@ -30,16 +32,40 @@ class OmniWheel {
   float rot_to_meter(float _rot);  // 回転数をメートルに変換
   float meter_to_rot(float _met);  // 指令値を回転数に変換
 
-  float radius;      // 半径
-  float distance;    // 中心からの距離
-  float argument;    // 軸の正面との角度
+  std::string wheel_name;  // 車輪の名前
+  float radius;            // 半径
+  float distance;          // 中心からの距離
+  float argument;          // 機体正面とタイヤ中心の角度
+  float theta;             // タイヤの角度
   float gear_ratio;  // タイヤ１回転あたりのモーターの回転数
 
   float disp;  // 単位時間あたりの変位
 };
 
-}  // namespace illias
+class SteerWheel {
+ public:
+  void set_params(std::string _wheel_name, float _rad, float _dist, float _arg,
+                  float _ratio);           // メンバー変数の設定
+  void set_pos(float _rot, float _steer);  // 現在地を登録
+  float send_cmd(float _met);              // 指令値を送信
+  operator float() { return disp; }  // 変位をインスタンスから取得
 
+ private:
+  float rot_to_meter(float _rot);    // 回転数をメートルに変換
+  float rot_to_theta(float _rot);    // ステア回転数を角度に変換
+  float meter_to_rot(float _met);    // 指令値を回転数に変換
+  float theta_to_rot(float _theta);  // 角度をステア回転数に変換
+
+  std::string wheel_name;  // 車輪の名前
+  float radius;            // 半径
+  float distance;          // 中心からの距離
+  float argument;          // 軸の正面との角度
+  float gear_ratio;  // タイヤ１回転あたりのモーターの回転数
+  float gear_ratio_horizonal;  // タイヤ１回転あたりのモーターの回転数(ステア)
+
+  float disp;  // 単位時間あたりの変位
+};
+}  // namespace illias
 
 // #pragma once
 // #include "rclcpp/rclcpp.hpp"
